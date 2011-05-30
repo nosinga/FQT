@@ -1,0 +1,543 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. Bronhouder BAG
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-02-18 09:20:50 +0100 (Fri, 18 Feb 2011) $
+|||  Revision : $Revision: 30081 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_bagdata.dat $
+|||  ID       : $Id: rpt_bagdata.dat 30081 2011-02-18 08:20:50Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Nummeraanduiding_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Nummeraanduiding_obvBusinessID','select aoa.identificatie
+,      aoa.authentiek
+,      aoa.typering
+,      aoa.huisnummer
+,      aoa.huisletter
+,      aoa.huisnummer_toevoeging      as toevoeging
+,      aoa.huisnummer_aanduiding      as aanduiding
+,      case when aoa.postcode is null then null
+            else ''#runreport#queryname=BAG_Nummeraanduiding_obvPostcode&Postcode_verplicht=''||aoa.postcode||''#''||aoa.postcode||''#''
+       end                 as postcode
+,      aoa.geconstateerd
+,      aoa.status
+,      aoa.type
+,      aoa.ingangsdatum_object        as ingangsdatum
+,      aoa.einddatum_object           as einddatum
+,      aoa.hoofdadres
+,      aoa.inonderzoek
+,      aoa.documentid
+,      aoa.documentdatum
+,      aoa.begingeldigheid
+,      aoa.eindgeldigheid
+,      aoa.xcoordinaat
+,      aoa.ycoordinaat
+,      aoa.gebiedscode
+,      aoa.begindatum_plus
+,      aoa.einddatum_plus
+,      aoa.documentid_plus
+,      aoa.documentdatum_plus
+,      case when aoa.openbareruimte is null then null
+            else ''#runreport#queryname=BAG_OpenbareRuimte_obvBusinessID&Identificatie_verplicht=''||aoa.openbareruimte||''#''||aoa.openbareruimte||'' - ''||opr.naam||''#''
+       end                 as OpenbareRuimte
+,      case when aoa.woonplaats is null then null
+            else ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||aoa.woonplaats||''#''||aoa.woonplaats||'' - ''||wpl.naam||''#''
+       end                 as Woonplaats
+,      case when aoa.buurtcode is null then null
+            else ''#runreport#queryname=BAG_Buurt_obvBusinessID&Identificatie_verplicht=''||aoa.buurtcode||''#''||brt.type||'' - ''||aoa.buurtcode||''#''
+       end                 as Buurt
+,      ''#runreport#queryname=BAG_ObjectAdres_obvAdresIDD&AdresID_verplicht=''||aoa.aoa_ID||''#Objecten#''    as Objecten
+from   bl_stf301_aoa_vw       aoa
+,      bl_stf301_wpl_vw       wpl
+,      bl_stf301_brt_vw       brt
+,      bl_stf301_opr_vw       opr
+where  aoa.woonplaats     = wpl.identificatie (+)
+and    aoa.buurtcode      = brt.identificatie (+)
+and    aoa.openbareruimte = opr.identificatie (+)
+and    aoa.identificatie  = case when substr(:Identificatie_verplicht,1,5) != ''05992''
+                                  and length(:Identificatie_verplicht)     != 16
+                                 then ''05992''||lpad(:Identificatie_verplicht,11,''0'')
+                                 else :Identificatie_verplicht
+                            end'
+,'BAG Nummeraanduiding o.b.v. Business Identificatie'
+,'BAG Nummeraanduiding o.b.v. Business Identificatie'||chr(10)||chr(10)||
+'Parameter Identificatie_verplicht
+Het is mogelijk om de gehele business sleutel in te voeren (vb 0599200000174687)
+Of alleen de laatste posities (vb 174687)'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Nummeraanduiding_obvPostcode)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Nummeraanduiding_obvPostcode','select aoa.identificatie
+,      aoa.authentiek
+,      aoa.typering
+,      aoa.huisnummer
+,      aoa.huisletter
+,      aoa.huisnummer_toevoeging       as toevoeging
+,      aoa.huisnummer_aanduiding       as aanduiding
+,      aoa.postcode
+,      aoa.geconstateerd
+,      aoa.status
+,      aoa.type
+,      aoa.ingangsdatum_object         as ingangsdatum
+,      aoa.einddatum_object            as einddatum
+,      aoa.hoofdadres
+,      aoa.inonderzoek
+,      aoa.documentid
+,      aoa.documentdatum
+,      aoa.begingeldigheid
+,      aoa.eindgeldigheid
+,      aoa.xcoordinaat
+,      aoa.ycoordinaat
+,      aoa.gebiedscode
+,      aoa.begindatum_plus
+,      aoa.einddatum_plus
+,      aoa.documentid_plus
+,      aoa.documentdatum_plus
+,      case when aoa.openbareruimte is null then null
+            else ''#runreport#queryname=BAG_OpenbareRuimte_obvBusinessID&Identificatie_verplicht=''||aoa.openbareruimte||''#''||aoa.openbareruimte||'' - ''||opr.naam||''#''
+       end                 as OpenbareRuimte
+,      case when aoa.woonplaats is null then null
+            else ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||aoa.woonplaats||''#''||aoa.woonplaats||'' - ''||wpl.naam||''#''
+       end                 as Woonplaats
+,      case when aoa.buurtcode is null then null
+            else ''#runreport#queryname=BAG_Buurt_obvBusinessID&Identificatie_verplicht=''||aoa.buurtcode||''#''||brt.type||'' - ''||aoa.buurtcode||''#''
+       end                 as Buurt
+,      ''#runreport#queryname=BAG_ObjectAdres_obvAdresIDD&AdresID_verplicht=''||aoa.aoa_ID||''#Objecten#''    as Objecten
+from   bl_stf301_aoa_vw       aoa
+,      bl_stf301_wpl_vw       wpl
+,      bl_stf301_brt_vw       brt
+,      bl_stf301_opr_vw       opr
+where  aoa.woonplaats            = wpl.identificatie (+)
+and    aoa.buurtcode             = brt.identificatie (+)
+and    aoa.openbareruimte        = opr.identificatie (+)
+and    aoa.postcode              = :Postcode_verplicht
+and    nvl(aoa.huisnummer           ,''geenWaarde'') = nvl(:Huisnummer           , nvl(aoa.huisnummer           ,''geenWaarde'') )
+and    nvl(aoa.huisletter           ,''geenWaarde'') = nvl(:Huisletter           , nvl(aoa.huisletter           ,''geenWaarde'') )
+and    nvl(aoa.huisnummer_toevoeging,''geenWaarde'') = nvl(:Huisnummertoevoeging , nvl(aoa.huisnummer_toevoeging,''geenWaarde'') )
+and    nvl(aoa.huisnummer_aanduiding,''geenWaarde'') = nvl(:Huisnummeraanduiding , nvl(aoa.huisnummer_aanduiding,''geenWaarde'') )'
+,'BAG Nummeraanduiding o.b.v. Postcode'
+,'BAG Nummeraanduiding o.b.v. Postcode + evt. Huisnummer/letter/toevoeging/aanduiding'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_OpenbareRuimte_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_OpenbareRuimte_obvBusinessID','select opr.identificatie
+,      opr.authentiek
+,      opr.type
+,      opr.naam
+,      opr.geconstateerd
+,      opr.status
+,      opr.ingangsdatum_object    as ingangsdatum
+,      opr.einddatum_object       as einddatum
+,      opr.huisnummerrange_even
+,      opr.huisnummerrange_oneven
+,      opr.huisnummerrange_beide
+,      opr.inonderzoek
+,      opr.documentid
+,      opr.documentdatum
+,      opr.begingeldigheid
+,      opr.eindgeldigheid
+,      opr.straatcode
+,      opr.straat_boco_d
+,      opr.straat_nen_d
+,      opr.begindatum_plus
+,      opr.einddatum_plus
+,      opr.documentid_plus
+,      opr.documentdatum_plus
+,      case when opr.woonplaats is null then null
+            else ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||opr.woonplaats||''#''||opr.woonplaats||'' - ''||wpl.naam||''#''
+       end                 as Woonplaats
+from   bl_stf301_opr_vw       opr
+,      bl_stf301_wpl_vw       wpl
+where  opr.woonplaats    = wpl.identificatie (+)
+and    opr.identificatie = case when substr(:Identificatie_verplicht,1,5) != ''05993''
+                                 and length(:Identificatie_verplicht)     != 16
+                                then ''05993''||lpad(:Identificatie_verplicht,11,''0'')
+                                else :Identificatie_verplicht
+                           end'
+,'BAG Openbare Ruimte o.b.v. Identificatie'
+,'BAG Openbare Ruimte o.b.v. Identificatie'||chr(10)||chr(10)||
+'Parameter Identificatie_verplicht
+Het is mogelijk om de gehele business sleutel in te voeren (vb 0599300000000083)
+Of alleen de laatste posities (vb 83)'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Woonplaats_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Woonplaats_obvBusinessID','select wpl.identificatie
+,      wpl.authentiek
+,      wpl.naam
+,      wpl.naam_nen
+,      wpl.geconstateerd
+,      wpl.status
+,      wpl.ingangsdatum_object  as ingangsdatum
+,      wpl.einddatum_object     as einddatum
+,      wpl.inonderzoek
+,      wpl.documentid
+,      wpl.documentdatum
+,      wpl.begingeldigheid
+,      wpl.eindgeldigheid
+,      wpl.begindatum_plus
+,      wpl.einddatum_plus
+,      wpl.documentid_plus
+,      wpl.documentdatum_plus
+from   bl_stf301_wpl_vw       wpl
+where  wpl.identificatie = :Identificatie_verplicht'
+,'BAG Woonplaats o.b.v. Identificatie'
+,'BAG Woonplaats o.b.v. Identificatie'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Wijk_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Wijk_obvBusinessID','select wyk.identificatie
+,      wyk.naam
+,      wyk.status
+,      wyk.ingangsdatum_object    as ingangsdatum
+,      wyk.einddatum_object       as einddatum
+,      wyk.begingeldigheid
+,      wyk.eindgeldigheid
+,      wyk.documentid
+,      wyk.documentdatum
+,      case when wyk.woonplaats is null then null
+            else ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||wyk.woonplaats||''#''||wyk.woonplaats||'' - ''||wpl.naam||''#''
+       end                 as Woonplaats
+from   bl_stf301_wyk_vw       wyk
+,      bl_stf301_wpl_vw       wpl
+where  wyk.woonplaats    = wpl.identificatie (+)
+and    wyk.identificatie = :Identificatie_verplicht'
+,'BAG Wijk o.b.v. Identificatie'
+,'BAG Wijk o.b.v. Identificatie'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Buurt_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Buurt_obvBusinessID','select brt.identificatie
+,      brt.naam
+,      brt.type
+,      brt.status
+,      brt.ingangsdatum_object   as ingangsdatum
+,      brt.einddatum_object      as einddatum
+,      brt.begingeldigheid
+,      brt.eindgeldigheid
+,      brt.documentid
+,      brt.documentdatum
+,      case when brt.wijkcode is null then null
+            else ''#runreport#queryname=BAG_Wijk_obvBusinessID&Identificatie_verplicht=''||brt.wijkcode||''#''||brt.wijkcode||'' - ''||wyk.naam||''#''
+       end                 as Wijk
+,      case when brt.parentcode is null then null
+            else ''#runreport#queryname=BAG_Buurt_obvBusinessID&Identificatie_verplicht=''||brt.parentcode||''#''||mst.type||'' - ''||brt.parentcode||''#''
+       end                 as Parent
+,      case when brt.woonplaats is null then null
+            else ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||brt.woonplaats||''#''||brt.woonplaats||'' - ''||wpl.naam||''#''
+       end                 as Woonplaats
+from   bl_stf301_brt_vw       brt
+,      bl_stf301_brt_vw       mst
+,      bl_stf301_wpl_vw       wpl
+,      bl_stf301_wyk_vw       wyk
+where  brt.parentcode    = mst.identificatie (+)
+and    brt.wijkcode      = wyk.identificatie (+)
+and    brt.woonplaats    = wpl.identificatie (+)
+and    brt.identificatie = :Identificatie_verplicht
+','BAG Buurt o.b.v. Identificatie','BAG Buurt o.b.v. Identificatie','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Pand_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Pand_obvBusinessID','select pnd.identificatie
+,      pnd.authentiek
+,      pnd.geconstateerd
+,      pnd.status
+,      pnd.bouwjaar
+,      pnd.ingangsdatum_object      as ingangsdatum
+,      pnd.einddatum_object         as einddatum
+,      pnd.laagstebouwlaag
+,      pnd.hoogstebouwlaag
+,      pnd.aantal_bouwlagen
+,      pnd.hoogteligging
+,      pnd.status_voortgangbouw
+,      pnd.inwinwijze_bovenaanzicht
+,      pnd.inwinwijze_maaiveld
+,      pnd.brutoinhoud
+,      pnd.oppervlakte
+,      pnd.oppervlakte_bebouwd
+,      pnd.inonderzoek
+,      pnd.documentid
+,      pnd.documentdatum
+,      pnd.begingeldigheid
+,      pnd.eindgeldigheid
+,      pnd.begindatum_plus
+,      pnd.einddatum_plus
+,      pnd.documentid_plus
+,      pnd.documentdatum_plus
+,      pnd.gebouwtype
+,      ''#runreport#queryname=BAG_ObjectPand_obvPandIDD&PandID_verplicht=''||pnd.pnd_id||''#Objecten#'' as Objecten
+from   bl_stf301_pnd_vw       pnd
+where  pnd.identificatie = case when substr(:Identificatie_verplicht,1,5) != ''05991''
+                                 and length(:Identificatie_verplicht)     != 16
+                                then ''05991''||lpad(:Identificatie_verplicht,11,''0'')
+                                else :Identificatie_verplicht
+                           end'
+,'BAG Pand o.b.v. Identificatie'
+,'BAG Pand o.b.v. Identificatie'||chr(10)||chr(10)||
+'Parameter Identificatie_verplicht
+Het is mogelijk om de gehele business sleutel in te voeren (vb 0599100000013362)
+Of alleen de laatste posities (vb 13362)'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Object_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Object_obvBusinessID','select obj.identificatie
+,      obj.authentiek
+,      obj.typering
+,      obj.geconstateerd
+,      obj.status
+,      obj.ingangsdatum_object       as ingangsdatum
+,      obj.einddatum_object          as einddatum
+,      obj.ontsluiting_verdieping
+,      obj.aantalkamers
+,      obj.laagstebouwlaag
+,      obj.hoogstebouwlaag
+,      obj.toegangbouwlaag
+,      obj.soortwoonobject
+,      obj.status_ogo
+,      obj.type
+,      obj.bouwjaar
+,      obj.status_voortgangbouw
+,      obj.inwinwijze_oppervlakte
+,      obj.brutoinhoud
+,      obj.oppervlakte
+,      obj.inonderzoek
+,      obj.documentid
+,      obj.documentdatum
+,      obj.begingeldigheid
+,      obj.eindgeldigheid
+,      obj.begindatum_plus
+,      obj.einddatum_plus
+,      obj.documentid_plus
+,      obj.documentdatum_plus
+,      obj.aanduiding_gebruiksdoel
+,      obj.woningtype
+,      obj.woonverblijfsoort
+,      obj.redenafvoer
+,      case when obj.aant_gdl = 0 then null
+            else ''#runreport#queryname=BAG_ObjectGebruiksdoel_obvObjectIDD&ObjectID_verplicht=''||obj.obj_id||''#Gebruiksdoelen#''
+       end         as Gebruiksdoelen
+,      case when obj.aant_thd = 0 then null
+            else ''#runreport#queryname=BAG_ObjectToegankelijk_obvObjectIDD&ObjectID_verplicht=''||obj.obj_id||''#Toegankelijkheid#''
+       end         as Toegankelijkheid
+,      ''#runreport#queryname=BAG_ObjectAdres_obvObjectIDD&ObjectID_verplicht=''||obj.obj_id||''#Adressen#''                as Adressen
+,      case when obj.aant_pnd = 0 then null
+            else ''#runreport#queryname=BAG_ObjectPand_obvObjectIDD&ObjectID_verplicht=''||obj.obj_id||''#Panden#''
+       end         as Panden
+,      case when obj.aant_obj_ontstaan = 0 then null
+            else ''#runreport#queryname=BAG_ObjectOntstaanUit_obvObjectIDD&ObjectID_verplicht=''||obj.obj_id||''#Ontstaan Uit#''
+       end         as OntstaanUit
+,      case when obj.aant_obj_overgegaan = 0 then null
+            else ''#runreport#queryname=BAG_ObjectOvergegaanIn_obvObjectIDD&ObjectID_verplicht=''||obj.obj_id||''#Overgegaan In#''
+       end         as OvergegaanIn
+from   bl_stf301_obj_vw       obj
+where  obj.identificatie = case when substr(:Identificatie_verplicht,1,4) != ''0599''
+                                 and length(:Identificatie_verplicht)     != 16
+                                then ''0599''||:Type_verplicht||lpad(:Identificatie_verplicht,10,''0'')
+                                else :Identificatie_verplicht
+                           end'
+,'BAG Object o.b.v. Identificatie'
+,'BAG Object o.b.v. Identificatie. Betreft verblijfsobjecten, ligplaatsen, standplaatsen en overige objecten'||chr(10)||chr(10)||
+'Parameter Identificatie_verplicht
+Het is mogelijk om de gehele business sleutel in te voeren (vb 0599010000014906)
+Of alleen de laatste posities (vb 14906)'||chr(10)||chr(10)||
+'Parameter Type_verplicht
+Deze geeft het soort object aan
+01 - Verblijfsobject
+02 - Ligplaats
+03 - Standplaats
+04 - Overig gebouwd object'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectGebruiksdoel_obvObjectIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values 
+  ('BAG_ObjectGebruiksdoel_obvObjectIDD'
+  ,'select gdl.identificatie   as ObjectIdentificatie
+,      gdl.gebruiksdoel
+,      gdl.omschrijving
+from   bl_stf301_objgdl_vw    gdl
+where  gdl.obj_id = :ObjectID_verplicht'
+  ,'BAG Relatie Object/Gebruiksdoel o.b.v. Object-ID'
+  ,'BAG Relatie Object/Gebruiksdoel o.b.v. Object-ID'
+  ,'y',null
+  );
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectToegankelijk_obvObjectIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values 
+  ('BAG_ObjectToegankelijk_obvObjectIDD'
+  ,'select thd.identificatie   as ObjectIdentificatie
+,      thd.toegankelijkheid
+,      thd.omschrijving
+from   bl_stf301_objthd_vw    thd
+where  thd.obj_id = :ObjectID_verplicht'
+  ,'BAG Relatie Object/Toegankelijkheid o.b.v. Object-ID'
+  ,'BAG Relatie Object/Toegankelijkheid o.b.v. Object-ID'
+  ,'y',null
+  );
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectAdres_obvObjectIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_ObjectAdres_obvObjectIDD','select * from (
+select hfd.identificatie_obj       as ObjectIdentificatie
+,      hfd.identificatie_aoa       as AdresIdentificatie
+,      ''Hoofdadres''                as Type
+,      aoa.huisnummer
+,      aoa.huisletter
+,      aoa.huisnummer_toevoeging   as toevoeging
+,      aoa.huisnummer_aanduiding   as aanduiding
+,      aoa.postcode
+,      ''#runreport#queryname=BAG_Nummeraanduiding_obvBusinessID&Identificatie_verplicht=''||hfd.identificatie_aoa||''#Details#'' as Details
+from   bl_stf301_objhfdaoa_vw hfd
+,      bl_stf301_aoa_vw       aoa
+where  hfd.aoa_id = aoa.aoa_id
+and    hfd.obj_id = :ObjectID_verplicht
+union
+select nvn.identificatie_obj       as ObjectIdentificatie
+,      nvn.identificatie_aoa       as AdresIdentificatie
+,      ''Nevenadres''                as Type
+,      aoa.huisnummer
+,      aoa.huisletter
+,      aoa.huisnummer_toevoeging   as toevoeging
+,      aoa.huisnummer_aanduiding   as aanduiding
+,      aoa.postcode
+,      ''#runreport#queryname=BAG_Nummeraanduiding_obvBusinessID&Identificatie_verplicht=''||nvn.identificatie_aoa||''#Details#'' as Details
+from   bl_stf301_objnvnaoa_vw nvn
+,      bl_stf301_aoa_vw       aoa
+where  nvn.aoa_id = aoa.aoa_id
+and    nvn.obj_id = :ObjectID_verplicht
+)
+order by type'
+,'BAG Relatie Object/Adres o.b.v. Object-ID'
+,'BAG Relatie Object/Adres o.b.v. Object-ID (Zowel hoofd- als nevenadressen)'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectAdres_obvAdresIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_ObjectAdres_obvAdresIDD','select hfd.identificatie_aoa   as AdresIdentificatie
+,      hfd.identificatie_obj   as ObjectIdentificatie
+,      ''Hoofdadres''          as Type
+,      obj.typ_object
+,      ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||hfd.identificatie_obj||''&Type_verplicht=''||substr(hfd.identificatie_obj,5,2)||''#Details#'' as Details
+from   bl_stf301_objhfdaoa_vw hfd
+,      gbw_obj_h_bgr_s_rtmv   obj
+where  hfd.obj_id = obj.idd_object
+and    hfd.aoa_id = :AdresID_verplicht
+union
+select nvn.identificatie_aoa   as AdresIdentificatie
+,      nvn.identificatie_obj   as ObjectIdentificatie
+,      ''Nevenadres''          as Type
+,      obj.typ_object
+,      ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||nvn.identificatie_obj||''&Type_verplicht=''||substr(nvn.identificatie_obj,5,2)||''#Details#'' as Details
+from   bl_stf301_objnvnaoa_vw nvn
+,      gbw_obj_h_bgr_s_rtmv   obj
+where  nvn.obj_id = obj.idd_object
+and    nvn.aoa_id = :AdresID_verplicht'
+,'BAG Relatie Object/Adres o.b.v. Adres-ID'
+,'BAG Relatie Object/Adres o.b.v. Adres-ID (Zowel hoofd- als nevenadressen)'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectPand_obvObjectIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values 
+  ('BAG_ObjectPand_obvObjectIDD'
+  ,'select pnd.identificatie_obj   as ObjectIdentificatie
+,      pnd.identificatie_pnd   as PandIdentificatie
+,      ''#runreport#queryname=BAG_Pand_obvBusinessID&Identificatie_verplicht=''||pnd.identificatie_pnd||''#Details#'' as Details
+from   bl_stf301_objpnd_vw    pnd
+where  pnd.obj_id = :ObjectID_verplicht'
+  ,'BAG Relatie Object/Pand o.b.v. Object-ID'
+  ,'BAG Relatie Object/Pand o.b.v. Object-ID'
+  ,'y',null
+  );
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectPand_obvPandIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_ObjectPand_obvPandIDD','select pnd.identificatie_pnd   as PandIdentificatie
+,      pnd.identificatie_obj   as ObjectIdentificatie
+,      ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||pnd.identificatie_obj||''&Type_verplicht=''||substr(pnd.identificatie_obj,5,2)||''#Details#'' as Details
+from   bl_stf301_objpnd_vw    pnd
+where  pnd.pnd_id = :PandID_verplicht'
+,'BAG Relatie Object/Pand o.b.v. Pand-ID'
+,'BAG Relatie Object/Pand o.b.v. Pand-ID'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectOntstaanUit_obvObjectIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_ObjectOntstaanUit_obvObjectIDD','select obj.identificatie_NIEUW   as ObjectIdentificatie
+,      obj.identificatie_OUD   as OntstaanUit
+,      ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||obj.identificatie_OUD||''&Type_verplicht=''||substr(obj.identificatie_OUD,5,2)||''#Details#'' as Details
+from   bl_stf301_objobj_vw    obj
+where  obj.obj_id_nieuw = :ObjectID_verplicht'
+,'BAG Object Ontstaan Uit o.b.v. Object-ID'
+,'BAG Object Ontstaan Uit o.b.v. Object-ID'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_ObjectOvergegaanIn_obvObjectIDD)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_ObjectOvergegaanIn_obvObjectIDD','select obj.identificatie_Oud   as ObjectIdentificatie
+,      obj.identificatie_NIEUW   as OvergegaanIn
+,      ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||obj.identificatie_NIEUW||''&Type_verplicht=''||substr(obj.identificatie_NIEUW,5,2)||''#Details#'' as Details
+from   bl_stf301_objobj_vw    obj
+where  obj.obj_id_oud = :ObjectID_verplicht'
+,'BAG Object Overgegaan In o.b.v. Object-ID'
+,'BAG Object Overgegaan In o.b.v. Object-ID'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Verschillen_GBA_BAG_Adres)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Verschillen_GBA_BAG_Adres','select * 
+from   delta_bag_gba_adr_vw'
+,'Verschillenlijst GBA en BAG adres'
+,'Lijst met veschillen tussen een adres aangeleverd door de GBA-administratie en een adres aangeleverd door de BAG-administratie'||chr(10)||chr(10)||
+'Het kan zijn dat de output van de query veel records retourneert. Oplossing is dan om de output naar een csv-bestand te sturen en deze vervolgens te downloaden'
+,'y',null);
+--

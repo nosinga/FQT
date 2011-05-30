@@ -1,0 +1,87 @@
+PROMPT file URP_Users2MetaUsers.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse roles
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+REM    ===============================================================================
+PROMPT - Metauser_super_admin 
+REM    ===============================================================================
+-- IOO ATA                          
+exec urp_utils.userprofile_add ( p_username => 'nosinga@ioo.rotterdam.nl',    p_profileusername => 'metauser_ata_admin');
+exec urp_utils.userprofile_add ( p_username => 'whoogendam@ioo.rotterdam.nl', p_profileusername => 'metauser_ata_admin');
+exec urp_utils.userprofile_add ( p_username => 'rvoets@ioo.rotterdam.nl',     p_profileusername => 'metauser_ata_admin');
+exec urp_utils.userprofile_add ( p_username => 'ghelmers@ioo.rotterdam.nl',   p_profileusername => 'metauser_ata_admin');
+-- IOO ABKR
+exec urp_utils.userprofile_add ( p_username => 'mcopier@ioo.rotterdam.nl',    p_profileusername => 'metauser_ata_admin');
+exec urp_utils.userprofile_add ( p_username => 'hneervoort@ioo.rotterdam.nl', p_profileusername => 'metauser_ata_admin');
+exec urp_utils.userprofile_add ( p_username => 'asaadou@ioo.rotterdam.nl',    p_profileusername => 'metauser_ata_admin');
+--
+-- GBAPRSBASIS
+-- -------------------------------------------------------------------------------
+-- Add USERPROFILES to USERS
+-- -------------------------------------------------------------------------------
+REM    ===============================================================================
+PROMPT - Metauser_stelselbeheerder_gbaprs
+REM    ===============================================================================
+exec urp_utils.userprofile_add ( p_username => 'e.vandenoort@gw.rotterdam.nl'   , p_profileusername => 'metauser_sogict_admin');
+exec urp_utils.userprofile_add ( p_username => 'k.gruppen@gw.rotterdam.nl'      , p_profileusername => 'metauser_sogict_admin');
+exec urp_utils.userprofile_add ( p_username => 'm.vanos@gw.rotterdam.nl'        , p_profileusername => 'metauser_sogict_admin');
+exec urp_utils.userprofile_add ( p_username => 's.verburg@gw.rotterdam.nl'      , p_profileusername => 'metauser_sogict_admin');
+exec urp_utils.userprofile_add ( p_username => 'r.vandersterre@gw.rotterdam.nl' , p_profileusername => 'metauser_stelselbeheerder_gbaprs');
+exec urp_utils.userprofile_add ( p_username => 'm.bouaddi@pzr.rotterdam.nl'     , p_profileusername => 'metauser_stelselbeheerder_gbaprs');
+exec urp_utils.userprofile_add ( p_username => 'y.hemmes-nigg@pzr.rotterdam.nl' , p_profileusername => 'metauser_stelselbeheerder_gbaprs');
+--
+REM    ===============================================================================
+PROMPT - Metauser_classified
+REM    ===============================================================================
+exec urp_utils.userprofile_add ( p_username => 'm.bouaddi@pzr.rotterdam.nl'     , p_profileusername => 'metauser_classified');
+exec urp_utils.userprofile_add ( p_username => 'y.hemmes-nigg@pzr.rotterdam.nl' , p_profileusername => 'metauser_classified');
+-- 
+REM    ===============================================================================
+PROMPT - Metauser_mijnloketbeheerder
+REM    ===============================================================================
+exec urp_utils.userprofile_add ( p_username => 'm.bouaddi@pzr.rotterdam.nl'     , p_profileusername => 'metauser_mijnloketbeheerder');
+exec urp_utils.userprofile_add ( p_username => 'y.hemmes-nigg@pzr.rotterdam.nl' , p_profileusername => 'metauser_mijnloketbeheerder');
+--
+REM    ===============================================================================
+PROMPT - Metauser_gbrbeheerder
+REM    ===============================================================================
+exec urp_utils.userprofile_add ( p_username => 'e.dakkenhorst@gbr.rotterdam.nl'   , p_profileusername => 'metauser_gbrbeheerder');
+exec urp_utils.userprofile_add ( p_username => 'r.kuss@gbr.rotterdam.nl'          , p_profileusername => 'metauser_gbrbeheerder');
+--
+REM    ===============================================================================
+PROMPT - Metauser_atatest
+REM    ===============================================================================
+exec urp_utils.userprofile_add ( p_username => 'atatest@rotterdam.nl'   , p_profileusername => 'metauser_ata_gebruik');
+--
+REM    ===============================================================================
+PROMPT - Metauser_dailycheck_mail_subscribers
+REM    ===============================================================================
+exec urp_utils.userprofile_add ( p_username => 'hneervoort@ioo.rotterdam.nl'  , p_profileusername => 'metauser_dailycheck_mail_subscribers');
+exec urp_utils.userprofile_add ( p_username => 'mcopier@ioo.rotterdam.nl'     , p_profileusername => 'metauser_dailycheck_mail_subscribers');
+exec urp_utils.userprofile_add ( p_username => 'nosinga@ioo.rotterdam.nl'     , p_profileusername => 'metauser_dailycheck_mail_subscribers');
+exec urp_utils.userprofile_add ( p_username => 'whoogendam@ioo.rotterdam.nl'  , p_profileusername => 'metauser_dailycheck_mail_subscribers');
+exec urp_utils.userprofile_add ( p_username => 'so-gict@gw.rotterdam.nl'      , p_profileusername => 'metauser_dailycheck_mail_subscribers');
+--
+REM    ===============================================================================
+PROMPT - Role_Super_Admin
+REM    ===============================================================================
+-- Hier worden alle nieuwe permissies van nieuwe rollen doorgegeven aan de <role_super_admin>
+exec urp_utils.user_add_role_based_on_role ( p_base_rolename => 'role_super_admin', p_new_rolename  => 'role_stelselbeheerder');
+exec urp_utils.user_add_role_based_on_role ( p_base_rolename => 'role_super_admin', p_new_rolename  => 'role_mijnloketbeheerder');
+exec urp_utils.user_add_role_based_on_role ( p_base_rolename => 'role_super_admin', p_new_rolename  => 'role_gbrbeheerder');
+exec urp_utils.user_add_role_based_on_role ( p_base_rolename => 'role_super_admin', p_new_rolename =>  'role_filter_admin');

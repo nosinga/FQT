@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/!svn/ver/20459/projecten/abkr/trunk/gm_xdb_ata/src/main/Sequences
+END
+SQM_sequence.sql
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/!svn/ver/14250/projecten/abkr/trunk/gm_xdb_ata/src/main/Sequences/SQM_sequence.sql
+END
+URP_sequence.sql
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/!svn/ver/14250/projecten/abkr/trunk/gm_xdb_ata/src/main/Sequences/URP_sequence.sql
+END

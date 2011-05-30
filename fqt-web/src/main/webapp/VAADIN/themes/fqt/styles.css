@@ -1,0 +1,6 @@
+@import "../runo/styles.css";
+
+/* mono space font for CLOBs */
+body textarea.fqt-monospace-style {
+    font-family: monospace;
+}

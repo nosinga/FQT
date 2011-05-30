@@ -1,0 +1,40 @@
+PROMPT file URP_Menus_Insert.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het maken van menus
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 07:49:56 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25507 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Roles.dat $
+|||  ID       : $Id: URP_Roles.dat 25507 2010-10-28 05:49:56Z nosinga $
+|||------------------------------------------------------------------------
+**/
+--
+-- Menus worden in de tabel URP_ROLES opgeslagen , dit moet ooit veranderd worden TODO
+-- reden hiervoor was in php minder database schermen, in java zijn deze makkelijk te bouwen
+REM    ===============================================================================
+PROMPT - Hoofdmenus
+REM    ===============================================================================
+ insert into urp_menunodes (menuname,menudescription,orderby) values ( 'Run Reports'                   , 'Running of reports'                                     , '10'); 
+ insert into urp_menunodes (menuname,menudescription,orderby) values ( 'Report Administration'         , 'Administration of Reports'                              , '20');                                
+ insert into urp_menunodes (menuname,menudescription,orderby) values ( 'User Management'               , 'Administration of Users, Roles & Permissions'           , '30');
+--
+REM    ===============================================================================  
+PROMPT - Rapport (rpt) menu
+REM    ===============================================================================                    
+ insert into urp_menunodes (menuname, parent_id) values ( 'ATA Usage'                      , urp_utils.menuname2id('Rapporten'));    
+ insert into urp_menunodes (menuname, parent_id) values ( 'Referentie'                     , urp_utils.menuname2id('Rapporten'));
+--
+REM    ===============================================================================
+PROMPT - Url (url) menu
+REM    ===============================================================================
+ insert into urp_menunodes (menuname, parent_id) values  ( 'External Example'              , urp_utils.menuname2id('GUC Configuratie'));
+ insert into urp_menunodes (menuname, parent_id) values  ( 'GucPings'                      , urp_utils.menuname2id('GUC Configuratie'));
+--

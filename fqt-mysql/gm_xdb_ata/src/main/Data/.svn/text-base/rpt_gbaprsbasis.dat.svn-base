@@ -1,0 +1,139 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. GBAPRS Basis
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Key2B_berichtPayload)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('Key2B_berichtPayload', 'select to_char(substr(xml_object,1,4000))     xml01
+,      to_char(substr(xml_object,4001,4000))  xml02
+,      to_char(substr(xml_object,8001,4000))  xml03
+,      to_char(substr(xml_object,12001,4000)) xml04
+,      to_char(substr(xml_object,16001,4000)) xml05
+,      to_char(substr(xml_object,20001,4000)) xml06
+,      to_char(substr(xml_object,24001,4000)) xml07
+,      to_char(substr(xml_object,28001,4000)) xml08
+,      to_char(substr(xml_object,32001,4000)) xml09
+,      to_char(substr(xml_object,36001,4000)) xml10
+,      to_char(substr(xml_object,40001,4000)) xml11
+,      to_char(substr(xml_object,44001,4000)) xml12
+,      to_char(substr(xml_object,48001,4000)) xml13
+,      to_char(substr(xml_object,52001,4000)) xml14
+from   STF300_STUURGEGEVENS
+where  REFERENTIENUMMER = :referentienummer'
+, 'StUF300 bericht payload'
+, 'Key2B_berichtPayload', NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Key2B_berichten)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('Key2B_berichten', 'select   bericht_key
+,        bsn
+,        to_char(laaddatum, ''yyyymmdd  hh24:mi:ss'') laaddatum
+,        referentienummer
+,        ''#clob#xml_object#stf300_stuurgegevens#bericht_key#''||bericht_key||''#'' bericht_details
+,        status
+,        versiestuf
+,        sectormodel
+,        versiesectormodel
+,        berichtcode
+,        zender_org
+,        zender_app
+,        zender_adm
+,        zender_gbr
+,        ontvanger_org
+,        ontvanger_app
+,        ontvanger_adm
+,        ontvanger_gbr
+,        tijdstipbericht
+,        crossrefnummer
+,        entiteittype
+,        functie
+,        tijdstipmutatie
+,        sleutel_waarde
+,        issue
+from     stf300_stuurgegevens
+where    ltrim(bsn,''0'')                        = ltrim(nvl(:bsn,bsn),''0'')
+and      to_char(trunc(laaddatum),''yyyymmdd'') >= nvl(:datum_vanaf_yyyymmdd,to_char(trunc(laaddatum),''yyyymmdd''))
+and      to_char(trunc(laaddatum),''yyyymmdd'') <= nvl(:datum_totenmet_yyyymmdd,to_char(trunc(laaddatum),''yyyymmdd''))
+and      rownum < 100
+order by laaddatum'
+, 'Stuurgegevens o.b.v. datum en/of BSN'
+, 'Stuurgegevens (inclusief StUF 3.00 bericht) met verwerkstatus gedurende een op te geven periode en/of BSN', NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (UniekeMLObezoekersopDag)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('UniekeMLObezoekersopDag', 'select  bsn
+,        dbms_crypto.hash(utl_raw.cast_to_raw(geslachtsnaam),3) geslachtsnaam_hash
+,        ''#runreport#queryname=AantalGeraadpleegdeMLOServices&bsn=''||bsn||''&datum_vanaf_yyyymmdd=''||to_char(DATUM, ''yyyymmdd'')||''&datum_totenmet_yyyymmdd=''||to_char(DATUM, ''yyyymmdd'')||''#details#'' details
+,        to_char(datum, ''yyyymmdd'')                             datum
+,        to_char(min_tijd, ''hh24:mi:ss'')                        start_tijd
+,        to_char(max_tijd, ''hh24:mi:ss'')                        eind_tijd
+,        aantal_ws_call
+,        min_verwerk
+,        max_verwerk
+,        avg_verwerk
+from   (       select * from getburger_rpt
+         union select * from getburger_rpt_today
+       )
+where    to_char(datum,''yyyymmdd'') >= nvl(:datum_vanaf_yyyymmdd   ,to_char(datum,''yyyymmdd''))
+and      to_char(datum,''yyyymmdd'') <= nvl(:datum_totenmet_yyyymmdd,to_char(datum,''yyyymmdd''))
+and      ltrim(bsn,''0'')             = nvl(ltrim(:bsn,''0''),ltrim(bsn,''0''))
+order by min_tijd'
+, 'Unieke MLO bezoekers op een dag'
+, 'Unieke MLO bezoekers gedurende een bepaalde periode', NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (UniekeMLObezoekersopDag_classified)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('UniekeMLObezoekersopDag_classified', 'SELECT  BSN
+,        GESLACHTSNAAM
+,        VOORNAMEN
+,        ''#runreport#queryname=AantalGeraadpleegdeMLOServices&bsn=''||bsn||''&datum_vanaf_yyyymmdd=''||to_char(DATUM, ''yyyymmdd'')||''&datum_totenmet_yyyymmdd=''||to_char(DATUM, ''yyyymmdd'')||''#details#'' details
+,        to_char(DATUM, ''yyyymmdd'') DATUM
+,        to_char(MIN_TIJD, ''hh24:mi:ss'') start_TIJD
+,        to_char(MAX_TIJD, ''hh24:mi:ss'') eind_TIJD
+,        AANTAL_WS_CALL
+,        MIN_VERWERK
+,        MAX_VERWERK
+,        AVG_VERWERK
+from
+(select * from getburger_rpt
+ union
+ select * from getburger_rpt_today
+)
+WHERE to_char(datum,''yyyymmdd'') >= nvl(:datum_vanaf_yyyymmdd,to_char(datum,''yyyymmdd''))
+and to_char(datum,''yyyymmdd'') <= nvl(:datum_totenmet_yyyymmdd,to_char(datum,''yyyymmdd''))
+and ltrim(bsn,''0'') = nvl(ltrim(:bsn,''0''),ltrim(bsn,''0''))
+and lower(geslachtsnaam) like ''%''||lower(:achternaam)||''%''
+ORDER BY min_tijd'
+, 'Unieke MLO bezoekers op een dag (Classified)'
+, 'getBurger calls classified', NULL);
+--

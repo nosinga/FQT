@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/!svn/ver/27021/projecten/abkr/trunk/gm_xdb_ata/src/main/Tables
+END
+DB_VERSIE.tab
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/!svn/ver/18146/projecten/abkr/trunk/gm_xdb_ata/src/main/Tables/DB_VERSIE.tab
+END
+SQM_tables.sql
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/!svn/ver/23881/projecten/abkr/trunk/gm_xdb_ata/src/main/Tables/SQM_tables.sql
+END
+ATA_tables.sql
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/!svn/ver/26505/projecten/abkr/trunk/gm_xdb_ata/src/main/Tables/ATA_tables.sql
+END
+URP_tables.sql
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/!svn/ver/27021/projecten/abkr/trunk/gm_xdb_ata/src/main/Tables/URP_tables.sql
+END

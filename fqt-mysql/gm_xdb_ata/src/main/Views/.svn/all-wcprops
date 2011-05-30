@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/!svn/ver/25980/projecten/abkr/trunk/gm_xdb_ata/src/main/Views
+END
+URP_user_menu_view.sql
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/!svn/ver/23371/projecten/abkr/trunk/gm_xdb_ata/src/main/Views/URP_user_menu_view.sql
+END
+URP_user_urls_view.sql
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/!svn/ver/23347/projecten/abkr/trunk/gm_xdb_ata/src/main/Views/URP_user_urls_view.sql
+END
+URP_views.sql
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/!svn/ver/23347/projecten/abkr/trunk/gm_xdb_ata/src/main/Views/URP_views.sql
+END
+URP_MENU_views.sql
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/!svn/ver/25980/projecten/abkr/trunk/gm_xdb_ata/src/main/Views/URP_MENU_views.sql
+END
+URP_user_reports_view.sql
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/!svn/ver/23347/projecten/abkr/trunk/gm_xdb_ata/src/main/Views/URP_user_reports_view.sql
+END

@@ -1,0 +1,270 @@
+CREATE OR REPLACE PACKAGE BODY Sqm_Utils IS
+--
+g_package_name CONSTANT VARCHAR2(35) DEFAULT 'SQM_UTILS';
+--
+---
+--- End Private Function
+---
+function getbindvariables (
+   p_query           in   varchar2
+)
+return bindvariable_tab_type
+is
+l_return bindvariable_tab_type;
+l_bindvariable varchar2(4000);
+l_new_bindvariable boolean;
+begin
+   for i in 1 .. 100
+   loop
+     -- bind variables start with a ":"
+     -- check if there exist an n-occurence (i) stringpart which starts with a ":"
+     if instr( p_query, ':', 1, i ) > 0
+     then
+       -- get the first 50 characters of that string part
+       l_bindvariable := substr(p_query,instr( p_query, ':', 1, i ), 50 );
+       -- put a ending character at the end of the string in order to
+       -- make sure
+       -- that the substr always has a postive match. This trick is
+       -- necessary
+       -- when the last characters of the sqlstatement are actually the
+       -- bind variable
+       l_bindvariable := l_bindvariable||':';
+       -- remove the characters from the string at the end of the bind
+       -- variable
+       -- a bind variable is terminated with one of the following characters
+       --    ",| )' <carriage return>"
+       l_bindvariable := substr(l_bindvariable, 2, instr( translate(l_bindvariable, ',| )''' || chr(10), '::::::' ), ':', 2 ) -2 );
+       -- check if the identified bind variable is not a reserved
+       -- character set for date formatting
+       if upper(l_bindvariable) not in ( 'HH24', 'MI', 'SS' )
+       then
+         -- assume that the identified bind variable is new
+         l_new_bindvariable := true;
+         -- check if that bind variable already exists in the return
+         -- pl/sql table
+         for j in 1 .. nvl (l_return.last, 0)
+         loop
+           -- if that bind variable already exists in the return pl/sql
+           -- table
+           -- then it is not a new bind variable
+           if (l_return(j).bindvariable = l_bindvariable)
+           then
+             l_new_bindvariable := false;
+           end if;
+         end loop;
+         -- only new bind variables are returned in the pl/sql table
+         if l_new_bindvariable
+         then
+           l_return (nvl (l_return.last, 0) + 1).bindvariable := l_bindvariable;
+         end if;
+       end if;
+     else
+       exit;
+     end if;
+   end loop;
+   return l_return;
+end getbindvariables
+;
+function getbindvariable (
+     p_query           in   varchar2
+    ,p_index           in   integer default 1
+)
+return varchar2
+is
+l_bindvariable_tab bindvariable_tab_type;
+begin
+   l_bindvariable_tab := getbindvariables(p_query);
+   return l_bindvariable_tab(p_index).bindvariable;
+end getbindvariable
+;
+function getbindvariabledefaultvalue (
+     p_bindvariable    in   varchar2
+)
+return varchar2
+is
+l_return varchar2(200) default p_bindvariable;
+begin
+   if     (instr(l_return, 'yyyymmdd') > 0)
+   then
+     l_return:= '19700101';
+   elsif (instr(l_return, 'id', -1 ) + 1 = length(l_return))
+   then
+     l_return:= '1';
+   end if;
+   return l_return;
+end getbindvariabledefaultvalue
+;
+function getbindvariablefitnessestring (
+     p_bindvariable    in   varchar2
+)
+return varchar2
+is
+l_return varchar2(200);
+begin
+   if(p_bindvariable is not null)
+   then
+     l_return:=
+      '| add parameter | '||
+      p_bindvariable||
+      ' | with value | '''||
+      getbindvariabledefaultvalue(p_bindvariable)|| ''' |'||
+      chr(10);
+   end if;
+   return l_return;
+end getbindvariablefitnessestring
+;
+PROCEDURE update_urp_permissions
+( p_cud_action IN VARCHAR2
+, p_new_queryname IN VARCHAR2
+, p_old_queryname IN VARCHAR2 DEFAULT NULL
+)
+IS
+l_count NUMBER DEFAULT 0;
+BEGIN
+    IF        p_cud_action = 'INSERTING'
+    THEN
+        SELECT COUNT(1) INTO l_count FROM URP_PERMISSIONS
+        WHERE  INSTR(value,'sqm#'||p_new_queryname||'#') =1;
+        IF l_count = 0
+        THEN
+           INSERT INTO URP_PERMISSIONS (value)
+           VALUES ('sqm#'||p_new_queryname||'#');
+        END IF;
+    ELSIF p_cud_action = 'UPDATING'
+    THEN
+          UPDATE URP_PERMISSIONS
+          SET value = REPLACE(value,'sqm#'||p_old_queryname||'#'
+                                   ,'sqm#'||p_new_queryname||'#')
+          WHERE INSTR(value,'sqm#'||p_old_queryname||'#') =1
+          ;
+    ELSIF p_cud_action = 'DELETING'
+    THEN
+         DELETE URP_ROLE_PERMISSION
+         WHERE       pms_id IN
+         (SELECT id FROM URP_PERMISSIONS
+          WHERE INSTR(value,'sqm#'||p_old_queryname||'#') =1
+         )
+         ;
+          DELETE URP_PERMISSIONS
+          WHERE INSTR(value,'sqm#'||p_old_queryname||'#') =1
+          ;
+     END IF;
+END update_urp_permissions
+;
+  function connectionname2id (p_connectionname in varchar2)
+    return number
+  is
+    cursor csr_connectionid (b_connectionname varchar2)
+    is
+      select id
+        from sqm_connections
+       where connectionname = b_connectionname;
+
+    l_return   number;
+  begin
+    for r in csr_connectionid (p_connectionname)
+    loop
+      l_return := r.id;
+      exit;
+    end loop;
+
+    return l_return;
+  end   connectionname2id
+;
+  function queryname2id (p_queryname in varchar2)
+    return number
+    is
+    cursor csr_queryid (b_queryname varchar2)
+    is
+      select id
+        from sqm_queries
+       where queryname = b_queryname;
+
+    l_return   number;
+  begin
+    for r in csr_queryid (p_queryname)
+    loop
+      l_return := r.id;
+      exit;
+    end loop;
+
+    return l_return;
+  end   queryname2id
+;
+function reportexists(p_reportname in varchar2)
+return boolean
+is
+cursor csr_reportexists(b_reportname varchar2)
+is
+select 1
+from   sqm_queries
+where  queryname = b_reportname
+;
+l_return boolean default false;
+begin
+  for r in csr_reportexists(p_reportname)
+  loop
+    l_return := true;
+  end loop;
+  return l_return;
+end reportexists
+;
+function connectionexists(p_connectionname in varchar2)
+return boolean
+is
+cursor csr_connectionexists(b_connectionname varchar2)
+is
+select 1
+from   sqm_connections
+where  connectionname = b_connectionname
+;
+l_return boolean default false;
+begin
+  for r in csr_connectionexists(p_connectionname)
+  loop
+    l_return := true;
+  end loop;
+  return l_return;
+end connectionexists
+;
+
+-- Wrapper method for GETORAINFO
+--
+PROCEDURE GETORAINFO (
+     p_user IN VARCHAR2
+   , px_transactionId IN OUT VARCHAR2
+   , x_PACKAGE_NAME OUT VARCHAR2
+   , x_PACKAGE_VSS_HEADER OUT VARCHAR2
+   , x_PACKAGE_VSS_REVISION OUT VARCHAR2
+   , x_ORA_USER OUT VARCHAR2
+   , x_SID OUT VARCHAR2
+   , x_ORA_VERSION_LIST OUT OraVersion_ref_csr_type
+)
+IS
+CURSOR global_name_csr
+IS
+SELECT GLOBAL_NAME
+FROM   GLOBAL_NAME
+;
+l_ORA_VERSION_LIST OraVersion_ref_csr_type;
+BEGIN
+--
+    x_PACKAGE_NAME := g_package_name;
+    x_PACKAGE_VSS_HEADER := '$Header:$';
+    x_PACKAGE_VSS_REVISION := '$Revision: 5985 $';
+    FOR r IN global_name_csr
+    LOOP
+      x_SID := r.GLOBAL_NAME;
+    END LOOP;
+    x_ORA_USER := USER;
+    OPEN l_ORA_VERSION_LIST FOR
+    SELECT
+         BANNER ORACLE_VERSION
+    FROM v$version
+    ;
+    x_ORA_VERSION_LIST := l_ORA_VERSION_LIST;
+END GetOraInfo;
+--
+END Sqm_Utils;
+/
+

@@ -1,0 +1,694 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. inkomende kennisgevingen
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-03-21 08:04:02 +0100 (Mon, 21 Mar 2011) $
+|||  Revision : $Revision: 31360 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_lk_inkomend.dat $
+|||  ID       : $Id: rpt_lk_inkomend.dat 31360 2011-03-21 07:04:02Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Aftap_Aantal_perStatus)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Aftap_Aantal_perStatus','select   status, count(1) aantal
+from     gbaprs_aftap_bericht_queue
+group by status'
+,'Aantallen berichten per status in de Aftap van de GBA'
+,'Rapport toont de verschillende statussen - inclusief aantal berichten - van de berichten in de aftap van de GBA'||chr(10)||chr(10)||
+'Mogelijke statussen:'||chr(10)||
+'- NEW            : Nog op te pakken bericht'||chr(10)||
+'- PROCESSED      : Verwerkt bericht zonder fouten'||chr(10)||
+'- ERROR-RESPONSE : Bericht met foutieve response of zonder response'||chr(10)||
+'- ERROR-IGNORE   : Bericht is a.g.v. een fout niet verwerkt (de GUC gaat door met verdere verwerking)'||chr(10)||
+'- ERROR          : Bericht is a.g.v. een fout niet verwerkt (de GUC stopt met verdere verwerking)'||chr(10)||
+'- PROCESSING     : Bericht wordt op dit moment verwerkt'
+,null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GUC_Trace_Endpoints)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GUC_Trace_Endpoints','select   correlation_id
+,        domain_id
+,        endpoint_name
+,        endpoint_uri
+,        case when nvl(length(payload),0) > 0 then ''#clob#payload#entry#id#''||id||''#''  else ''''             end payload
+,        case when nvl(length(error_payload),0) > 0 then ''#clob#error_payload#entry#id#''||id||''#''  else '''' end error_payload
+,        no_payload_reason
+,        message_type
+,        entry_timestamp
+,        key1
+,        value1
+,        key2
+,        value2
+from     entry
+where    correlation_id = :correlation_id_verplicht
+order by id'
+,'Trace Endpoints o.b.v. CorrelationID'
+,'Toont informatie inzake trace endpoints o.b.v. correlation_id
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Foutmeldingen_Bericht_GM)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Foutmeldingen_Bericht_GM','select err.tabelnaam          tabelnaam
+,      case when ref.ind_error = ''I'' then ''Informatief''
+            when ref.ind_error = ''W'' then ''Warning''
+            else ''Error''
+       end soort
+,      err.err_code           code
+,      err.err_melding        melding
+,      err.eventnaam          eventnaam
+from   dvgm_err                            err
+,      ref_err_r                           ref
+where  err.err_code       = ref.cde_error (+)
+and    err.ird_transactie = :bericht_verplicht'
+,'(Fout)Meldingen GM o.b.v. Berichtnummer'
+,'Tonen van de fout- en/of logmeldingen van een bericht in het Gegevensmagazijn
+Het opvragen vindt plaats m.b.v. het unieke berichtsleutel van een bericht'||chr(10)||chr(10)||
+'Attribuut Tabelnaam
+Geeft weer bij welke GM-tabel de fout is opgetreden'||chr(10)||chr(10)||
+'Attribuut Soort
+Geeft de soort melding weer (Informatief, Warning of Error)'||chr(10)||chr(10)||
+'Attribuut Code
+Geeft de code van de melding weer'||chr(10)||chr(10)||
+'Attribuut Melding
+Geeft de melding weer'||chr(10)||chr(10)||
+'Attribuut Eventnaam
+Geeft de naam van het event weer waardoor de melding is ontstaan
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Foutmeldingen_Bericht_GUC)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Foutmeldingen_Bericht_GUC','select guc.correlation_id     correlation_id
+,      guc.entry_timestamp    datum
+,      value1                 err_melding
+,      guc.endpoint_name      eventnaam
+from   entry            guc
+where  guc.value1 is not null
+and    correlation_id = :correlation_id_verplicht'
+,'Foutmeldingen GUC o.b.v. CorrelationID'
+,'Tonen van de fout- en/of logmeldingen van een bericht in de GUC. 
+Het opvragen vindt plaats m.b.v. het unieke correlation_id van een bericht
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (StUF300Berichten_obvCorrelationID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('StUF300Berichten_obvCorrelationID','select   bericht_key
+,        entiteittype
+,        tijdstipbericht
+,        laaddatum
+,        round(   extract (hour   from (verwerkttijd - laaddatum) ) * 3600000
+                + extract (minute from (verwerkttijd - laaddatum) ) * 60000
+                + extract (second from (verwerkttijd - laaddatum) ) * 1000
+              ) verwerkingssduur
+,        functie
+,        referentienummer
+,        status
+,        sleutel_naam
+,        sleutel_waarde
+,        correlation_id
+,        ''#clob#xml_object#stf300_stuurgegevens#bericht_key#''||bericht_key||''#''                                                    bericht_0300
+,        ''#runreport#queryname=StUF300Berichten_obvSleutelwaarde&Entiteittype=''||entiteittype||''&SleutelWaarde_verplicht=''||sleutel_waarde||''#Berichten_sleutel#''  Berichten_sleutel
+,        ''#runreport#queryname=Foutmeldingen_Bericht_GM&bericht_verplicht=''||bericht_key||''#Meldingen GM#dvgm@gegmag#''             Meldingen_GM
+,        ''#runreport#queryname=Audit_GM_Transacties&Bericht_verplicht=''||bericht_key||''#Audit GM#dvgm@gegmag#''                     Audit_GM
+,        case when status != ''V''
+              then''#runreport#queryname=Jira_Issues_obvBericht&Bericht_verplicht=''||bericht_key||''#Jira Issue#abkr_rpt@ABKR#''
+              else null
+         end                                                                                                                       Jira
+from     stf300_stuurgegevens
+where    correlation_id = :correlation_id_verplicht'
+,'StUF300 Berichten o.b.v. CorrelationID'
+,'Ophalen van de aangeleverde StUF berichten o.b.v. de correlation_id
+De berichten betreft de 300 versie uit STUF300_IN.'||chr(10)||chr(10)||
+'Parameter CorrelationID_verplicht
+Deze parameter is verplicht en betreft het unieke correlationID van een bericht'||chr(10)||chr(10)||
+'Attribuut Bericht_0300
+Dit attribuut toont het aangeleverde bericht in formaat 03.00'||chr(10)||chr(10)||
+'Attribuut Berichten_Sleutel
+Door hierop te klikken verschijnt er een nieuw scherm met daarin alle berichten die voor dit object (o.b.v. sleutel) zijn aangeleverd.'||chr(10)||chr(10)||
+'Attribuut Meldingen_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin alle meldingen die bij het laden van het bericht door het Gegevensmagazijn zijn gelogged'||chr(10)||chr(10)||
+'Attribuut Audit_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin auditgegevens van het laden van het bericht in het Gegevensmagazijn
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (StUF300Berichten_obvSleutelwaarde)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('StUF300Berichten_obvSleutelwaarde','select   entiteittype
+,        bericht_key
+,        tijdstipbericht
+,        laaddatum
+,        round(   extract (hour   from (verwerkttijd - laaddatum) ) * 3600000
+                + extract (minute from (verwerkttijd - laaddatum) ) * 60000
+                + extract (second from (verwerkttijd - laaddatum) ) * 1000
+              ) verwerkingssduur
+,        functie
+,        referentienummer
+,        status
+,        sleutel_naam
+,        sleutel_waarde
+,        correlation_id
+,        ''#clob#xml_object#stf300_stuurgegevens#bericht_key#''||bericht_key||''#''                                      bericht_0300
+,        ''#runreport#queryname=Foutmeldingen_Bericht_GM&bericht_verplicht=''||bericht_key||''#Meldingen#dvgm@gegmag#''  Meldingen_GM
+,        ''#runreport#queryname=Audit_GM_Transacties&Bericht_verplicht=''||bericht_key||''#Audit GM#dvgm@gegmag#''       Audit_GM
+,        case when status != ''V''
+              then''#runreport#queryname=Jira_Issues_obvBericht&Bericht_verplicht=''||bericht_key||''#Jira Issue#abkr_rpt@ABKR#''
+              else null
+         end                                                                                                         Jira
+from     stf300_stuurgegevens
+where    entiteittype   = nvl(:Entiteittype , entiteittype)
+and      sleutel_waarde = :SleutelWaarde_verplicht
+order by entiteittype, laaddatum'
+,'StUF300 Berichten o.b.v. SleutelWaarde'
+,'Ophalen van de aangeleverde StUF berichten o.b.v. de technische sleutel
+De berichten betreft de 300 versie uit STUF300_IN.'||chr(10)||chr(10)||
+'Parameter Sleutelwaarde_verplicht
+Deze parameter is verplicht en betreft de unieke sleutel van een object weer.
+Ofwel de technische sleutel uit het bericht.'||chr(10)||chr(10)||
+'Attribuut Bericht_0300
+Dit attribuut toont het aangeleverde bericht in formaat 03.00'||chr(10)||chr(10)||
+'Attribuut Meldingen_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin alle meldingen die bij het laden van het bericht door het Gegevensmagazijn zijn gelogged'||chr(10)||chr(10)||
+'Attribuut Audit_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin auditgegevens van het laden van het bericht in het Gegevensmagazijn'
+,null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Audit_GM_Transacties)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Audit_GM_Transacties','select   ird_transactie   as berichtID
+,        dat_audit_start     starttijd
+,        dat_audit_einde     eindtijd
+,        round(   extract (hour   from (dat_audit_einde - dat_audit_start) ) * 3600000
+                + extract (minute from (dat_audit_einde - dat_audit_start) ) * 60000
+                + extract (second from (dat_audit_einde - dat_audit_start) ) * 1000
+              ) verwerkingssduur
+,        ind_oud_actueel
+,        tabelnaam
+,        modulenaam
+,        aant_sel                 aant_selects
+,        aant_ins_vrwsrt_i
+       + aant_ins_vrwsrt_t
+       + aant_ins_vrwsrt_w
+       + aant_ins_vrwsrt_v
+       + aant_ins_vrwsrt_r
+       + aant_ins_vrwsrt_e
+       + aant_ins_vrwsrt_o
+       + aant_ins_vrwsrt_s        aant_inserts
+,        aant_upd_vrwsrt_i
+       + aant_upd_vrwsrt_t
+       + aant_upd_vrwsrt_w
+       + aant_upd_vrwsrt_v
+       + aant_upd_vrwsrt_r
+       + aant_upd_vrwsrt_e
+       + aant_upd_vrwsrt_o
+       + aant_upd_vrwsrt_s        aant_updates
+from     dvgm_audit
+where    ird_transactie = :Bericht_verplicht'
+,'Auditinformatie GM o.b.v. Berichtnummer'
+,'Toont de auditgegevens van een bericht in het Gegevensmagazijn'||chr(10)||chr(10)||
+'Parameter Bericht_verplicht
+Verplicht attribuut en betreft de unieke sleutel van het bericht'||chr(10)||chr(10)||
+'Attribuut BerichtID
+De unieke technische sleutel van een bericht binnen het GM'||chr(10)||chr(10)||
+'Attribuut Tabelnaam
+De naam van de tabel in het Gegevensmagazijn waarvoor de acties hebben plaatsgevonden'||chr(10)||chr(10)||
+'Attribuut Modulenaam
+Naam van de module die de acties in het Gegevensmagazijn heeft uitgevoerd'||chr(10)||chr(10)||
+'Attribuut Aant_Selects
+Aantal aangeleverde records uit de berichten'||chr(10)||chr(10)||
+'Attribuut Aant_Inserts
+Aantal toevoegingen die hebben plaatsgevonden'||chr(10)||chr(10)||
+'Attribuut Aant_Updates
+Aantal wijzigingen die hebben plaatsgevonden
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvReferentienummer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Info_obvReferentienummer','select * 
+from ( select gabq.sequence_id             sequence_id
+       ,      gabq.correlation_id          correlation_id
+       ,      gabq.enqueue_timestamp       enqueue_timestamp
+       ,      gabq.status                  status
+       ,      info.entiteittype
+       ,      info.zenderapplicatie        zender_app
+       ,      info.referentienummer        referentienr
+       ,      info.k_mutatiesoort          mutatiesoort
+       ,      info.sleutelverzendend
+       ,      info.sleutelnaam_01          sleutelnaam
+       ,      info.sleutelwaarde_01        sleutelwaarde
+       ,      info.verwerkingsduur_ms
+       ,      null                         info_initieel
+       ,      ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Aftap&correlation_id_verplicht=''||gabq.correlation_id||''#AftapBericht#''    info_aftap
+       ,      case when info.sleutelnaam_01 = ''BSN''
+                   then ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||info.sleutelwaarde_01||''#Persoonslijst#gm_out@gegmag#''
+                   else null
+              end                           persoonslijst
+       from   bericht_info                     info
+       ,      gbaprs_aftap_bericht_queue       gabq
+       where  info.sequence_id      = gabq.sequence_id (+)
+       and    info.indinitieel      = ''N''
+       and    info.sleutelnaam_01   = ''BSN''
+       and    info.referentienummer = :referentienummer_verplicht
+       union
+       select gibq.sequence_id             sequence_id
+       ,      gibq.correlation_id          correlation_id
+       ,      gibq.enqueue_timestamp       enqueue_timestamp
+       ,      gibq.status                  status
+       ,      info.entiteittype
+       ,      info.zenderapplicatie        zender_app
+       ,      info.referentienummer        referentienr
+       ,      info.k_mutatiesoort          mutatiesoort
+       ,      info.sleutelverzendend
+       ,      info.sleutelnaam_01          sleutelnaam
+       ,      info.sleutelwaarde_01        sleutelwaarde
+       ,      info.verwerkingsduur_ms
+       ,      ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Initieel&correlation_id_verplicht=''||gibq.correlation_id||''#InitieelBericht#'' info_initieel
+       ,      null                                                                                                                              info_aftap
+       ,      case when info.sleutelnaam_01 = ''BSN''
+                   then ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||info.sleutelwaarde_01||''#Persoonslijst#gm_out@gegmag#''
+                   else null
+              end                           persoonslijst
+       from   bericht_info                     info
+       ,      gbaprs_initieel_bericht_queue    gibq
+       where  info.sequence_id      = gibq.sequence_id (+)
+       and    info.indinitieel      = ''J''
+       and    info.sleutelnaam_01   = ''BSN''
+       and    info.referentienummer = :referentienummer_verplicht
+     ) 
+order by info_initieel, enqueue_timestamp'
+,'GBA Aftapberichten o.b.v. Referentienummer'
+,'Ophalen GBA aftap berichtinformatie o.b.v. referentienummer
+Resultaat toont zowel de aftap- als de initiele berichten.'||chr(10)||chr(10)||
+'Attribuut Info_Initieel
+Indien het gevonden bericht een bericht van de initiele load betreft dan geeft deze link de nadere informatie voor het bericht'||chr(10)||chr(10)||
+'Attribuut Info_Aftap
+Indien het gevonden bericht een bericht van de aftap betreft dan geeft deze link de nadere informatie voor het bericht
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvBSN)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Info_obvBSN','select * 
+from ( select gabq.sequence_id             sequence_id
+       ,      gabq.correlation_id          correlation_id
+       ,      gabq.enqueue_timestamp       enqueue_timestamp
+       ,      gabq.status                  status
+       ,      info.entiteittype
+       ,      info.zenderapplicatie        zender_app
+       ,      info.referentienummer        referentienr
+       ,      info.k_mutatiesoort          mutatiesoort
+       ,      info.sleutelverzendend
+       ,      info.sleutelnaam_01          sleutelnaam
+       ,      info.sleutelwaarde_01        sleutelwaarde
+       ,      info.verwerkingsduur_ms
+       ,      null                         info_initieel
+       ,      ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Aftap&correlation_id_verplicht=''||gabq.correlation_id||''#AftapBericht#''    info_aftap
+       ,      case when info.sleutelnaam_01 = ''BSN''
+                   then ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||info.sleutelwaarde_01||''#Persoonslijst#gm_out@gegmag#''
+                   else null
+              end                           persoonslijst
+       from   bericht_info                     info
+       ,      gbaprs_aftap_bericht_queue       gabq
+       where  info.sequence_id      = gabq.sequence_id (+)
+       and    info.indinitieel      = ''N''
+       and    info.sleutelnaam_01   = ''BSN''
+       and    info.sleutelwaarde_01 = ltrim(:BSN_verplicht,''0'')
+       union
+       select gibq.sequence_id             sequence_id
+       ,      gibq.correlation_id          correlation_id
+       ,      gibq.enqueue_timestamp       enqueue_timestamp
+       ,      gibq.status                  status
+       ,      info.entiteittype
+       ,      info.zenderapplicatie        zender_app
+       ,      info.referentienummer        referentienr
+       ,      info.k_mutatiesoort          mutatiesoort
+       ,      info.sleutelverzendend
+       ,      info.sleutelnaam_01          sleutelnaam
+       ,      info.sleutelwaarde_01        sleutelwaarde
+       ,      info.verwerkingsduur_ms
+       ,      ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Initieel&correlation_id_verplicht=''||gibq.correlation_id||''#InitieelBericht#'' info_initieel
+       ,      null                                                                                                                              info_aftap
+       ,      case when info.sleutelnaam_01 = ''BSN''
+                   then ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||info.sleutelwaarde_01||''#Persoonslijst#gm_out@gegmag#''
+                   else null
+              end                           persoonslijst
+       from   bericht_info                     info
+       ,      gbaprs_initieel_bericht_queue    gibq
+       where  info.sequence_id      = gibq.sequence_id (+)
+       and    info.indinitieel      = ''J''
+       and    info.sleutelnaam_01   = ''BSN''
+       and    info.sleutelwaarde_01 = ltrim(:BSN_verplicht,''0'')
+     ) 
+order by info_initieel, enqueue_timestamp'
+,'GBA Aftapberichten o.b.v. Burgerservicenummer'
+,'Ophalen GBA aftap berichtinformatie o.b.v. burgerservicenummer
+Resultaat toont zowel de aftap- als de initiele berichten.'||chr(10)||chr(10)||
+'Attribuut Info_Initieel
+Indien het gevonden bericht een bericht van de initiele load betreft dan geeft deze link de nadere informatie voor het bericht'||chr(10)||chr(10)||
+'Attribuut Info_Aftap
+Indien het gevonden bericht een bericht van de aftap betreft dan geeft deze link de nadere informatie voor het bericht
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvDag)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Info_obvDag','select abq.sequence_id
+,      abq.correlation_id
+,      abq.enqueue_timestamp
+,      abq.status
+,      info.entiteittype
+,      info.zenderapplicatie        zender_app
+,      info.referentienummer        referentienr
+,      info.k_mutatiesoort          mutatiesoort
+,      info.sleutelverzendend
+,      info.sleutelnaam_01          sleutelnaam
+,      info.sleutelwaarde_01        sleutelwaarde
+,      info.verwerkingsduur_ms
+,      ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Aftap&correlation_id_verplicht=''||abq.correlation_id||''#AftapBericht#''         info_aftap
+from   bericht_info                     info
+,      gbaprs_aftap_bericht_queue       abq
+where  info.sequence_id      = abq.sequence_id
+and    info.indinitieel      = ''N''
+and    to_char(abq.enqueue_timestamp,''YYYYMMDD'') = :datum_yyyymmdd_verplicht
+and    to_char(abq.enqueue_timestamp,''hh24miss'') >= nvl(:tijdstip_vanaf_hh24miss,to_char(abq.enqueue_timestamp,''hh24miss''))
+and    to_char(abq.enqueue_timestamp,''hh24miss'') <= nvl(:tijdstip_tot_hh24miss,to_char(abq.enqueue_timestamp,''hh24miss''))'
+,'GBA Aftapberichten o.b.v. Datum en evt. Tijdstip'
+,'Ophalen GBA aftap berichtinformatie o.b.v. een dag
+Resultaat toont alleen de aftapberichten.
+Zoeken naar initiele berichten kan o.b.v. referentienummer of BSN
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvStatus)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Info_obvStatus','select abq.sequence_id
+,      abq.correlation_id
+,      abq.enqueue_timestamp
+,      abq.status
+,      info.entiteittype
+,      info.zenderapplicatie        zender_app
+,      info.referentienummer        referentienr
+,      info.k_mutatiesoort          mutatiesoort
+,      info.sleutelverzendend
+,      info.sleutelnaam_01          sleutelnaam
+,      info.sleutelwaarde_01        sleutelwaarde
+,      info.verwerkingsduur_ms
+,      ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Aftap&correlation_id_verplicht=''||abq.correlation_id||''#AftapBericht#''         info_aftap
+from   bericht_info                     info
+,      gbaprs_aftap_bericht_queue       abq
+where  info.sequence_id                          = abq.sequence_id
+and    info.indinitieel                          = ''N''
+and    abq.status                                = :status_verplicht
+and    to_char(abq.enqueue_timestamp,''YYYYMMDD'') = nvl(:datum_yyyymmdd,to_char(abq.enqueue_timestamp,''YYYYMMDD''))'
+,'GBA Aftapberichten o.b.v. Status'
+,'Ophalen GBA aftap berichtinformatie o.b.v. status en periode
+Resultaat toont alleen de aftapberichten.
+Zoeken naar initiele berichten kan o.b.v. referentienummer of BSN'||chr(10)||chr(10)||
+'Mogelijke statussen:'||chr(10)||
+'- NEW'||chr(10)||
+'- ERROR-RESPONSE'||chr(10)||
+'- ERROR-IGNORE'||chr(10)||
+'- ERROR'||chr(10)||
+'- PROCESSING'||chr(10)||
+'- PROCESSED'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvCorrelationID_Aftap)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Info_obvCorrelationID_Aftap','select   abq.sequence_id
+,        abq.correlation_id
+,        abq.enqueue_timestamp
+,        abq.dequeue_timestamp
+,        abq.status
+,        case when rsq.sequence_id      is null     then ''Geen response''
+              when lower(rsq.payload) like ''%bv01%'' then ''Bevestiging''
+              when lower(rsq.payload) like ''%fo01%'' then ''Fout''
+              else ''Onbekend''
+         end                                                                                       soort_response
+,        ''#clob#payload#gbaprs_aftap_bericht_queue#correlation_id#''||abq.correlation_id||''#''       bericht
+,        case when rsq.sequence_id is null
+         then
+            null
+         else
+           ''#clob#payload#gbaprs_aftap_response_queue#correlation_id#''||abq.correlation_id||''#''
+         end response
+,        case when upper(status) like ''%ERROR%''
+         then
+           ''#runreport#queryname=Foutmeldingen_Bericht_GUC&correlation_id_verplicht=''||abq.correlation_id||''#Foutmeldingen#guc_trace@guc#''
+         else
+           null
+         end foutmeldingen_GUC
+,        ''#runreport#queryname=GUC_Trace_Endpoints&correlation_id_verplicht=''||abq.correlation_id||''#Endpoints#guc_trace@guc#''      endpoints_GUC
+,        ''#runreport#queryname=StUF300Berichten_obvCorrelationID&correlation_id_verplicht=''||abq.correlation_id||''#StUF300_GM#stuf300_in@gegmag#''      StUF300_GM
+,        ''#runreport#queryname=Relatie_Lk01IN_Lk01OUT&correlation_id_verplicht=''||abq.correlation_id||''#Afnemers#guc_unique@guc#''    Afnemers
+from     gbaprs_aftap_bericht_queue     abq
+,        gbaprs_aftap_response_queue    rsq
+where    abq.correlation_id = rsq.correlation_id (+)
+and      abq.correlation_id = :correlation_id_verplicht'
+,'GBA Aftapberichten o.b.v. CorrelationID'
+,'Ophalen GBA aftap berichtinformatie o.b.v. correlationID'||chr(10)||chr(10)||
+'Attribuut Bericht
+Deze link toont het XML bericht'||chr(10)||chr(10)||
+'Attribuut Response
+Indien het bericht een response bevat dan toont deze link het responsebericht'||chr(10)||chr(10)||
+'Attribuut Foutmeldingen_GUC
+Indien het bericht niet goed verwerkt is dan geeft deze link de foutmeldingen van de GUC'||chr(10)||chr(10)||
+'Attribuut Endpoints GUC
+Roept rapport aan met de informatie over de endpoints gedurende de verwerking van het bericht'||chr(10)||chr(10)||
+'Attribuut StUF300_GM
+Roept rapport aan met daarin de informatie over de verwerking van het bericht in het Gegevensmagazijn'||chr(10)||chr(10)||
+'Attribuut Afnemers
+Roept rapport aan met daarin de informatie over verspreiding van het bericht naar afnemers'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvCorrelationID_Initieel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Info_obvCorrelationID_Initieel','select   ibq.sequence_id
+,        ibq.correlation_id
+,        ibq.enqueue_timestamp
+,        ibq.dequeue_timestamp
+,        ibq.status
+,        case when rsq.sequence_id is null then ''Geen response''
+              when lower(rsq.payload) like ''%bv01%'' then ''Bevestiging''
+              when lower(rsq.payload) like ''%fo01%'' then ''Fout''
+              else ''Onbekend''
+         end                                                                                       soort_response
+,        ''#clob#payload#gbaprs_initieel_bericht_queue#correlation_id#''||ibq.correlation_id||''#''       bericht
+,        case when rsq.sequence_id is null
+         then
+            null
+         else
+           ''#clob#payload#gbaprs_initieel_response_queue#correlation_id#''||ibq.correlation_id||''#''
+         end response
+,        case when upper(status) like ''%ERROR%''
+         then
+           ''#runreport#queryname=Foutmeldingen_Bericht_GUC&correlation_id_verplicht=''||ibq.correlation_id||''#Foutmeldingen#guc_trace@guc#''
+         else
+           null
+         end foutmeldingen_GUC
+,        ''#runreport#queryname=GUC_Trace_Endpoints&correlation_id_verplicht=''||ibq.correlation_id||''#Endpoints#guc_trace@guc#''      endpoints_GUC
+,        ''#runreport#queryname=StUF300Berichten_obvCorrelationID&correlation_id_verplicht=''||ibq.correlation_id||''#StUF300_GM#stuf300_in@gegmag#''      StUF300_GM
+from     gbaprs_initieel_bericht_queue     ibq
+,        gbaprs_initieel_response_queue    rsq
+where    ibq.correlation_id = rsq.correlation_id (+)
+and      ibq.correlation_id = :correlation_id_verplicht'
+,'Initiele GBA berichten o.b.v. CorrelationID'
+,'Ophalen initiele GBA berichtinformatie o.b.v. correlationID'||chr(10)||chr(10)||
+'Attribuut Bericht
+Deze link toont het XML bericht'||chr(10)||chr(10)||
+'Attribuut Response
+Indien het bericht een response bevat dan toont deze link het responsebericht'||chr(10)||chr(10)||
+'Attribuut Foutmeldingen_GUC
+Indien het bericht niet goed verwerkt is dan geeft deze link de foutmeldingen van de GUC'||chr(10)||chr(10)||
+'Attribuut Endpoints GUC
+Roept rapport aan met de informatie over de endpoints gedurende de verwerking van het bericht'||chr(10)||chr(10)||
+'Attribuut StUF300_GM
+Roept rapport aan met daarin de informatie over de verwerking van het bericht in het Gegevensmagazijn
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Bericht_Status_obvMaand)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Bericht_Status_obvMaand','select   sub.dag                        datum
+,        to_char(sub.dag_trunc,''DY'')    dag
+,        case when sub.new = 0   then null
+              when sub.new > 500 then sub.new||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvStatus&status_verplicht=''||''NEW''||''&datum_yyyymmdd=''||sub.dag||''#''||sub.new||'' Berichten#''
+         end     new
+,        case when sub.processing = 0   then null
+              when sub.processing > 500 then sub.processing||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvStatus&status_verplicht=''||''PROCESSING''||''&datum_yyyymmdd=''||sub.dag||''#''||sub.processing||'' Berichten#''
+         end     processing
+,        case when sub.processed = 0   then null
+              when sub.processed > 500 then sub.processed||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvStatus&status_verplicht=''||''PROCESSED''||''&datum_yyyymmdd=''||sub.dag||''#''||sub.processed||'' Berichten#''
+         end     processed
+,        case when sub.err_response = 0   then null
+              when sub.err_response > 500 then sub.err_response||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvStatus&status_verplicht=''||''ERROR-RESPONSE''||''&datum_yyyymmdd=''||sub.dag||''#''||sub.err_response||'' Berichten#''
+         end     error_response
+,        case when sub.err_ignore = 0   then null
+              when sub.err_ignore > 500 then sub.err_ignore||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvStatus&status_verplicht=''||''ERROR-IGNORE''||''&datum_yyyymmdd=''||sub.dag||''#''||sub.err_ignore||'' Berichten#''
+         end     error_ignore
+,        case when sub.err = 0   then null
+              when sub.err > 500 then sub.err||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvStatus&status_verplicht=''||''ERROR''||''&datum_yyyymmdd=''||sub.dag||''#''||sub.err||'' Berichten#''
+         end     error
+,        case when sub.overig = 0   then null
+              when sub.overig > 500 then sub.overig||'' Berichten''
+              else ''#runreport#queryname=GBA_Bericht_Info_obvDag&datum_yyyymmdd_verplicht=''||sub.dag||''#''||sub.overig||'' Berichten#''
+         end     overig
+from   ( select   to_char(abq.enqueue_timestamp,''YYYYMMDD'')   dag
+         ,        trunc(abq.enqueue_timestamp)                dag_trunc
+         ,        sum(case when abq.status = ''NEW''            then 1 else 0 end)        new
+         ,        sum(case when abq.status = ''ERROR''          then 1 else 0 end)        err
+         ,        sum(case when abq.status = ''ERROR-IGNORE''   then 1 else 0 end)        err_ignore
+         ,        sum(case when abq.status = ''ERROR-RESPONSE'' then 1 else 0 end)        err_response
+         ,        sum(case when abq.status = ''PROCESSED''      then 1 else 0 end)        processed
+         ,        sum(case when abq.status = ''PROCESSING''     then 1 else 0 end)        processing
+         ,        sum(case when abq.status not in (''NEW'',''ERROR'',''ERROR-IGNORE'',''ERROR-RESPONSE'',''PROCESSING'',''PROCESSED'') then 1 else 0 end) overig
+         from     bericht_info                  info
+         ,        gbaprs_aftap_bericht_queue    abq
+         where    info.sequence_id = abq.sequence_id
+         and      info.indinitieel = ''N''
+         and      to_char(abq.enqueue_timestamp,''YYYYMM'') = :maand_yyyymm_verplicht
+         group by to_char(abq.enqueue_timestamp,''YYYYMMDD'')
+         ,        trunc(abq.enqueue_timestamp)
+       ) sub
+order by sub.dag'
+,'Aantallen GBA berichten per dag en status o.b.v. Maand'
+,'Toont de aantallen GBA berichten per dag en onderverdeeld naar status voor een bepaalde maand.
+Indien het aantal berichten kleiner is dan 500 dan is de link beschikbaar om naar het rapport voor berichten van een bepaalde status op een opgegeven dag door te klikken (Bericht_Info_obvStatus)
+Bij een aantal van meer dan 500 is dit vanuit performance redenen niet mogelijk.
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Jira_Issues_obvDagIssue)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Jira_Issues_obvDagIssue','select bericht_key
+,      entiteittype
+,      tijdstipbericht
+,      laaddatum
+,      verwerkttijd
+,      referentienummer
+,      correlation_id
+,      status
+,      sleutel_naam
+,      sleutel_waarde
+,      bsn
+,      issue
+,      ''#runreport#queryname=StUF300Berichten_obvCorrelationID&correlation_id_verplicht=''||correlation_id||''#Details#stuf300_in@gegmag#''  Details
+from   stf300_stuurgegevens
+where  status    = ''Error''
+and    issue  like ''%''||:issue_verplicht||''%''
+and    substr(tijdstipbericht,1,8) = nvl(:datum_yyyymmdd,substr(tijdstipbericht,1,8))'
+,'GBA Berichten gekoppeld aan Jira-Issues o.b.v. issue en evt. datum'
+,'Toont o.b.v. issue-nummer uit Jira de GBA berichten waarbij dit issue is opgetreden
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Jira_Issues_obvMaand)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Jira_Issues_obvMaand','select   maand
+,        dag
+,        case when abkr1   = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-01'' ||''&datum_yyyymmdd=''||dag||''#''||abkr1  ||''#'' end  ABKR01
+,        case when abkr17  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-17'' ||''&datum_yyyymmdd=''||dag||''#''||abkr17 ||''#'' end  ABKR17
+,        case when abkr34  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-34'' ||''&datum_yyyymmdd=''||dag||''#''||abkr34 ||''#'' end  ABKR34
+,        case when abkr51  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-51'' ||''&datum_yyyymmdd=''||dag||''#''||abkr51 ||''#'' end  ABKR51
+,        case when abkr52  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-52'' ||''&datum_yyyymmdd=''||dag||''#''||abkr52 ||''#'' end  ABKR52
+,        case when abkr53  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-53'' ||''&datum_yyyymmdd=''||dag||''#''||abkr53 ||''#'' end  ABKR53
+,        case when abkr54  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-54'' ||''&datum_yyyymmdd=''||dag||''#''||abkr54 ||''#'' end  ABKR54
+,        case when abkr57  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-57'' ||''&datum_yyyymmdd=''||dag||''#''||abkr57 ||''#'' end  ABKR57
+,        case when abkr58  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-58'' ||''&datum_yyyymmdd=''||dag||''#''||abkr58 ||''#'' end  ABKR58
+,        case when abkr60  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-60'' ||''&datum_yyyymmdd=''||dag||''#''||abkr60 ||''#'' end  ABKR60
+,        case when abkr79  = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-79'' ||''&datum_yyyymmdd=''||dag||''#''||abkr79 ||''#'' end  ABKR79
+,        case when abkr101 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-101''||''&datum_yyyymmdd=''||dag||''#''||abkr101||''#'' end  ABKR101
+,        case when abkr113 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-113''||''&datum_yyyymmdd=''||dag||''#''||abkr113||''#'' end  ABKR113
+,        case when abkr114 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-114''||''&datum_yyyymmdd=''||dag||''#''||abkr114||''#'' end  ABKR114
+,        case when abkr115 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-115''||''&datum_yyyymmdd=''||dag||''#''||abkr115||''#'' end  ABKR115
+,        case when abkr116 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-116''||''&datum_yyyymmdd=''||dag||''#''||abkr116||''#'' end  ABKR116
+,        case when abkr118 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-118''||''&datum_yyyymmdd=''||dag||''#''||abkr118||''#'' end  ABKR118
+,        case when abkr120 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-120''||''&datum_yyyymmdd=''||dag||''#''||abkr120||''#'' end  ABKR120
+,        case when abkr125 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-125''||''&datum_yyyymmdd=''||dag||''#''||abkr125||''#'' end  ABKR125
+,        case when abkr126 = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ABKR-126''||''&datum_yyyymmdd=''||dag||''#''||abkr126||''#'' end  ABKR126
+,        case when ora_err = 0 then null else ''#runreport#queryname=GBA_Jira_Issues_obvDagIssue&issue_verplicht=''||''ORA''     ||''&datum_yyyymmdd=''||dag||''#''||ora_err||''#'' end  ora
+,        case when noissue = 0 then null else noissue end noissue
+from     jira_issues_vw
+where    maand = nvl(:maand_yyyymm,maand)
+order by dag'
+,'Aantallen GBA berichten per Jira-issue o.b.v. maand'
+,'Toont de aantallen GBA berichten per dag en onderverdeeld naar Jira-issue voor een bepaalde maand.'||chr(10)||
+'Indien het aantal berichten kleiner is dan 500 dan is de link beschikbaar om naar het rapport voor berichten van een bepaalde issue op een opgegeven dag door te klikken (Jira_Issues_obvDagIssue)'||chr(10)||
+'Bij een aantal van meer dan 500 is dit vanuit performance redenen niet mogelijk.'
+,null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Jira_Issues_obvBericht)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Jira_Issues_obvBericht','select bericht_key        Bericht_ID
+,      correlation_id
+,      issue
+,      issue_toelichting
+from   table(abkr_reports.abkr_issues)
+where  bericht_key = :Bericht_verplicht'
+,'Berichten gekoppeld aan Jira-Issues o.b.v. Berichtnummer'
+,'Toont de verwijzing naar de Jira-Issues
+Met een eventuele nadere toelichting (indien bekend) zoals de attribuutnaam en waarde waar een mogelijk probleem ligt
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_Statistieken_QUEUE)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_Statistieken_QUEUE','select   info.entiteittype
+,        sum(case when gabq.status = ''NEW''            then 1 else 0 end) new
+,        sum(case when gabq.status = ''PROCESSED''      then 1 else 0 end) processed
+,        sum(case when gabq.status = ''PROCESSING''     then 1 else 0 end) processing
+,        sum(case when gabq.status = ''ERROR-RESPONSE'' then 1 else 0 end) error_response
+,        sum(case when gabq.status = ''ERROR-IGNORE''   then 1 else 0 end) error_ignore
+,        sum(case when gabq.status = ''ERROR''          then 1 else 0 end) error
+,        sum(case when gabq.status not in (''NEW'',''ERROR'',''ERROR-IGNORE'',''ERROR-RESPONSE'',''PROCESSING'',''PROCESSED'') then 1 else 0 end) overig
+from     gbaprs_aftap_bericht_queue     gabq
+,        bericht_info                   info
+where    gabq.sequence_id = info.sequence_id (+)
+and      info.indinitieel = ''N''
+group by info.entiteittype'
+,'Status statistieken van de GBA Queue'
+,'Geeft per berichttype en status het aantal berichten weer','y',null);
+--

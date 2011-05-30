@@ -1,0 +1,34 @@
+PROMPT file URP_Users2MetaUsers.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse roles
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-01-12 14:47:40 +0100 (Wed, 12 Jan 2011) $
+|||  Revision : $Revision: 28185 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Users2MetaUsers.dat $
+|||  ID       : $Id: URP_Users2MetaUsers.dat 28185 2011-01-12 13:47:40Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+REM    ===============================================================================
+PROMPT - Metauser_super_admin 
+REM    ===============================================================================
+-- ASSAI                          
+exec urp_utils.userprofile_add ( p_username => 'fsch',    p_profileusername => 'metauser_super_admin');
+exec urp_utils.userprofile_add ( p_username => 'kdw',    p_profileusername => 'metauser_super_admin');
+exec urp_utils.userprofile_add ( p_username => 'kdw',    p_profileusername => 'projectdocumentcontrol_user');
+-- IOO ATA                          
+exec urp_utils.userprofile_add ( p_username => 'nanne.osinga@epsvenue.com'       , p_profileusername => 'metauser_super_admin');
+exec urp_utils.userprofile_add ( p_username => 'wim@assai.nl'        , p_profileusername => 'metauser_super_admin');
+REM    ===============================================================================
+PROMPT - Role_Super_Admin
+REM    ===============================================================================
+-- Hier worden alle nieuwe permissies van nieuwe rollen doorgegeven aan de <role_super_admin>
+--exec urp_utils.user_add_role_based_on_role ( p_base_rolename => 'role_super_admin', p_new_rolename  => 'role_stelselbeheerder');

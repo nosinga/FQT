@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/!svn/ver/31507/projecten/abkr/trunk/gm_xdb_ata/src/main
+END
+testmenu.sql
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/!svn/ver/25714/projecten/abkr/trunk/gm_xdb_ata/src/main/testmenu.sql
+END
+ATA_CBT_All.sql
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/!svn/ver/25681/projecten/abkr/trunk/gm_xdb_ata/src/main/ATA_CBT_All.sql
+END
+testmenuundo.sql
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/!svn/ver/25681/projecten/abkr/trunk/gm_xdb_ata/src/main/testmenuundo.sql
+END
+ATA_Build_All.sql
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/!svn/ver/31507/projecten/abkr/trunk/gm_xdb_ata/src/main/ATA_Build_All.sql
+END
+ATA_Clean_All.sql
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/!svn/ver/17815/projecten/abkr/trunk/gm_xdb_ata/src/main/ATA_Clean_All.sql
+END

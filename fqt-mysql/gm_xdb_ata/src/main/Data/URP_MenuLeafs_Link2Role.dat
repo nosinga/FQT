@@ -1,0 +1,105 @@
+PROMPT file URP_MenuLeafs_Link2Role
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het linken van MenuLeafs aan rolen
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 07:49:56 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25507 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Permissions.dat $
+|||  ID       : $Id: URP_Permissions.dat 25507 2010-10-28 05:49:56Z nosinga $
+|||------------------------------------------------------------------------
+**/
+--
+REM    ===============================================================================
+PROMPT - RAPPORTEN ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+exec  urp_menu_utils.linkMenuLeaf2Role('Rapporten','STATIC','role_rapporten_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role('DB Connecties','STATIC','role_rapporten_admin')
+--
+exec  urp_menu_utils.linkMenuLeaf2Role('DB Connecties','STATIC','role_dbconnecties_admin')
+--
+REM    ===============================================================================
+PROMPT - URL MenuLeafs
+REM    ===============================================================================
+--
+--  In het geval van links moeten er twee stappen gedaan worden
+--  om een link permissie te inserten en aan een link menu en een rol te hangen
+--  1. insert url permissie en koppel deze url permissie aan een user role
+--  2. koppel deze url permissie aan een link menu
+--
+exec urp_menu_utils.linkMenuLeaf2Role('Google','URL','role_grt_admin')
+--
+-- met bovennstaande call ga je naar google en moet je door de proxy
+-- kijk of de proxy staat ingesteld in de application properties
+-- Apache DocumentRoot/<env>/ata/appenv/<env>.environment.properties.php
+-- en kijk hier naar UTL_HTTP_SET_PROXY
+-- in Gemeente Rotterdam : define('UTL_HTTP_SET_PROXY','twdproxy.ir.rotterdam.nl:8080,localhost');
+-- zonder proxy : define('UTL_HTTP_SET_PROXY',',');
+--
+exec  urp_menu_utils.linkMenuLeaf2Role('ping','URL','role_stelselbeheerder')
+exec  urp_menu_utils.linkMenuLeaf2Role('config','URL','role_stelselbeheerder')
+exec  urp_menu_utils.linkMenuLeaf2Role('functionalPing','URL','role_stelselbeheerder')
+exec  urp_menu_utils.linkMenuLeaf2Role('statistics','URL','role_stelselbeheerder')
+--
+REM    ===============================================================================
+PROMPT - DOC MenuLeafs
+REM    ===============================================================================
+--
+--
+-- Nu moet er per submenu een permissie aangemaakt worden om documenten te raadplegen of te veranderen
+exec  urp_menu_utils.linkMenuLeaf2Role ('ArchitectuurDocumenten','DOC','role_grt_admin');
+--
+-- Het bekijken van Architectuurdocumenten wordt toegestaan aan meerdere rollen
+--
+exec  urp_menu_utils.linkMenuLeaf2Role ('ArchitectuurDocumenten','DOC','role_stelselbeheerder')
+exec  urp_menu_utils.linkMenuLeaf2Role ('ArchitectuurDocumenten','DOC','role_stelselbeheerder');
+exec  urp_menu_utils.linkMenuLeaf2Role ('ArchitectuurDocumenten','DOC','role_grt_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StelselBeheerderDocumenten','DOC','role_stelselbeheerder');
+--   
+--
+REM    ===============================================================================
+PROMPT - DCA MenuLeafs
+REM    ===============================================================================
+--
+exec  urp_menu_utils.linkMenuLeaf2Role ('ArchitectuurDocumenten','DCA','role_documenten_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StelselBeheerderDocumenten','DCA','role_documenten_admin')
+--
+REM    ===============================================================================
+PROMPT - AGENT TOOL ABKR ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+exec  urp_menu_utils.linkMenuLeaf2Role ('Gebruikers','STATIC','role_grt_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('Rollen','STATIC','role_grt_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('Toestemmingen','STATIC','role_grt_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('ATA Configuratie','STATIC','role_grt_admin')
+--
+exec  urp_menu_utils.linkMenuLeaf2Role ('Gebruikers','STATIC','role_gebruikers_admin')
+--
+REM    ===============================================================================
+PROMPT - FILTERS (statisch menu)
+REM    ===============================================================================
+-- main menu : 'mainmenu#60#Filters#Filters'
+--
+--  insert submenu (als permissie) hang dit submenu aan een hoofdmenu en aan een rol.
+exec  urp_menu_utils.linkMenuLeaf2Role ('Keten','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('Filter','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('FilterTest','STATIC','role_filter_admin')
+--
+REM    ===============================================================================
+PROMPT - FILTERS ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+-- main menu : 'mainmenu#61#Filters Administratie#Administratie Filters'
+--
+exec  urp_menu_utils.linkMenuLeaf2Role ('Organisatie','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('Applicatie','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StUF Bericht Identificatie','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StUF Versie','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StUF Entititeittype','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StUF Berichtsoort','STATIC','role_filter_admin')
+exec  urp_menu_utils.linkMenuLeaf2Role ('StUF Sectormodel','STATIC','role_filter_admin')

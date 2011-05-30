@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/!svn/ver/30189/projecten/abkr/trunk/gm_xdb_ata/src/main/DataMigrate
+END
+URP_sequence_Migrate.sql
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/!svn/ver/26819/projecten/abkr/trunk/gm_xdb_ata/src/main/DataMigrate/URP_sequence_Migrate.sql
+END
+ATA_Clean_Migrate_All.sql
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/!svn/ver/30189/projecten/abkr/trunk/gm_xdb_ata/src/main/DataMigrate/ATA_Clean_Migrate_All.sql
+END
+URP_tables_Migrate.sql
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/!svn/ver/30189/projecten/abkr/trunk/gm_xdb_ata/src/main/DataMigrate/URP_tables_Migrate.sql
+END

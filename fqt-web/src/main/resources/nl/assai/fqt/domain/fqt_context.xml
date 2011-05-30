@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                http://www.springframework.org/schema/tx
+                http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+                http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="nl.assai.fqt"/>
+
+    <!-- Plain Datasource -->
+    <bean id="ataDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${JNDI_JDBC_USERS}"/>
+    </bean>
+
+    <!-- Transaction aware Datasource -->
+    <bean id="txFqtDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
+        <property name="targetDataSource" ref="ataDataSource"/>
+    </bean>
+
+    <!-- TransactionManager for Datasource -->
+    <bean id="ataTxManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="txFqtDataSource"/>
+    </bean>
+
+    <!-- Base bean for transactional proxies -->
+    <bean id="txFqtProxyTemplate"
+        abstract="true"
+        class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="ataTxManager"/>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
+                <prop key="find*">PROPAGATION_REQUIRED, readOnly</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- SqlMapClient -->
+    <bean id="fqtSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+        <property name="configLocation" value="classpath:/nl/assai/fqt/domain/ibatis/dao/fqt/ibatis-config-fqt.xml"/>
+        <property name="dataSource" ref="txFqtDataSource"/>
+    </bean>
+
+    <!-- DAO -->
+    <bean id="fqtDao" class="nl.assai.fqt.domain.ibatis.dao.fqt.FqtDao">
+        <property name="sqlMapClient" ref="fqtSqlMapClient"/>
+    </bean>
+
+    <!-- Plain Repository -->
+    <bean id="fqtRepositoryTarget" class="nl.assai.fqt.domain.service.FqtRepositoryImpl">
+        <property name="fqtDao" ref="fqtDao"/>
+    </bean>
+
+    <!-- Transactional Repository -->
+    <bean id="fqtRepository" parent="txFqtProxyTemplate">
+        <property name="target" ref="fqtRepositoryTarget"/>
+    </bean>
+
+</beans>
+

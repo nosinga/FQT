@@ -1,0 +1,201 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. StelselCatalogus
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-03-07 12:09:06 +0100 (Mon, 07 Mar 2011) $
+|||  Revision : $Revision: 30786 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_stelselcatalogus.dat $
+|||  ID       : $Id: rpt_stelselcatalogus.dat 30786 2011-03-07 11:09:06Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (SC_Administratie)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('SC_Administratie','select code
+,      omschrijving
+,      ind_uitleveren
+,      ''#runreport#queryname=SC_Categorie&administratie_code=''||code||''#Categorie#'' Categorie
+from   scb_meta_administratie'
+,'Administraties in de Stelselcatalogus'
+,'Geeft alle registraties weer waarvoor meta-data vastgelegd is.'||chr(10)||chr(10)||
+'Attribuut Code           : De administratie code
+Attribuut Omschrijving   : Omschrijving van de administratie
+Attribuut Ind Uitleveren : Indicatie of de administratie naar afnemers gecommuniceerd wordt
+Attribuut Categorie      : Toont de categorieen van de administratie
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (SC_Categorie)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('SC_Categorie','select cat.id
+,      cat.adm_id
+,      adm.code                            as adm_code
+,      cat.code
+,      cat.afkorting
+,      nvl(cat.code,cat.afkorting)         as tag
+,      cat.omschrijving
+,      ''#runreport#queryname=SC_Element&categorie_id=''||cat.id||''#Elementen#'' Element
+from   scb_meta_categorie     cat
+,      scb_meta_administratie adm
+where  cat.adm_id = adm.id
+and    adm.code   = nvl(:administratie_code,adm.code)
+order by adm.code, adm.id, cat.id, nvl(cat.code,cat.afkorting)'
+,'Categorieen in de Stelselcatalogus'
+,'Geeft alle categorieen weer voor een bepaalde administratie (registratie)'||chr(10)||chr(10)||
+'Attribuut Adm_Code       : Code van de administratie'||chr(10)||
+'Attribuut Code           : Code van de categorie'||chr(10)||
+'Attribuut Afkorting      : Afkorting van de categorie'||chr(10)||
+'Attribuut Tag            : De tag van de categorie zoals deze naar afnemers gecommuniceerd wordt)'||chr(10)||
+'Attribuut Omschrijving   : De omschrijving van de categorie'||chr(10)||
+'Attribuut Element        : Toont de elementen van de categorie
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (SC_Element)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('SC_Element','select grp.code                                                                                as grp_code
+,      ''#runreport#queryname=SC_Bron&bron_id_verplicht=''||emt.brn_id||''#''||brn.code||''#''       as brn_code
+,      emt.code
+,      ''(''||grp.omschrijving ||'') ''||emt.omschrijving                                          as omschrijving
+,      ''#runreport#queryname=SC_Stufpaden&element_id_verplicht=''||emt.id||''#StUFPaden#''        as StufPaden
+,      ''#runreport#queryname=SC_GM_Verwijzing&element_id_verplicht=''||emt.id||''#GMVerwijzing#'' as GmVerwijzing
+from   scb_meta_element        emt
+,      scb_meta_groep          grp
+,      scb_meta_categorie      cat
+,      scb_meta_bron           brn
+where  emt.grp_id         = grp.id
+and    grp.cat_id         = cat.id
+and    emt.brn_id         = brn.id
+and    cat.id             = :categorie_id
+order by emt.id'
+,'Elementen in de Stelselcatalogus o.b.v. Categorie'
+,'Geeft alle attributen weer van een bepaalde categorie voor een bepaalde administratie (registratie)'||chr(10)||chr(10)||
+'Attribuut Grp_Code       : Code van de groep'||chr(10)||
+'Attribuut Brn_Code       : Code van de bron'||chr(10)||
+'Attribuut Code           : Code van het element'||chr(10)||
+'Attribuut Omschrijving   : De omschrijving van het element'||chr(10)||
+'Attribuut StUFPaden      : Toont de xpath expressies in de verschillende StUF berichten'||chr(10)||
+'Attribuut GmVerwijzing   : Toont de tabelnaam en kolomnaam waar het attribuut in het Gegevensmagazijn is te vinden
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (SC_Stufpaden)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('SC_Stufpaden','select stf.versie
+,      stf.xpath
+,      stf.toelichting
+,      stf.ind_uitleveren
+from   scb_meta_stufpath       stf
+where  emt_id = :element_id_verplicht'
+,'StUFpaden in de Stelselcatalogus o.b.v. Element'
+,'Geeft voor een bepaald attribuut binnen een administratie per StUF versie het juiste xpath weer'||chr(10)||chr(10)||
+'Attribuut Versie         : Versie van het StUF bericht
+Attribuut XPath          : De Xpath expressie in het StUF bericht
+Attribuut Toelichting    : Eventuele nadere toelichting
+Attribuut Ind_Uitleveren : Indicatie of de xpath expressie naar afnemers gecommuniceerd wordt
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (SC_GM_Verwijzing)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('SC_GM_Verwijzing','select tabelnaam
+,      kolomnaam
+,      case when domein > 0
+            then ''#runreport#queryname=Domeinwaarden&Domeinnaam=''||kolomnaam||''#Domeinwaarden#''
+            else null
+       end                                                                                           as domeinwaarden
+from ( select gmv.tabelnaam
+       ,      gmv.kolomnaam
+       ,    ( select count(1) from gm_domeinwaarde_vw where nam_domein = gmv.kolomnaam ) domein
+       from   scb_meta_gm_verwijzing  gmv
+       where  emt_id = :element_id_verplicht
+    )'
+,'Verwijzing naar attributen in GM o.b.v. Element'
+,'Geeft voor een bepaald attribuut binnen een administratie weer waar deze in het Gegevensmagazijn is ondergebracht'||chr(10)||chr(10)||
+'Attribuut Tabelnaam      : De naam van de Tabel in het Gegevensmagazijn
+Attribuut Kolomnaam      : De naam van de Kolom in het Gegevensmagazijn
+Attribuut Domein         : Indien er een domein aanwezig is voor de Kolom dan is het mogelijk hier door te linken naar deze domeinwaarden
+',null,null);
+--
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES (SC_Bron)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('SC_Bron','select code
+,      omschrijving
+,      ind_uitleveren
+from   scb_meta_bron
+where  id = :bron_id_verplicht'
+,'Brongegevens in de Stelselcatalogus'
+,'Geeft informatie over de diverse bronnen'||chr(10)||chr(10)||
+'Attribuut Ind Uitleveren : Indicatie of de elementen van de bron naar afnemers gecommuniceerd wordt
+',null,null);
+--
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES (SC_GM_Verwijzing_obvTabelKolom)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('SC_GM_Verwijzing_obvTabelKolom','select tabelnaam
+,      kolomnaam
+,      case when domein > 0
+            then ''#runreport#queryname=Domeinwaarden&Domeinnaam=''||kolomnaam||''#Domeinwaarden#''
+            else null
+       end                                                                                     as Domeinwaarden
+,      ''#runreport#queryname=SC_Stufpaden&element_id_verplicht=''||emt_id||''#StUFPaden#''        as StufPaden
+,      ''#runreport#queryname=SC_Element&element_id_verplicht=''||emt_id||''#Element#''            as Element
+from   ( select   gmv.emt_id
+         ,        gmv.tabelnaam
+         ,        gmv.kolomnaam
+         ,      ( select count(1) from gm_domeinwaarde_vw where nam_domein = gmv.kolomnaam ) domein
+         from     scb_meta_gm_verwijzing    gmv
+         where    upper(gmv.tabelnaam) = upper(nvl(:tabelnaam,gmv.tabelnaam))
+         and      upper(gmv.kolomnaam) = upper(nvl(:kolomnaam,gmv.kolomnaam))
+       )
+order by tabelnaam
+,        kolomnaam'
+,'Metadata opvragen o.b.v. GM Tabelnaam en/of Kolomnaam'
+,'Metadata opvragen o.b.v. GM Tabelnaam en/of Kolomnaam'
+,'y',null);
+--
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES (SC_Stufpaden_obvXpath)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('SC_Stufpaden_obvXpath','select   versie
+,        xpath
+,        toelichting
+,        ind_uitleveren
+,        ''#runreport#queryname=SC_GM_Verwijzing&element_id_verplicht=''||emt_id||''#GMVerwijzing#'' as GMVerwijzing
+,        ''#runreport#queryname=SC_Element&element_id_verplicht=''||emt_id||''#Element#''            as Element
+from     scb_meta_stufpath
+where    lower(xpath) like lower(''%''||:xpath_verplicht||''%'')
+order by emt_id
+,        id'
+,'Metadata opvragen o.b.v. (deel) StUF xpath expressie'
+,'Metadata opvragen o.b.v. (deel) StUF xpath expressie','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Domeinwaarden)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Domeinwaarden','select   dom.nam_domein         as domeinnaam
+,        dom.oms_domein         as domeinomschrijving
+,        dom.cde_domein         as code
+,        dom.txt_domein         as omschrijving
+from     gm_domeinwaarde_vw    dom
+where    dom.nam_domein = nvl(:Domeinnaam,dom.nam_domein)
+order by dom.nam_domein
+,        dom.cde_domein'
+,'Domeinwaarden van attributen binnen het Gegevensmagazijn'
+,'Domeinwaarden van attributen binnen het Gegevensmagazijn'
+,'y',null);
+--

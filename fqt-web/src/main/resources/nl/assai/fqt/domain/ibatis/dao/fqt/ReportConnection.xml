@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="REC">
+
+	<resultMap id="recMap" class="ReportConnection">
+		<result property="id" 			column="ID"/>
+		<result property="rv" 			column="RV"/>
+        <result property="name" 		column="NAME"/>
+        <result property="type" 		column="TYPE"/>
+        <result property="menuName"     column="MENUNAME"/>
+		<result property="menuId" 		column="MENU_ID"/>
+		<result property="sqlId" 		column="SQL_ID"/>
+        <result property="conId" 		column="CON_ID"/>
+        <result property="roleId" 		column="ROLE_ID"/>
+        <result property="orderBy" 		column="ORDERBY"/>
+	</resultMap>
+
+	<select id="findAllReportConnections" resultMap="recMap">
+        select qry.queryname||chr(35)||con.connectionname as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      mnu.menuname as menuname
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      null       as role_id
+        ,      pms.orderby   orderby
+        from   urp_permissions pms
+        ,      sqm_queries     qry
+        ,      sqm_connections con
+        ,      urp_menunodes   mnu
+        where  pms.type    = 'REPORT'
+        and    pms.sql_id  = qry.id
+        and    pms.con_id  = con.id
+        and    pms.menu_id = mnu.id (+)
+        order by 1
+	</select>
+
+    <select id="getReportConnectionByName" resultMap="recMap" parameterClass="java.lang.String">
+        select qry.queryname||chr(35)||con.connectionname as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      mnu.menuname as menuname
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      null       as role_id
+        ,      pms.orderby   orderby
+        from   urp_permissions pms
+        ,      sqm_queries     qry
+        ,      sqm_connections con
+        ,      urp_menunodes   mnu
+        where  pms.type    = 'REPORT'
+        and    pms.sql_id  = qry.id
+        and    pms.con_id  = con.id
+        and    pms.menu_id = mnu.id (+)
+        where  pms.name=#name#
+    </select>
+
+
+    <procedure id="insertReportConnection" parameterClass="ReportConnection">
+         call fqt_reports.insertReportConnection(#sqlId#,#conId#,#menuId#,#roleId#,#orderBy#)
+    </procedure>
+
+<!--
+	<insert id="insertReportConnection" parameterClass="ReportConnection">
+		insert into URP_PERMISSIONS (
+			NAME
+		,	TYPE
+		,	MENU_ID
+		,	SQL_ID
+		,	CON_ID
+		) values (
+			#name#
+		,	#type#
+		,	#menuId#
+		,	#sqlId#
+		,	#conId#
+		)
+        <selectKey resultClass="long" >
+             SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+	</insert>
+-->
+
+    <procedure id="updateReportConnection" parameterClass="ReportConnection">
+         call fqt_reports.updateReportConnection(#id#,#sqlId#,#conId#,#menuId#,#roleId#,#orderBy#)
+    </procedure>
+
+<!--
+	<update id="updateReportConnection" parameterClass="ReportConnection">
+		update URP_PERMISSIONS SET
+			NAME = #name#
+		,	TYPE = #type#
+		,	MENU_ID = #menuId#
+		,	SQL_ID = #sqlId#
+		,	CON_ID = #conId#
+		where ID = #id#
+	</update>
+-->
+
+	<delete id="deleteReportConnection" parameterClass="ReportConnection">
+		delete URP_PERMISSIONS where ID = #id#
+	</delete>
+
+
+</sqlMap>

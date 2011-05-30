@@ -1,0 +1,65 @@
+PROMPT file URP_Permissions
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van permissions
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+--- ***
+--- Toevoegen PERMISSIONS
+--- en meteen verbinden aan ROLES
+--- ***
+--
+REM    ===============================================================================
+PROMPT - Create PHP PERMISSIONS
+REM    ===============================================================================
+-- alle php file permissions
+-- toestemming tot aanroepen alle php files (vanaf root)
+-- TODO
+-- exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/'               , p_rolename => 'role_ata_admin');
+--   toestemming voor de root files (menu login etc)
+--
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/approot/'       , p_rolename => 'role_connect');
+--   toestemmingen voor runnen de audit rapporten te runnen in php
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/run'        , p_rolename => 'role_connect' );
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/show'       , p_rolename => 'role_connect' );
+--  onderhouden van user roles en permissions
+--  toestemming op onderhoudschermen gebruiker (user) rol en toestemming (permission) 
+--  nederlands: grt, engels : urp 
+--
+exec urp_utils.insert_pms_and_link2role (p_permissionvalue => '/urp/'            , p_rolename => 'role_grt_admin');
+exec urp_utils.insert_pms_and_link2role (p_permissionvalue => '/urp/'            , p_rolename => 'role_gebruikers_admin');
+--  toestemming voor alle files subdirectory sqm
+--  dit is voor onderhoud rapporten en connecties
+--
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/'                       , p_rolename => 'role_rapporten_admin');
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/editDBConnection.php'   , p_rolename => 'role_dbconnecties_admin');
+-- onderstaande toestemming is nodig om de documenten te bekijken in php
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/apputils/'      , p_rolename => 'role_connect');
+--
+-- onderstaande toestemming is nodig om de documenten te bekijken in php
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/appdocs/'       , p_rolename => 'role_connect' );
+--
+-- om data te beschermen
+-- exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/classified' , p_rolename => 'role_classified');
+--
+--
+-- Persoonslijst gebonden permissions
+--
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/classifiedshowReportClob_vcs.php' , p_rolename => 'role_stelselbeheerder');
+exec urp_utils.insert_pms_and_link2role ( p_permissionvalue => '/sqm/classifiedshowTableClob_vcs.php'  , p_rolename => 'role_stelselbeheerder');
+--
+-- Filters gebonden permissions
+-- Nooit geimplementeerd in php

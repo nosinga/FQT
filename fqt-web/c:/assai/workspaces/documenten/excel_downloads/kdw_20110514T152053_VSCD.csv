@@ -1,0 +1,30 @@
+ID;CSV_ID;ONLINE_CN;NAME;CATEGORIE;POSTAL_ADDRESS;POSTAL_ZIPCODE;POSTAL_CITY;VISIT_ADDRESS;VISIT_ZIPCODE;VISIT_CITY;TELEPHONE_GENERAL;TELEPHONE_MANAGEMENT;TELEPHONE_SALES;FAX;EMAIL;URL;PERSOONSNUMMER;MANAGER_PREFIX;MANAGER_FIRSTNAME;MANAGER_INFIX;MANAGER_LASTNAME;PR_MANAGER_PREFIX;PR_MANAGER_FIRSTNAME;PR_MANAGER_INFIX;PR_MANAGER_LASTNAME;TECHNICIAN_PREFIX;TECHNICIAN_FIRSTNAME;TECHNICIAN_INFIX;TECHNICIAN_LASTNAME;SALESMANAGER_PREFIX;SALESMANAGER_FIRSTNAME;SALESMANAGER_INFIX;SALESMANAGER_LASTNAME;NUMBER_ROOMS;CHAIRS_ROOM_1;CHAIRS_ROOM_2;CHAIRS_ROOM_3;CHAIRS_TOTAL;PROD_HOUSE_COMPANY
+15103;649;;MC Made in da Shade / Cosmic theater;230;Postbus 57194;1040 BB;AMSTERDAM;Polonceaukade 6;1014 DA;AMSTERDAM;020-6065050;;020 6065040;020-6065060;info@mconline.nl;www.mconline.nl;6694;De heer;Lucien;;Kembel;Mevrouw;Hester;;Mol;De heer;Claes;;Meijer;Mevrouw;Hester;;Mol;2;180;100;0;280;
+15138;1005;;Stadsschouwburg Amsterdam SSBA;230;;;;Leidseplein 26;1017 PT;AMSTERDAM;020-5237700;;020-6242311;020-6238685;info@ssba.nl;www.ssba.nl;788;De heer;Melle;;Daamen;Mevrouw;Karin;;Sommerer;;;;;;;;;2;900;500;0;1400;
+15160;1203;;Theater De Balie;230;;;;Kleine-Gartmanplantsoen 10;1017 RR;AMSTERDAM;020-5535151;;;020-5535155;balie@balie.nl;www.balie.nl;7506;Mevrouw;Dianne;;Zuidema;Mevrouw;Maya;;Chamir;De heer;Jan Willem;;Boogers;;;;;3;175;75;54;304;
+15107;723;;Muziekgebouw aan 't IJ;230;Postbus 1122;1000 BC;AMSTERDAM;Piet Heinkade 1;1019 BR;AMSTERDAM;020-7882010;;020-7882000;020-7882020;post@muziekgebouw.nl;www.muziekgebouw.nl;9003;De heer;Tino;;Haenen;Mevrouw;Hilde;van;Gurp;De heer;Ries;;Vernooy;Mevrouw;;van;Roessel;2;735;125;0;860;
+15112;813;;Over het IJ Festival Stichting IJ Producties;230;Postbus 37149;1030 AC;AMSTERDAM;TT Neveritaweg 15;1033 WB;AMSTERDAM;020-4922229;;;020-4924359;info@overhetij.nl;www.overhetij.nl;2317;De heer;Lode;van;Piggelen;De heer;Arjen;;Barel;;;;;t.a.v.;;;Hoofd kassa;0;0;0;0;0;
+15062;101;;BIMhuis Stichting Jazz Amsterdam;230;;;;Piet Heinkade 3;1019 BR;AMSTERDAM;020-7882150;;020-7882188;020-7882180;info@bimhuis.nl;www.bimhuis.nl;11655;Mevrouw;Manon;;Koers;De heer;Chiel;;Zwinkels;De heer;Jurre;;Wieman;De heer;Chiel;;Zwinkels;1;220;0;0;220;
+15073;248;;De Brakke Grond, Vlaams Cultuurhuis;229;;;;Nes 45;1012 KD;AMSTERDAM;020-6229014;;020-6266866;020-6253279;info@brakkegrond.nl;www.brakkegrond.nl;1147;Mevrouw;Leen;;Laconte;Mevrouw;Bettina;;Lorsheijd;De heer;Erik;;Koletzki;Mevrouw;Kris;;Peeters;2;120;180;0;300;
+15076;259;;De Kleine Komedie;230;;;;Amstel 56 -58;1017 AC;AMSTERDAM;020-6265917;;020-6240534;020-6228492;algemeen@dekleinekomedie.nl;www.dekleinekomedie.nl;8039;Mevrouw;Vivienne;;Ypma;De heer;Thomas;;Bruining;De heer;Jacques;;Visser;Mevrouw;Bianca;;Derwort;1;500;0;0;500;
+15080;267;;Meervaart;230;;;;Meer en Vaart 300;1068 LE;AMSTERDAM;020-4107700;;020-4107777;020-4107789;info@meervaart.nl;www.meervaart.nl;476;De heer;Bert;;Liebregs;Mevrouw;Willemien;van;Lith;De heer;Martin;;Keereweer;Mevrouw;Malika;;Oukil;2;800;257;0;1057;
+15089;438;;Het Concertgebouw N.V.;230;;;;Concertgebouwplein 2 -6;1071 LN;AMSTERDAM;020-5730573;;0900-6718345;020-5730570;concertgebouw@concertgebouw.nl;www.concertgebouw.nl;9182;drs.;Gea;;Zantinge;De heer;Pieter;van;Diepen;;;;;;;;;2;2037;478;0;2515;
+15090;449;;Het Muziektheater Amsterdam;230;Postbus 16822;1001 RH;AMSTERDAM;Waterlooplein 22;1011 PG;AMSTERDAM;020-5518911;;020-6255455;020-5518068;info@het-muziektheater.nl;www.hetmuziektheater.nl;6643;Mevrouw;Marion;;Cornelissen;;;;;De heer;Frans;;Huneker;De heer;Mattijn;;Hallers;1;1600;0;0;1600;
+15095;585;;Tropentheater;229;Postbus 95001;1090 HA;AMSTERDAM;Linnaeusstraat 2 / Mauritskade 63;1092 AD;AMSTERDAM;020-5688451;;020 - 5688 500;020-5688384;tropentheater@kit.nl;www.tropentheater.nl;10968;De heer;Rien;;Vrijenhoek;;;;;De heer;Frits;van den;Akker;Mevrouw;Deborah;;Klumperbeek;2;450;185;0;635;
+15096;596;;Koninklijk Theater CarrÃ©;230;Postbus 20202;1000 HE;AMSTERDAM;Amstel 115 -125;1018 EM;AMSTERDAM;020-5249494;;0900-2525255;020-5249442;info@theatercarre.nl;www.theatercarre.nl;613;De heer;Hein;;Jens;Mevrouw;Priscilla;;Wattimena;De heer;Hans;;Petter;Mevrouw;Carry;van der;Sleen;2;1997;100;0;2097;
+15196;1283;;Theater Bellevue;230;;;;Leidsekade 90;1017 PN;AMSTERDAM;020-5305300;;020-5305301/02;020-5305303/020-6201;info@theaterbellevue.nl;www.theaterbellevue.nl;412;Mevrouw;Jeannette;;Smit;Mevrouw;Jessica;;Tepe;De heer;Hans;;Bruijn;Mevrouw;Mechteline;van;Es;2;248;105;0;353;
+15205;3242;;DeLaMar Theater;229;Leidsekade 91;1017PN;AMSTERDAM;Marnixstraat 402;1017PL;AMSTERDAM;020-5552627;;0900 - 3352627;020-5552699;info@delamar.nl;www.delamar.nl;10833;De heer;Fons;;Bruins;Mevrouw;Cynthia;;Schell;De heer;Marco;;Hartendorf;Mevrouw;Saskia;van der;Linde;2;943;601;0;1544;
+
+Vraagsteller,kdw
+Tijdstip, 20110514T15:20:53
+
+Vraag,VSCD
+Omschrijving,VSCD
+
+search,amsterdam
+
+Database
+Connectionname,fqt@XE
+Schemaname,fqt
+Servicename,nosu:1521:XE
+Description,flexible query tool

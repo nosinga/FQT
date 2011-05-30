@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/!svn/ver/26459/projecten/abkr/trunk/gm_xdb_ata/src/main/Constraints
+END
+SQM_constraints.sql
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/!svn/ver/20459/projecten/abkr/trunk/gm_xdb_ata/src/main/Constraints/SQM_constraints.sql
+END
+URP_constraints.sql
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/!svn/ver/26459/projecten/abkr/trunk/gm_xdb_ata/src/main/Constraints/URP_constraints.sql
+END

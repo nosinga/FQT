@@ -1,0 +1,316 @@
+PROMPT file URP_MenuLeafs4Reports.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het updaten van <sqm#>permissions
+|||  (deze <sqm#> permissie wordt op zijn beurt aangemaakt door een
+|||   trigger op de SQM_QUERIES tabel)
+|||  waarmee een query aan een connectie wordt verbonden 
+|||  en vervolgens wordt
+|||  deze "query connectie permissie" verbonden aan 
+|||  een rapport menu en aan een rol
+|||
+||| Bovenstaande beschriiving wordt uitgevoerd door een procedure
+||| die urp_utils.lq2c2m2r heet (link query to connecation to menu to role)
+||| de documentatie van deze functie is leidend
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+--  In het geval van rappporten moeten er vier stappen gedaan worden
+--  om een rapport aan een connectie, een rapport menu en een rol te hangen
+--  1. insert sqm permissie
+--  2. koppel hierbij een connectie aan het rapport
+--  3. koppel deze sqm permissie aan een rapport menu
+--     Als je voor <p_rptmenu> null invult wordt het rappport niet aan een menu gehangen
+--     dit is voornamelijk handig voor doorlink rapporten die je niet rechtstreeks in een menu wilt hangen
+--  4. koppel deze url permissie aan een user role
+--  deze 4 stappen worden dmv 1 procedure call uitgevoerd : ata_install_dml.lq2c2m2r
+
+REM    ===============================================================================
+PROMPT - ATA_GM
+REM    ===============================================================================
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('ATA_ACTIONS'               ,'ATA Usage'     ,'role_grt_admin' ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('ATA_LOGINS'                ,'ATA Usage'     ,'role_grt_admin' ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('Query_Afhankelijkheid'     ,'ATA Usage'     ,'role_rapporten_admin' ,'ata@ABKR'  );
+--
+REM    ===============================================================================
+PROMPT - GBAPRSBASIS
+REM    ===============================================================================
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('UniekeMLObezoekersopDag'               ,'AfnemerMijnLoket'            ,'role_mijnloketbeheerder'    ,'abkr_rpt@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('UniekeMLObezoekersopDag_classified'    ,'AfnemerMijnLoket_classified' ,'role_mijnloket_classified'  ,'abkr_rpt@ABKR'  );
+--
+REM    ===============================================================================
+PROMPT - DAILYCHECK
+REM    ===============================================================================
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('daily_check001_JobControles_ALL'                         , 'DailyCheck' , 'role_stelselbeheerder'  , 'abkr_rpt@ABKR'       );
+exec urp_menu_utils.addMenuLeafReport('daily_check002_Verdacht_Bericht_GBA'                     , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'  );
+exec urp_menu_utils.addMenuLeafReport('daily_check002_Verdacht_Bericht_BAG'                     , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'  );
+exec urp_menu_utils.addMenuLeafReport('daily_check003_Aantal_Niet_Verwerkte_AftapBerichten_GBA' , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'  );
+exec urp_menu_utils.addMenuLeafReport('daily_check004_Laatste_Bericht_StUF300_IN_GBA'           , 'DailyCheck' , 'role_stelselbeheerder'  , 'stuf300_in@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('daily_check004_Laatste_Bericht_StUF301_IN_BAG'           , 'DailyCheck' , 'role_stelselbeheerder'  , 'stuf301_in@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('daily_check005_Statistieken_Totaal_GBA'                  , 'DailyCheck' , 'role_stelselbeheerder'  , 'abkr_rpt@ABKR'       );
+exec urp_menu_utils.addMenuLeafReport('daily_check005_Statistieken_Totaal_BAG'                  , 'DailyCheck' , 'role_stelselbeheerder'  , 'stuf301_in@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('daily_check006_Statistieken_Totaal_perDatum_GBA'         , 'DailyCheck' , 'role_stelselbeheerder'  , 'abkr_rpt@ABKR'       );
+exec urp_menu_utils.addMenuLeafReport('daily_check007_Gedetecteerde_Issues_perIssue_GBA'        , 'DailyCheck' , 'role_stelselbeheerder'  , 'abkr_rpt@ABKR'       );
+exec urp_menu_utils.addMenuLeafReport('daily_check008_Gedetecteerde_Issues_perDatum_GBA'        , 'DailyCheck' , 'role_stelselbeheerder'  , 'abkr_rpt@ABKR'       );
+exec urp_menu_utils.addMenuLeafReport('daily_check009_Aantal_Kennisgeving_Afnemer_Error_ALL'    , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'  );
+exec urp_menu_utils.addMenuLeafReport('daily_check010_Volgindicaties_DDS_Error_ALL'             , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_unique@guc'      );
+exec urp_menu_utils.addMenuLeafReport('daily_check011_Volgindicaties_Afnemer_Error_ALL'         , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_unique@guc'      );
+exec urp_menu_utils.addMenuLeafReport('daily_check012_ORA_Meldingen_GUC_ALL'                    , 'DailyCheck' , 'role_stelselbeheerder'  , 'guc_trace@guc'       );
+exec urp_menu_utils.addMenuLeafReport('daily_check013_ORA_Meldingen_GM_ALL'                     , 'DailyCheck' , 'role_stelselbeheerder'  , 'dvgm@gegmag'         );
+exec urp_menu_utils.addMenuLeafReport('DailyCheck_Totaal_Rapport_perDatum'                      , 'DailyCheck' , 'role_stelselbeheerder'  , 'abkr_rpt@ABKR'       );
+--
+REM    ===============================================================================
+PROMPT - DAILYCHECK GBA mail rol
+REM    ===============================================================================--
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check001_JobControles_ALL'                         , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'abkr_rpt@ABKR'      );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check002_Verdacht_Bericht_GBA'                     , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'guc_queue@pivqueue' );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check003_Aantal_Niet_Verwerkte_AftapBerichten_GBA' , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'guc_queue@pivqueue' );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check004_Laatste_Bericht_StUF300_IN_GBA'           , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'stuf300_in@gegmag'  );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check005_Statistieken_Totaal_GBA'                  , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'abkr_rpt@ABKR'      );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check007_Gedetecteerde_Issues_perIssue_GBA'        , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'abkr_rpt@ABKR'      );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check009_Aantal_Kennisgeving_Afnemer_Error_ALL'    , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'guc_queue@pivqueue' );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check010_Volgindicaties_DDS_Error_ALL'             , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'guc_unique@guc'     );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check011_Volgindicaties_Afnemer_Error_ALL'         , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'guc_unique@guc'     );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check012_ORA_Meldingen_GUC_ALL'                    , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'guc_trace@guc'      );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check013_ORA_Meldingen_GM_ALL'                     , 'RPT' , 'role_dailyCheck_GBA_mail_subscribers' , 'dvgm@gegmag'        );
+--
+REM    ===============================================================================
+PROMPT - DAILYCHECK BAG mail rol
+REM    ===============================================================================--
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check001_JobControles_ALL'                         , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'abkr_rpt@ABKR'      );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check002_Verdacht_Bericht_BAG'                     , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'guc_queue@pivqueue' );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check004_Laatste_Bericht_StUF301_IN_BAG'           , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'stuf301_in@gegmag'  );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check005_Statistieken_Totaal_BAG'                  , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'stuf301_in@gegmag'  );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check009_Aantal_Kennisgeving_Afnemer_Error_ALL'    , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'guc_queue@pivqueue' );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check010_Volgindicaties_DDS_Error_ALL'             , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'guc_unique@guc'     );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check011_Volgindicaties_Afnemer_Error_ALL'         , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'guc_unique@guc'     );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check012_ORA_Meldingen_GUC_ALL'                    , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'guc_trace@guc'      );
+exec urp_menu_utils.linkMenuLeaf2Role( 'daily_check013_ORA_Meldingen_GM_ALL'                     , 'RPT' , 'role_dailyCheck_BAG_mail_subscribers' , 'dvgm@gegmag'        );
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- overzichtsrapport
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+--
+REM    ===============================================================================
+PROMPT - Bronhouder GBA
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('Dubbele_BSN'                            , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'gm_out@gegmag'      );
+exec urp_menu_utils.addMenuLeafReport('Persoonsgegevens_GM_obvBSN'             , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'dvgm@gegmag'        ); 
+exec urp_menu_utils.addMenuLeafReport('Persoonslijst'                          , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'gm_out@gegmag'      );
+exec urp_menu_utils.addMenuLeafReport('Personen_met_TeveelAdressen'            , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'gm_out@gegmag'      );
+exec urp_menu_utils.addMenuLeafReport('Gerelateerde_Personen'                  , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'stuf300_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('Escalatie_Personen'                     , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'dvgm@gegmag'        );
+exec urp_menu_utils.addMenuLeafReport('Verschillen_GBA_BAG_Adres'              , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'stuf300_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('Personen_zonder_Toevoeging'             , 'Bronhouder GBA'                 , 'role_stelselbeheerder'   ,    'abkr_rpt@ABKR'      );
+/*
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten
+*/
+exec urp_menu_utils.addMenuLeafReport('Persoonslijst_MLO'                      , null                             , 'role_stelselbeheerder'    ,   'abkr_rpt@ABKR'      );
+exec urp_menu_utils.addMenuLeafReport('Persoonslijst_StUF300'                  , null                             , 'role_stelselbeheerder'    ,   'stuf300_out@gegmag' );
+--
+REM    ===============================================================================
+PROMPT - Kennisgevingen Inkomend
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , parentmenuname , rolename , connectionname)
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('GUC_Trace_Endpoints'                        , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_trace@guc'      );
+exec urp_menu_utils.addMenuLeafReport('Foutmeldingen_Bericht_GUC'                  , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_trace@guc'      );
+exec urp_menu_utils.addMenuLeafReport('Foutmeldingen_Bericht_GM'                   , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'dvgm@gegmag'        );
+exec urp_menu_utils.addMenuLeafReport('Audit_GM_Transacties'                       , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'dvgm@gegmag'        );
+--
+exec urp_menu_utils.addMenuLeafReport('StUF300Berichten_obvCorrelationID'          , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'stuf300_in@gegmag'  ); 
+exec urp_menu_utils.addMenuLeafReport('StUF300Berichten_obvSleutelwaarde'          , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'stuf300_in@gegmag'  ); 
+exec urp_menu_utils.addMenuLeafReport('GBA_Aftap_Aantal_perStatus'                 , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' ); 
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Info_obvReferentienummer'       , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Info_obvBSN'                    , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Info_obvDag'                    , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Info_obvStatus'                 , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Info_obvCorrelationID_Aftap'    , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Info_obvCorrelationID_Initieel' , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Bericht_Status_obvMaand'                , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('GBA_Jira_Issues_obvDagIssue'                , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'abkr_rpt@ABKR'      );
+exec urp_menu_utils.addMenuLeafReport('GBA_Jira_Issues_obvMaand'                   , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'abkr_rpt@ABKR'      );
+exec urp_menu_utils.addMenuLeafReport('GBA_Statistieken_QUEUE'                     , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+--
+exec urp_menu_utils.addMenuLeafReport('StUF301Berichten_obvCorrelationID'          , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'stuf301_in@gegmag'  ); 
+exec urp_menu_utils.addMenuLeafReport('StUF301Berichten_obvSleutelwaarde'          , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'stuf301_in@gegmag'  ); 
+exec urp_menu_utils.addMenuLeafReport('BAG_Bericht_Info_obvCorrelationID'          , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Bericht_Info_obvBusinessID'             , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Bericht_Info_obvReferentienummer'       , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Bericht_Info_obvStatus'                 , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Bericht_Info_obvDag'                    , 'Kennisgevingen Inkomend' , 'role_stelselbeheerder'   , 'guc_queue@pivqueue' );
+--
+/*
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten
+*/ 
+exec urp_menu_utils.addMenuLeafReport('Jira_Issues_obvBericht'                 , null                             , 'role_stelselbeheerder'   , 'abkr_rpt@ABKR'      ); 
+--
+REM    ===============================================================================
+PROMPT - Kennisgevingen Uitgaand
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , parentmenuname , rolename , connectionname )
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('AfnemersBericht_Info_obvAantallen'        , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'); 
+exec urp_menu_utils.addMenuLeafReport('AfnemersBericht_Info_obvCorrelationID'    , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'); 
+exec urp_menu_utils.addMenuLeafReport('AfnemersBericht_Info_obvAfnemer'          , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'); 
+exec urp_menu_utils.addMenuLeafReport('AfnemersBericht_Info_obvStatus'           , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'); 
+exec urp_menu_utils.addMenuLeafReport('AfnemersBericht_Info_obvReferentienummer' , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_queue@pivqueue'); 
+exec urp_menu_utils.addMenuLeafReport('Afnemer_Applicaties'                      , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_filters@guc'   ); 
+exec urp_menu_utils.addMenuLeafReport('Afnemer_Volgindicaties_obvAfnemer'        , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_unique@guc'    ); 
+exec urp_menu_utils.addMenuLeafReport('Afnemer_Volgindicaties_TotaalperAfnemer'  , 'Kennisgevingen Uitgaand' , 'role_stelselbeheerder'  , 'guc_unique@guc'    ); 
+/*
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten
+*/ 
+exec urp_menu_utils.addMenuLeafReport('Relatie_Lk01IN_Lk01OUT'                   , null                             , 'role_stelselbeheerder'   , 'guc_unique@guc'   ); 
+--
+REM    ===============================================================================
+PROMPT - Vraag/Antwoord Uitgaand
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , parentmenuname , rolename , connectionname)
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('Antwoord_Aantal_obvMaand'                     , 'Vraag/Antwoord Uitgaand' , 'role_stelselbeheerder' , 'abkr_rpt@ABKR'  ); 
+exec urp_menu_utils.addMenuLeafReport('AantalGeraadpleegdeMLOServices'               , 'Vraag/Antwoord Uitgaand' , 'role_stelselbeheerder' , 'abkr_rpt@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('AantalUniekeMLObezoekersopDag'                , 'Vraag/Antwoord Uitgaand' , 'role_stelselbeheerder' , 'abkr_rpt@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('MijnLoket_PL_met_issues'                      , 'Vraag/Antwoord Uitgaand' , 'role_stelselbeheerder' , 'abkr_rpt@ABKR'  );
+--
+exec urp_menu_utils.linkMenuLeaf2Role( 'AantalGeraadpleegdeMLOServices' , 'RPT', 'role_mijnloketbeheerder' , 'abkr_rpt@ABKR' );
+exec urp_menu_utils.linkMenuLeaf2Role( 'AantalUniekeMLObezoekersopDag'  , 'RPT', 'role_mijnloketbeheerder' , 'abkr_rpt@ABKR' ); 
+exec urp_menu_utils.linkMenuLeaf2Role( 'MijnLoket_PL_met_issues'        , 'RPT', 'role_mijnloketbeheerder' , 'abkr_rpt@ABKR' );
+--
+REM    ===============================================================================
+PROMPT - GUC
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , connectionname , parentmenuname , rolename)
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('GUC_Recovery_Status'                      , 'GUC'                            , 'role_stelselbeheerder'   , 'guc_trace@guc'        );
+--
+REM    ===============================================================================
+PROMPT - Referentie
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , connectionname , parentmenuname , rolename)
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('Rapport Beschrijvingen'                   , 'Referentie'                     , 'role_connect'            , 'ata@ABKR'        );
+exec urp_menu_utils.addMenuLeafReport('Functionele_Foutmeldingen_GM'             , 'Referentie'                     , 'role_stelselbeheerder'   , 'dvgm@gegmag'     ); 
+exec urp_menu_utils.addMenuLeafReport('Database_Versies'                         , 'Referentie'                     , 'role_stelselbeheerder'   , 'abkr_rpt@ABKR'   ); 
+exec urp_menu_utils.addMenuLeafReport('Jira_Issues'                              , 'Referentie'                     , 'role_stelselbeheerder'   , 'abkr_rpt@ABKR'   ); 
+exec urp_menu_utils.addMenuLeafReport('RMC-Regio'                                , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   ); 
+--
+exec urp_menu_utils.addMenuLeafReport('Gebruikers'                               , 'Referentie'                     , 'role_gebruikers_admin'   , 'ata@ABKR'        );
+exec urp_menu_utils.addMenuLeafReport('Rol Beschrijvingen'                       , 'Referentie'                     , 'role_gebruikers_admin'   , 'ata@ABKR'        ); 
+exec urp_menu_utils.addMenuLeafReport('Rollen en gekoppelde toestemmingen'       , 'Referentie'                     , 'role_gebruikers_admin'   , 'ata@ABKR'        ); 
+exec urp_menu_utils.addMenuLeafReport('Gebruikers en gekoppelde toestemmingen'   , 'Referentie'                     , 'role_gebruikers_admin'   , 'ata@ABKR'        ); 
+--
+/* Landelijke tabellen GBA */
+exec urp_menu_utils.addMenuLeafReport('GBA_AdellijkeTitelsPerdikaatTabel'        , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_GemeentenTabel'                       , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_LandenTabel'                          , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_NationaliteitenTabel'                 , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_RedenOntbindingTabel'                 , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_NederlandsReisdocumentTabel'          , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_VerblijfstitelTabel'                  , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+exec urp_menu_utils.addMenuLeafReport('GBA_VerkrijgingVerlies_NLschapTabel'      , 'Referentie'                     , 'role_stelselbeheerder'   , 'gm_out@gegmag'   );
+/*
+|| Onderstaande drie rapporten staan niet in een menu, maar zijn drill-down rapporten
+*/
+exec urp_menu_utils.addMenuLeafReport('Gebruikers_menu'                          , null                             , 'role_gebruikers_admin'   , 'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('Gebruikers_rapporten'                     , null                             , 'role_gebruikers_admin'   , 'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('Gebruikers_urls'                          , null                             , 'role_gebruikers_admin'   , 'ata@ABKR'  );
+--
+REM    ===============================================================================
+PROMPT - StelselCatalogus
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , parentmenuname , rolename , connectionname )
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('SC_Administratie'                           , 'StelselCatalogus'               , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('SC_Categorie'                               , 'StelselCatalogus'               , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('SC_GM_Verwijzing_obvTabelKolom'             , 'StelselCatalogus'               , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('SC_Stufpaden_obvXpath'                      , 'StelselCatalogus'               , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('Domeinwaarden'                              , 'StelselCatalogus'               , 'role_stelselbeheerder'  , 'gm_out@gegmag'  ); 
+/*                                                                                                                                                                  
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten                                                                                    
+*/                                                                                                                                                                  
+exec urp_menu_utils.addMenuLeafReport('SC_Element'                                 , null                             , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('SC_Bron'                                    , null                             , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('SC_Stufpaden'                               , null                             , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+exec urp_menu_utils.addMenuLeafReport('SC_GM_Verwijzing'                           , null                             , 'role_stelselbeheerder'  , 'gm_out@gegmag'  );
+--
+REM    ===============================================================================
+PROMPT - Filters
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , connectionname , parentmenuname , rolename)
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('Filter_Applicaties_obvNaam'               , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Entiteittype_obvNaam'              , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Berichtsoort_obvNaam'              , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Sectormodel_obvNaam'               , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Berichtidentificatie_obvNaam'      , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filters_obvNaam'                          , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Keten_obvNaam'                     , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Keten_obvBronAfnemer'              , 'Filters'                        , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+/*                                                                                                                                                                  
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten                                                                                    
+*/                                                                                                                                                                  
+exec urp_menu_utils.addMenuLeafReport('Filter_Applicaties_obvID'                 , null                             , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Berichtidentificatie_obvID'        , null                             , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filters_obvID'                            , null                             , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_KetenItems_obvKetenID'             , null                             , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_KetenItems_obvFilterID'            , null                             , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+exec urp_menu_utils.addMenuLeafReport('Filter_Volgindicaties_obvKetenNaam'       , null                             , 'role_stelselbeheerder'   , 'guc_filters@guc' );
+--
+REM    ===============================================================================
+PROMPT - Bronhouder BAG
+REM    ===============================================================================
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('BAG_Nummeraanduiding_obvBusinessID'      , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Nummeraanduiding_obvPostcode'        , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_OpenbareRuimte_obvBusinessID'        , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Woonplaats_obvBusinessID'            , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Wijk_obvBusinessID'                  , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Buurt_obvBusinessID'                 , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Pand_obvBusinessID'                  , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_Object_obvBusinessID'                , 'Bronhouder BAG'                 , 'role_stelselbeheerder'   ,    'stuf301_out@gegmag' );
+/*
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten
+*/
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectGebruiksdoel_obvObjectIDD'     , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectToegankelijk_obvObjectIDD'     , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectAdres_obvObjectIDD'            , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectAdres_obvAdresIDD'             , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectPand_obvObjectIDD'             , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectPand_obvPandIDD'               , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectOntstaanUit_obvObjectIDD'      , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+exec urp_menu_utils.addMenuLeafReport('BAG_ObjectOvergegaanIn_obvObjectIDD'     , null                             , 'role_stelselbeheerder'    ,    'stuf301_out@gegmag' );
+--

@@ -1,0 +1,60 @@
+PROMPT file URP_MenuLeafs_Link2Role
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het linken van MenuLeafs aan rolen
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 07:49:56 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25507 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Permissions.dat $
+|||  ID       : $Id: URP_Permissions.dat 25507 2010-10-28 05:49:56Z nosinga $
+|||------------------------------------------------------------------------
+**/
+--
+REM    ===============================================================================
+PROMPT - RAPPORTEN ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+exec  urp_utils.link_permissionname2role('reports_admin','Reports'       )
+exec  urp_utils.link_permissionname2role('reports_admin','Report DB Connections')
+exec  urp_utils.link_permissionname2role('reports_admin','ReportMenuConnectors')
+--
+--
+--exec  urp_utils.link_permissionname2role('reports_admin','Queries Execute'       )
+REM    ===============================================================================
+PROMPT - URL MenuLeafs
+REM    ===============================================================================
+--
+--  In het geval van links moeten er twee stappen gedaan worden
+--  om een link permissie te inserten en aan een link menu en een rol te hangen
+--  1. insert url permissie en koppel deze url permissie aan een user role
+--  2. koppel deze url permissie aan een link menu
+--
+-- exec urp_utils.link_permissionname2role('role_grt_admin','Google')
+-- --
+-- -- met bovennstaande call ga je naar google en moet je door de proxy
+-- -- kijk of de proxy staat ingesteld in de application properties
+-- -- Apache DocumentRoot/<env>/ata/appenv/<env>.environment.properties.php
+-- -- en kijk hier naar UTL_HTTP_SET_PROXY
+-- -- in Gemeente Rotterdam : define('UTL_HTTP_SET_PROXY','twdproxy.ir.rotterdam.nl:8080,localhost');
+-- -- zonder proxy : define('UTL_HTTP_SET_PROXY',',');
+-- --
+-- exec  urp_utils.link_permissionname2role('role_stelselbeheerder','ping'          )
+-- exec  urp_utils.link_permissionname2role('role_stelselbeheerder','config'        )
+-- exec  urp_utils.link_permissionname2role('role_stelselbeheerder','functionalPing')
+-- exec  urp_utils.link_permissionname2role('role_stelselbeheerder','statistics'    )
+-- --
+REM    ===============================================================================
+PROMPT - AGENT TOOL ABKR ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+exec  urp_utils.link_permissionname2role ('user_management','Users'            )
+exec  urp_utils.link_permissionname2role ('user_management','Roles'            )
+exec  urp_utils.link_permissionname2role ('user_management','Permissions'      )
+exec  urp_utils.link_permissionname2role ('user_management','Menus'            )
+exec  urp_utils.link_permissionname2role ('user_management','ATA Configuratie' )
+--

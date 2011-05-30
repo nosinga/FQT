@@ -1,0 +1,46 @@
+PROMPT file URP_Roles.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse roles
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-11-04 09:08:07 +0100 (Thu, 04 Nov 2010) $
+|||  Revision : $Revision: 25865 $
+|||  Author   : $Author: whoogendam $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Roles.dat $
+|||  ID       : $Id: URP_Roles.dat 25865 2010-11-04 08:08:07Z whoogendam $
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT Toevoegen ROLES
+--
+REM ===============================================================================
+REM Create URP_ROLES
+REM =============================================================================== 
+--- Echte Roles
+--- role_connect
+--- door een user connect af te nemen kan hij ook niet meer aanloggen
+--- dit is handig om een user tijdelijk de toegang te ontzeggen zonder 
+--- zijn hele profiel te moeten verwijderen
+insert into urp_roles (rolename) values ('connect');     
+--- - role_super_admin
+--- - role die bij alle schermen kan
+insert into urp_roles (rolename) values ('super_admin');       
+--- - role_grt_admin
+--- - grt staat voor gebruikers rollen toestemmingen
+insert into urp_roles (rolename) values ('user_management');        
+--
+insert into urp_roles (rolename) values ('reports_admin');        
+--
+insert into urp_roles (rolename) values ('reports_db_conn_admin');        
+--
+insert into urp_roles (rolename) values ('reports_run');        
+--
+insert into urp_roles (rolename) values ('audit_ata_usage');
+--
+insert into urp_roles (rolename) values ('vscd_usage');

@@ -1,0 +1,41 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. GUC
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GUC_Recovery_Status)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GUC_Recovery_Status','select   domain_id
+,        event_timestamp
+,        correlation_id
+,        event_type
+,        actie
+,        melding
+,        bericht
+,        stacktrace
+,        case when correlation_id is not null 
+              then ''#runreport#queryname=GBA_Bericht_Info_obvCorrelationID_Aftap&correlation_id_verplicht=''||correlation_id||''#Bericht#guc_queue@pivqueue#''
+              else null
+         end bericht_aftap
+from     event
+where    event_type = ''HERSTEL''
+order by id desc'
+,'Recovery informatie GUC'
+,'Geeft aan of en wat de herstelstappen geweest zijn bij het stoppen/starten van de GUC'
+,'y',null);
+--

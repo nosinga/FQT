@@ -1,0 +1,310 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. uitgaande kennisgevingen
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-02-17 10:05:08 +0100 (Thu, 17 Feb 2011) $
+|||  Revision : $Revision: 30033 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_lk_uitgaand.dat $
+|||  ID       : $Id: rpt_lk_uitgaand.dat 30033 2011-02-17 09:05:08Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvCorrelationID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('AfnemersBericht_Info_obvCorrelationID','select   abq.sequence_id
+,        abq.correlation_id
+,        abq.enqueue_timestamp
+,        abq.dequeue_timestamp
+,        abq.afnemer
+,        abq.status
+,        to_char( substr(abq.payload, instr(abq.payload,''referentienummer>'',1)+17
+                                    , (instr(abq.payload,''referentienummer>'',1,2)) - (instr(abq.payload,''referentienummer>'',1)+19)
+                        )
+                ) referentienummer
+,        case when arq.sequence_id is null then ''Geen response''
+              when lower(arq.payload) like ''%bv01%'' then ''Bevestiging_Bv01''
+              when lower(arq.payload) like ''%bv02%'' then ''Bevestiging_Bv02''
+              when lower(arq.payload) like ''%bv03%'' then ''Bevestiging_Bv03''
+              when lower(arq.payload) like ''%bv04%'' then ''Bevestiging_Bv04''
+              when lower(arq.payload) like ''%fo01%'' then ''Fout_Fo01''
+              when lower(arq.payload) like ''%fo02%'' then ''Fout_Fo02''
+              when lower(arq.payload) like ''%fo03%'' then ''Fout_Fo03''
+              when lower(arq.payload) like ''%fo04%'' then ''Fout_Fo04''
+              else ''Onbekend''
+         end     soort_response
+,        ''#clob#payload#afnemers_bericht_queue#correlation_id#''||abq.correlation_id||''#''       bericht
+,        case when arq.sequence_id is null
+         then
+            null
+         else
+           ''#clob#payload#afnemers_response_queue#correlation_id#''||abq.correlation_id||''#''
+         end response
+from     afnemers_bericht_queue         abq
+,        afnemers_response_queue        arq
+where    abq.correlation_id = arq.correlation_id (+)
+and      abq.correlation_id = :correlation_id_verplicht
+','Distributieberichten afnemers o.b.v. CorrelationID'
+,'Ophalen distributie berichten naar afnemers o.b.v. correlationID
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvAfnemer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('AfnemersBericht_Info_obvAfnemer','select   abq.enqueue_timestamp          datum
+,        abq.dequeue_timestamp
+,        abq.afnemer
+,        abq.status
+,        to_char( substr(abq.payload, instr(abq.payload,''referentienummer>'',1)+17
+                                    , (instr(abq.payload,''referentienummer>'',1,2)) - (instr(abq.payload,''referentienummer>'',1)+19)
+                        )
+                ) referentienummer
+,        case when arq.sequence_id is null then ''Geen response''
+              when lower(arq.payload) like ''%bv01%'' then ''Bevestiging_Bv01''
+              when lower(arq.payload) like ''%bv02%'' then ''Bevestiging_Bv02''
+              when lower(arq.payload) like ''%bv03%'' then ''Bevestiging_Bv03''
+              when lower(arq.payload) like ''%bv04%'' then ''Bevestiging_Bv04''
+              when lower(arq.payload) like ''%fo01%'' then ''Fout_Fo01''
+              when lower(arq.payload) like ''%fo02%'' then ''Fout_Fo02''
+              when lower(arq.payload) like ''%fo03%'' then ''Fout_Fo03''
+              when lower(arq.payload) like ''%fo04%'' then ''Fout_Fo04''
+              else ''Onbekend''
+         end     soort_response
+,        ''#clob#payload#afnemers_bericht_queue#correlation_id#''||abq.correlation_id||''#''       bericht
+,        case when arq.sequence_id is null
+         then
+            null
+         else
+           ''#clob#payload#afnemers_response_queue#correlation_id#''||abq.correlation_id||''#''
+         end response
+from     afnemers_bericht_queue         abq
+,        afnemers_response_queue        arq
+where    abq.correlation_id                        = arq.correlation_id (+)
+and      lower(abq.afnemer)                        = lower(:afnemer_verplicht)
+and      to_char(abq.enqueue_timestamp,''YYYYMMDD'') = :datum_yyyymmdd_verplicht'
+,'Distributieberichten afnemers o.b.v. Afnemer'
+,'Ophalen distributie berichten naar afnemers o.b.v. afnemer
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvStatus)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('AfnemersBericht_Info_obvStatus','select   abq.enqueue_timestamp          datum
+,        abq.dequeue_timestamp
+,        abq.afnemer
+,        abq.status
+,        to_char( substr(abq.payload, instr(abq.payload,''referentienummer>'',1)+17
+                                    , (instr(abq.payload,''referentienummer>'',1,2)) - (instr(abq.payload,''referentienummer>'',1)+19)
+                        )
+                ) referentienummer
+,        case when arq.sequence_id is null then ''Geen response''
+              when lower(arq.payload) like ''%bv01%'' then ''Bevestiging_Bv01''
+              when lower(arq.payload) like ''%bv02%'' then ''Bevestiging_Bv02''
+              when lower(arq.payload) like ''%bv03%'' then ''Bevestiging_Bv03''
+              when lower(arq.payload) like ''%bv04%'' then ''Bevestiging_Bv04''
+              when lower(arq.payload) like ''%fo01%'' then ''Fout_Fo01''
+              when lower(arq.payload) like ''%fo02%'' then ''Fout_Fo02''
+              when lower(arq.payload) like ''%fo03%'' then ''Fout_Fo03''
+              when lower(arq.payload) like ''%fo04%'' then ''Fout_Fo04''
+              else ''Onbekend''
+         end     soort_response
+,        ''#clob#payload#afnemers_bericht_queue#correlation_id#''||abq.correlation_id||''#''       bericht
+,        case when arq.sequence_id is null
+         then
+            null
+         else
+           ''#clob#payload#afnemers_response_queue#correlation_id#''||abq.correlation_id||''#''
+         end response
+from     afnemers_bericht_queue         abq
+,        afnemers_response_queue        arq
+where    abq.correlation_id                        = arq.correlation_id (+)
+and      lower(abq.afnemer)                        = lower(:afnemer_verplicht)
+and      upper(abq.status)                         = upper(:status_verplicht)
+and      to_char(abq.enqueue_timestamp,''YYYYMMDD'') = :datum_yyyymmdd_verplicht'
+,'Distributieberichten afnemers o.b.v. Status en Afnemer'
+,'Ophalen distributie berichten naar afnemers o.b.v. Status en Afnemer'||chr(10)||chr(10)||
+'Parameter Status
+De status van de doorverzonden berichten
+- NEW        : Nog te verzenden berichten
+- DELIVERING : Dequeued voor sturen naar afnemer
+- DELIVERED  : Bericht is bij de afnemer aangekomen
+- ERROR      : Er is een fout opgetreden bij het doorzenden
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Afnemer_Applicaties)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Afnemer_Applicaties','select app.naam
+,      app.omschrijving
+,      app.organisatie
+,      app.email_adres
+,      ''#runreport#queryname=Afnemer_Volgindicaties_204_obvAfnemer&afnemer_verplicht=''||app.naam||''#Volgindicaties_204#guc_unique@guc#'' as Volgindicaties_204
+,      ''#runreport#queryname=Afnemer_Volgindicaties_300_obvAfnemer&afnemer_verplicht=''||app.naam||''#Volgindicaties_300#abkr_rpt@ABKR#'' as Volgindicaties_300
+from   bfk_applicatie   app
+where  lower(app.naam) like lower(''%''||:afnemer_applicatie_like||''%'') '
+,'Afnemers met filters'
+,'Toont de afnemers waarvoor filters zijn aangemaakt',null,null);
+--
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvAantallen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('AfnemersBericht_Info_obvAantallen','select   afnemer
+,        min(trunc(enqueue_timestamp))   periode_van
+,        max(trunc(enqueue_timestamp))   periode_tm
+,        status
+,        count(1)  aantal
+from     afnemers_bericht_queue
+where    afnemer = nvl(:afnemer,afnemer)
+and      to_char(enqueue_timestamp,''YYYYMMDD'') >= nvl(:datum_vanaf_yyyymmdd , to_char(enqueue_timestamp,''YYYYMMDD'') )
+and      to_char(enqueue_timestamp,''YYYYMMDD'') <= nvl(:datum_tm_yyyymmdd , to_char(enqueue_timestamp,''YYYYMMDD'') )
+group by afnemer
+,        status'
+,'Aantallen berichten per afnemer'
+,'Rapport toont per afnemer het aantal doorgestuurde berichten opgesplitst naar status'||chr(10)||chr(10)||
+'Attribuut Afnemer
+Betreft de naam van de afnemer waarnaar het bericht verzonden is/wordt'||chr(10)||chr(10)||
+'Attribuut Periode Van
+Dit toont de eerste dag van de opgegeven periode
+Indien geen periode wordt opgegeven dan zal deze query altijd de totale stand laten zien.
+Dan geeft dit attribuut de eerste dag van deze periode weer'||chr(10)||chr(10)||
+'Attribuut Periode Van
+Dit toont de laatste dag van de opgegeven periode
+Indien geen periode wordt opgegeven dan zal deze query altijd de totale stand laten zien.
+Dan geeft dit attribuut de laatste dag van deze periode weer'||chr(10)||chr(10)||
+'Attribuut Status
+De status van de doorverzonden berichten
+- NEW        : Nog te verzenden berichten
+- DELIVERING : Dequeued voor sturen naar afnemer
+- DELIVERED  : Bericht is bij de afnemer aangekomen
+- ERROR      : Er is een fout opgetreden bij het doorzenden
+',null,null);
+--
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvReferentienummer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('AfnemersBericht_Info_obvReferentienummer','select * 
+from ( select   abq.enqueue_timestamp          datum
+       ,        abq.dequeue_timestamp
+       ,        abq.afnemer
+       ,        abq.status
+       ,        to_char(substr(abq.refnr,1,instr(abq.refnr,''</'')-1))  referentienummer
+       ,        abq.correlation_id       
+       ,        case when arq.sequence_id is null then ''Geen response''
+                     when lower(arq.payload) like ''%bv01%'' then ''Bevestiging_Bv01''
+                     when lower(arq.payload) like ''%bv02%'' then ''Bevestiging_Bv02''
+                     when lower(arq.payload) like ''%bv03%'' then ''Bevestiging_Bv03''
+                     when lower(arq.payload) like ''%bv04%'' then ''Bevestiging_Bv04''
+                     when lower(arq.payload) like ''%fo01%'' then ''Fout_Fo01''
+                     when lower(arq.payload) like ''%fo02%'' then ''Fout_Fo02''
+                     when lower(arq.payload) like ''%fo03%'' then ''Fout_Fo03''
+                     when lower(arq.payload) like ''%fo04%'' then ''Fout_Fo04''
+                     else ''Onbekend''
+                end     soort_response
+       ,        ''#clob#payload#afnemers_bericht_queue#correlation_id#''||abq.correlation_id||''#''       bericht
+       ,        case when arq.sequence_id is null
+                then
+                   null
+                else
+                  ''#clob#payload#afnemers_response_queue#correlation_id#''||abq.correlation_id||''#''
+                end response
+       from   ( select abq.*
+                ,      substr(abq.payload, instr(abq.payload,''referentienummer>'')+17)  refnr
+                from   afnemers_bericht_queue  abq
+              ) abq
+       ,        afnemers_response_queue        arq
+       where    abq.correlation_id = arq.correlation_id (+)
+       and      abq.afnemer        = arq.afnemer        (+)
+     )
+where referentienummer = :referentienummer_verplicht'
+,'Distributieberichten afnemers o.b.v. Referentienummer'
+,'Ophalen distributie berichten naar afnemers o.b.v. Referentienummer','y',null);
+--
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES (Relatie_Lk01IN_Lk01OUT)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Relatie_Lk01IN_Lk01OUT','select onv.correlation_id
+,      onv.znd_naam             zender_naam
+,      onv.znd_refnr            zender_referentienummer
+,      vzn.znd_refnr            afnemer_referentienummer
+,      ''#runreport#queryname=AfnemersBericht_Info_obvReferentienummer&referentienummer_verplicht=''||vzn.znd_refnr||''#Bericht#guc_queue@pivqueue#'' as Bericht
+from   vzn_refnrs   vzn
+,      onv_refnrs   onv
+where  vzn.orn_id = onv.id
+and    onv.correlation_id = :correlation_id_verplicht'
+,'Relatie tussen Lk01 inkomend en Lk01 Uitgaand'
+,'Relatie tussen Lk01 inkomend en Lk01 Uitgaand','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Afnemer_Volgindicaties_204_obvAfnemer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Afnemer_Volgindicaties_204_obvAfnemer'
+,'select ''#runreport#queryname=Afnemer_Applicaties&afnemer_applicatie_like=''||via.applicatie_afnemer ||''#''||via.applicatie_afnemer ||''#guc_filters@guc#'' as applicatie_afnemer 
+,      vip.k2b_sleutel
+,      vip.dds_sleutel
+,      vip.abkr_sleutel
+,      via.sleutel_afnemer
+,      vip.bsn
+,      vip.gemeentecode
+,      via.status
+,      via.creatie_timestamp      datum
+from   volgindicatiesafnemers    via
+,      volgindicatiepersonen     vip
+where  vip.id                                     = via.vip_id
+and    via.applicatie_afnemer                     = nvl(:afnemer_verplicht , via.applicatie_afnemer )
+and    nvl(vip.k2b_sleutel     , vip.dds_sleutel) = nvl(:sleutel_bron      , nvl(vip.k2b_sleutel     , vip.dds_sleutel) )
+and    nvl(via.sleutel_afnemer , ''geenWaarde'' )   = nvl(:sleutel_afnemer   , nvl(via.sleutel_afnemer , ''geenWaarde'' ) )
+and    nvl(vip.bsn             , ''geenWaarde'' )   = nvl(:bsn               , nvl(vip.bsn             , ''geenWaarde'' ) )'
+,'Volgindicaties gezet door een afnemer (via StUF 2.04)'
+,'Alle volgindicaties, gezet door een afnemer via StUF 2.04'||chr(10)||chr(10)||
+'Parameters:
+Afnemer_verplicht : De applicatienaam van de afnemer (zoals vermeld in de stuurgegevens)
+Sleutel_bron      : De eventuele technische sleutel van de bronhouder (of K2B-sleutel of DDS-sleutel)
+Sleutel_afnemer   : De eventuele technische sleutel van de afnemer
+BSN               : Het eventuele BurgerServiceNummer van de te volgen persoon'||chr(10)||chr(10)||
+'Attribuut Status : 
+  - NEW             Nieuwe afnemer om persoon te volgen
+  - CONFIRMING      Dequeued voor sturen van Lk01 T naar afnemer
+  - CONFIRMED       Bv01 ontvangen van afnemer
+  - BSN_CHANGED     Lk01 W of C ontvangen van K2DD met bsn aanpassing
+  - ERROR           Wanneer er geen Bv01 ontvangen wordt'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Afnemer_Volgindicaties_300_obvAfnemer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Afnemer_Volgindicaties_300_obvAfnemer'
+,'select ''#runreport#queryname=Afnemer_Applicaties&afnemer_applicatie_like=''||app.naam||''#''||app.naam||''#guc_filters@guc#'' as applicatie_naam
+,      ''#runreport#queryname=Filter_Keten_obvNaam&Keten_naam=''||ktn.naam||''#''||ktn.naam||''#guc_filters@guc#'' as keten_naam
+,      flt.sleutel_naam
+,      flt.sleutel_waarde
+from   guc_filters.bfk_applicatie@guc_filters_ro              app
+,      guc_filters.bfk_keten@guc_filters_ro                   ktn
+,      guc_unique.bfk_externe_filter_waarde@guc_unique_ro     flt
+where  app.id                  = ktn.afnemer_id
+and    ktn.naam                = flt.keten_naam
+and    app.naam                = :afnemer_verplicht
+and    lower(flt.sleutel_naam) = lower(nvl(:sleutel_naam,flt.sleutel_naam))
+and    flt.sleutel_waarde      = nvl(:sleutel_waarde,flt.sleutel_waarde)'
+,'Volgindicaties gezet door een afnemer (via StUF3.00)'
+,'Alle volgindicaties, gezet door een afnemer via StUF 3.00'||chr(10)||chr(10)||
+'Parameters:
+Afnemer_verplicht : De applicatienaam van de afnemer (zoals vermeld in de stuurgegevens)
+Sleutel_naam      : Naam van de sleutel waarvoor de volgindicatie is gezet
+Sleutel_waarde    : De sleutelwaarde van de persoon/object die gevolgd dient te worden'
+,'y',null);
+--

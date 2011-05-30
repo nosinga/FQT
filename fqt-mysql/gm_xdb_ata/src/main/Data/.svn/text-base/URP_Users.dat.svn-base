@@ -1,0 +1,94 @@
+PROMPT file URP_Users.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse users
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||  De idm_ids (user names) e103** zijn beschikbaar in IDM in de TAP straat.
+||| 
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT Toevoegen USERS
+--
+REM    ===============================================================================
+PROMPT - Users IOO ATA
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'nosinga@ioo.rotterdam.nl', p_idm_id => 'e10368');
+exec urp_utils.addUser ( p_username => 'whoogendam@ioo.rotterdam.nl', p_idm_id => 'e10369');
+exec urp_utils.addUser ( p_username => 'ghelmers@ioo.rotterdam.nl', p_idm_id => 'e10370');
+exec urp_utils.addUser ( p_username => 'rvoets@ioo.rotterdam.nl', p_idm_id => 'e200018');
+-- 
+REM    ===============================================================================
+PROMPT - Users IOO ABKR
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'mcopier@ioo.rotterdam.nl', p_idm_id => 'e10367');
+exec urp_utils.addUser ( p_username => 'hneervoort@ioo.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'asaadou@ioo.rotterdam.nl', p_idm_id => 'e10366');
+-- 
+REM    ===============================================================================
+PROMPT - Users IOO other
+REM    ===============================================================================
+--
+REM    ===============================================================================
+PROMPT - Users PZR
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'm.bouaddi@pzr.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'y.hemmes-nigg@pzr.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'd.bongers@pzr.rotterdam.nl');
+--
+REM    ===============================================================================
+PROMPT - Users GBR
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'e.dakkenhorst@gbr.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'r.kuss@gbr.rotterdam.nl');
+--
+REM    ===============================================================================
+PROMPT - Users SoZaWe
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'a.roosjen@sozawe.rotterdam.nl');
+--
+REM    ===============================================================================
+PROMPT - Users SO-GICT
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'e.vandenoort@gw.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'k.gruppen@gw.rotterdam.nl', p_idm_id => 'e12345');
+exec urp_utils.addUser ( p_username => 'm.vanos@gw.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 's.verburg@gw.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'r.vandersterre@gw.rotterdam.nl');
+exec urp_utils.addUser ( p_username => 'so-gict@gw.rotterdam.nl');
+--
+REM    ===============================================================================
+PROMPT - Users TWD
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'atatest@rotterdam.nl');
+--
+REM    ===============================================================================
+PROMPT - Meta Users
+REM    ===============================================================================
+--- - Users META USERS
+--- ***
+--- -  meta users zijn een soort profiel users, hiermee hoor je niet aan te loggen
+--- -  deze users kunnen gebruikt worden om nieuwe users aan te maken
+--- -  alle rollen die een bepaald type user nodig heeft zit aan zo'n user toegevoegd 
+--- ***
+--- -  TODO alleen users met het juiste userdomain mogen aanloggen
+--- -       metausers hebben geen userdomain en kunnen dus ook niet aanloggen
+--
+exec urp_utils.addUser ( p_username => 'metauser_ata_admin');
+exec urp_utils.addUser ( p_username => 'metauser_sogict_admin');
+exec urp_utils.addUser ( p_username => 'metauser_stelselbeheerder_gbaprs');
+exec urp_utils.addUser ( p_username => 'metauser_mijnloketbeheerder');
+exec urp_utils.addUser ( p_username => 'metauser_filter_admin');
+exec urp_utils.addUser ( p_username => 'metauser_dailycheck_gba_mail_subscribers');
+exec urp_utils.addUser ( p_username => 'metauser_dailycheck_bag_mail_subscribers');
+exec urp_utils.addUser ( p_username => 'metauser_twd_admin');

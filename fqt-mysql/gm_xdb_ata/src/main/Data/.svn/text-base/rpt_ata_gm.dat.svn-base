@@ -1,0 +1,110 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. ATA GM
+|||
+|||  Dit script installeert alleen een aantal queries die onafhankelijk 
+|||  zijn van het domein
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_LOGINS)
+REM ===============================================================================
+insert into sqm_queries
+                (queryname,
+                 sqlstatement,
+				 short_description,
+                 description, logusage
+                )
+         values ('ATA_LOGINS',
+                 'select to_char(timestamp,''yyyymmdd'') timestamp
+,      username
+,      to_char(min(timestamp),''hh24:mi'') eerste_tijdstip
+,      to_char(max(timestamp),''hh24:mi'') laatste_tijdstip
+,      count(1) aantal_keren_ingelogd
+,      decode(result,1,''ja'',0,''nee'')   inlog_succesvol
+from   ata_logins_jna
+where  to_char(timestamp,''yyyymmdd'') >= nvl(:datum_vanaf_yyyymmdd,to_char(timestamp,''yyyymmdd'') )
+and    to_char(timestamp,''yyyymmdd'') <= nvl(:datum_totenmet_yyyymmdd,to_char(timestamp,''yyyymmdd'') )
+and    username like ltrim(rtrim(lower(''%''||:gebruikersnaam||''%'')))
+group  by to_char(timestamp,''yyyymmdd'')
+,      username
+,      decode(result,1,''ja'',0,''nee'')
+order  by timestamp
+,      eerste_tijdstip
+,      username
+,      inlog_succesvol'
+,'Toont de inloggegevens van gebruikers'
+,'Rapport dat logins op de ata tool vastlegt', 'y'
+                );
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_ACTIONS)
+REM ===============================================================================
+insert into sqm_queries
+                (queryname,
+                 sqlstatement,
+				 short_description,
+                 description, logusage
+                )
+         values ('ATA_ACTIONS',
+                 'select to_char(timestamp,''yyyymmdd'') timestamp
+,      username
+,      to_char(min(timestamp),''hh24:mi'') eerste_tijdstip
+,      to_char(max(timestamp),''hh24:mi'') laatste_tijdstip
+,      count(1) aantal_raadplegingen
+,      action   actie
+from   ata_actions_jna
+where  to_char(timestamp,''yyyymmdd'') >= nvl(:datum_vanaf_yyyymmdd,to_char(timestamp,''yyyymmdd'') )
+and    to_char(timestamp,''yyyymmdd'') <= nvl(:datum_totenmet_yyyymmdd,to_char(timestamp,''yyyymmdd'') )
+and    username like ltrim(rtrim(lower(''%''||:gebruikersnaam||''%'')))
+group  by to_char(timestamp,''yyyymmdd'')
+,      username
+,      action
+order  by timestamp
+,      eerste_tijdstip
+,      username
+,      actie'
+,'Toont de ATA-acties van gebruikers'
+,'Rapport het gebruik van de ata tool vastlegt', 'y'
+                );
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Query_Afhankelijkheid)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Query_Afhankelijkheid','select sub.queryname
+,      case when sub.called_by is not null
+            then ''#clob#called_by#(select * from table(ata_reports.query_dependencies))#queryname#''||sub.queryname||''#''       
+            else null
+       end  called_by
+,      case when sub.calling is not null
+            then ''#clob#calling#(select * from table(ata_reports.query_dependencies))#queryname#''||sub.queryname||''#''       
+            else null
+       end  calling
+,      case when sub.calling_missing is not null
+            then ''#clob#calling_missing#(select * from table(ata_reports.query_dependencies))#queryname#''||sub.queryname||''#''       
+            else null
+       end  calling_missing
+from  (select * from table(ata_reports.query_dependencies))  sub
+where  lower(sub.queryname) = lower(nvl(:queryname,sub.queryname))
+order by sub.queryname'
+,'Afhankelijkheden tussen queries'
+,'Geeft per query de afhankelijkheden naar andere queries aan'||chr(10)||chr(10)||
+'Attribuut Called_By       : Alle queries die de huidige query aanroepen
+Attribuut Calling         : Alle queries die de query zelf aanroept
+Attribuut Calling_Missing : Alle queries die de query zelf aanroept, maar die niet (meer) zodanig als query aanwezig zijn
+De laatste kolom zou eigenlijk altijd leeg moeten zijn'
+,'y',null);
+--

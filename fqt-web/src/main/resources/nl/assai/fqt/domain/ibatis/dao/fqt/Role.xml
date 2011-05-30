@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="RLE">
+
+	<resultMap id="rleMap" class="Role">
+		<result property="id" 	       column="ID"/>
+		<result property="rv" 	       column="RV"/>
+		<result property="name"        column="ROLENAME"/>
+        <result property="permissions" column="ID"        select="findPermissionsByRole"/>
+	</resultMap>
+
+    <resultMap id="rpmMap" class="nl.assai.fqt.domain.model.fqt.Link">
+        <result property="id"      column="ID"/>
+        <result property="rv"      column="RV"/>
+        <result property="fromId"  column="RLE_ID"/>
+        <result property="toId"    column="PMS_ID"/>
+    </resultMap>
+
+    <select id="getRolePermissionLinks" parameterClass="Role" resultMap="rpmMap">
+        select * from URP_ROLE_PERMISSION where RLE_ID = #id#
+    </select>
+
+    <insert id="insertRolePermission" parameterClass="nl.assai.fqt.domain.model.fqt.Link">
+        insert into URP_ROLE_PERMISSION (
+            RLE_ID
+        ,   PMS_ID
+        ) values (
+            #fromId#
+        ,   #toId#
+        )
+        <selectKey resultClass="long" >
+             SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+    </insert>
+
+    <insert id="insertRolePermissionMySql" parameterClass="nl.assai.fqt.domain.model.fqt.Link">
+        insert into URP_ROLE_PERMISSION (
+            RLE_ID
+        ,   PMS_ID
+        ) values (
+            #fromId#
+        ,   #toId#
+        )
+        <selectKey resultClass="long">
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <delete id="deleteRolePermissionLinks" parameterClass="Role">
+        delete from URP_ROLE_PERMISSION where RLE_ID = #id#
+    </delete>
+
+    <select id="findAllRoles" resultMap="rleMap">
+		select * from URP_ROLES order by rolename
+	</select>
+
+    <select id="findAllSearchRoles" parameterClass="java.lang.String" resultMap="rleMap">
+		select * from URP_ROLES
+        where  lower(rolename) like lower(concat(concat('%',#value#),'%'))
+        order  by rolename
+	</select>
+
+    <select id="findAllRolesOfType"  parameterClass="String" resultMap="rleMap">
+        select * from URP_ROLES where rolename like #value# order by rolename
+    </select>
+    
+    
+	<select id="findRolesByUser" parameterClass="java.lang.Long" resultMap="rleMap">
+		select rls.rolename, rls.id, rls.rv
+        from   URP_ROLES     rls
+        ,      URP_USER_ROLE url
+        where  rls.id     = url.rle_id
+        and    url.usr_id = #value#
+    </select>
+
+    <insert id="insertRole" parameterClass="Role">
+		insert into URP_ROLES (
+			ROLENAME
+		) values (
+			#name#
+		)
+        <selectKey resultClass="long" >
+             SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+	</insert>
+
+
+    <insert id="insertRoleMySql" parameterClass="Role">
+		insert into URP_ROLES (
+			ROLENAME
+		) values (
+			#name#
+		)
+    <selectKey resultClass="long">
+        select LAST_INSERT_ID() as id
+    </selectKey>
+    </insert>
+
+	<update id="updateRole" parameterClass="Role">
+		update URP_ROLES SET
+			ROLENAME = #name#
+		where ID = #id#
+	</update>
+
+	<delete id="deleteRole" parameterClass="Role">
+		delete from URP_ROLES where ID = #id#
+	</delete>
+
+</sqlMap>

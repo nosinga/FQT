@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/!svn/ver/26461/projecten/abkr/trunk/gm_xdb_ata/src/main/Triggers
+END
+SQM_triggers.sql
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/!svn/ver/25607/projecten/abkr/trunk/gm_xdb_ata/src/main/Triggers/SQM_triggers.sql
+END
+URP_VIEW_triggers.sql
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/!svn/ver/26461/projecten/abkr/trunk/gm_xdb_ata/src/main/Triggers/URP_VIEW_triggers.sql
+END
+URP_triggers.sql
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/!svn/ver/14250/projecten/abkr/trunk/gm_xdb_ata/src/main/Triggers/URP_triggers.sql
+END

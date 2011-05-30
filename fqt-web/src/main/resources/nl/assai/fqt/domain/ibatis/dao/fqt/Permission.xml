@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PMS">
+
+	<resultMap id="pmsMap" class="Permission">
+		<result property="id" 			column="ID"/>
+		<result property="rv" 			column="RV"/>
+		<result property="name" 		column="NAME"/>
+        <result property="type" 		column="TYPE"/>
+		<result property="value" 		column="VALUE"/>
+		<result property="menuId" 		column="MENU_ID"/>
+		<result property="sqlId" 		column="SQL_ID"/>
+        <result property="conId" 		column="CON_ID"/>
+        <result property="orderBy" 		column="ORDERBY"/>
+	</resultMap>
+
+    <resultMap id="lnkMap" class="UrlLink">
+        <result property="url"          column="URL"/>
+        <result property="name"         column="PROMPT"/>
+    </resultMap>
+
+    <select id="findAllPermissions" resultMap="pmsMap">
+        select pms.name as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      pms.value as value
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      pms.orderby as orderby
+        from   urp_permissions pms
+        order by name
+    </select>
+
+    <select id="findAllSearchPermissions" parameterClass="java.lang.String" resultMap="pmsMap">
+        select pms.name as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      pms.value as value
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      pms.orderby as orderby
+        from   urp_permissions pms
+        where  fqt_reports.search(#value#,'URP_PERMISSIONS') like '%'||chr(0)||pms.id||chr(0)||'%'
+        order by name
+    </select>
+
+    <select id="findAllSearchPermissionsMySql" parameterClass="java.lang.String" resultMap="pmsMap">
+ select pms.name as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      pms.value as value
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      pms.orderby as orderby
+        from   urp_permissions pms
+        where  lower(concat(concat(pms.name, pms.type), pms.value)) like lower(concat(concat('%',#value#),'%'))
+        order by name
+    </select>
+
+    <select id="getPermissionByName" resultMap="pmsMap" parameterClass="java.lang.String">
+		select pms.name as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      pms.value as value
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      pms.orderby as orderby
+        from   urp_permissions pms
+        where  pms.name=#value#
+    </select>
+
+    <select id="findPermissionsByRole" parameterClass="java.lang.Long" resultMap="pmsMap">
+		select pms.name as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      pms.value as value
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      pms.orderby as orderby
+        from   URP_PERMISSIONS     pms
+        ,      URP_ROLE_PERMISSION rpm
+        where  pms.id     = rpm.pms_id
+        and    rpm.rle_id = #value#
+        order by 1
+    </select>
+
+    <select id="findPermissionsByUser" resultMap="pmsMap">
+		select pms.name as name
+        ,      pms.id as id
+        ,      pms.rv as rv
+        ,      pms.type as type
+        ,      pms.value as value
+        ,      pms.menu_id as menu_id
+        ,      pms.sql_id as sql_id
+        ,      pms.con_id as con_id
+        ,      pms.orderby as orderby
+        from   URP_PERMISSIONS     pms
+        ,      URP_ROLE_PERMISSION rpm
+        ,      URP_USER_ROLE       url
+        where  pms.id     = rpm.pms_id
+        and    rpm.rle_id = url.rle_id
+        and    url.usr_id = #value#
+        order by 1
+	</select>
+
+    <insert id="insertPermission" parameterClass="Permission">
+        insert into URP_PERMISSIONS (
+            NAME
+        ,	TYPE
+        ,	VALUE
+        ,	MENU_ID
+        ,	SQL_ID
+        ,	CON_ID
+        ,   ORDERBY
+        ) values (
+            #name#
+        ,	#type#
+        ,	#value#
+        ,	#menuId#
+        ,	#sqlId#
+        ,	#conId#
+        ,   #orderBy#
+        )
+        <selectKey resultClass="long" >
+             SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+    </insert>
+
+    <insert id="insertPermissionMySql" parameterClass="Permission">
+        insert into URP_PERMISSIONS (
+            NAME
+        ,	TYPE
+        ,	VALUE
+        ,	MENU_ID
+        ,	SQL_ID
+        ,	CON_ID
+        ,   ORDERBY
+        ) values (
+            #name#
+        ,	#type#
+        ,	#value#
+        ,	#menuId#
+        ,	#sqlId#
+        ,	#conId#
+        ,   #orderBy#
+        )
+        <selectKey resultClass="long" >
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+	<update id="updatePermission" parameterClass="Permission">
+		update URP_PERMISSIONS SET
+			NAME = #name#
+		,	TYPE = #type#
+		,	VALUE = #value#
+		,	MENU_ID = #menuId#
+		,	SQL_ID = #sqlId#
+		,	CON_ID = #conId#
+        ,   ORDERBY = #orderBy#
+		where ID = #id#
+	</update>
+
+	<delete id="deletePermission" parameterClass="Permission">
+		delete URP_PERMISSIONS where ID = #id#
+	</delete>
+
+    <select id="findUrlLinks" parameterClass="java.util.HashMap" resultMap="lnkMap">
+        select pms.value        url
+        ,      pms.name         prompt
+        from   urp_permissions  pms
+        ,      urp_menunodes    menu 
+        where  menu.menuname =  #urlmenuname#
+        and    menu.id       =  pms.menu_id
+        and    pms.id in (select rpm.pms_id
+                          from   urp_role_permission rpm
+                          ,      urp_user_role       url
+                          ,      urp_users           usr 
+                          where  rpm.rle_id = url.rle_id
+                          and    url.usr_id = usr.id 
+                          and    usr.username = #username#)
+    </select>
+
+</sqlMap>

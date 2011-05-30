@@ -1,0 +1,36 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse connecties
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-02-23 15:02:11 +0100 (Wed, 23 Feb 2011) $
+|||  Revision : $Revision: 30320 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/SQM_Connections.dat $
+|||  ID       : $Id: SQM_Connections.dat 30320 2011-02-23 14:02:11Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT Toevoegen CONNECTIONS
+--
+REM ===============================================================================
+REM Create SQM_CONNECTIONS
+REM =============================================================================== 
+exec  urp_utils.insert_connection ( p_connectionname => 'ata@ABKR'           , p_username       => 'ata_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'abkr_rpt@ABKR'      , p_username       => 'abkr_rpt_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'guc_queue@pivqueue' , p_username       => 'guc_queue_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'guc_unique@guc'     , p_username       => 'guc_unique_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'guc_trace@guc'      , p_username       => 'guc_trace_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'guc_filters@guc'    , p_username       => 'guc_filters_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'stuf300_in@gegmag'  , p_username       => 'stuf300_in_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'stuf301_in@gegmag'  , p_username       => 'stuf301_in_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'dvgm@gegmag'        , p_username       => 'dvgm_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'mlo_out@gegmag'     , p_username       => 'mlo_out_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'stuf300_out@gegmag' , p_username       => 'stuf300_out_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'stuf301_out@gegmag' , p_username       => 'stuf301_out_user' );
+exec  urp_utils.insert_connection ( p_connectionname => 'gm_out@gegmag'      , p_username       => 'gm_out_user' );

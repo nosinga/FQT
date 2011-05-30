@@ -1,0 +1,141 @@
+PROMPT file URP_Roles2MetaUsers.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse roles
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-11-04 09:08:07 +0100 (Thu, 04 Nov 2010) $
+|||  Revision : $Revision: 25865 $
+|||  Author   : $Author: whoogendam $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Roles2MetaUsers.dat $
+|||  ID       : $Id: URP_Roles2MetaUsers.dat 25865 2010-11-04 08:08:07Z whoogendam $
+|||------------------------------------------------------------------------
+**/
+--
+REM    ===============================================================================
+PROMPT - Metauser_super_admin
+REM    ===============================================================================
+-- koppel eerst metauser_super_admin aan rollen
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'connect');
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'super_admin');
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'user_management');
+--
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'reports_admin');
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'reports_run');
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'super_admin');
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'user_management');
+--
+exec urp_utils.link_user2role ( p_username => 'metauser_super_admin', p_rolename => 'audit_ata_usage');
+--
+-- REM    ===============================================================================
+-- PROMPT - Metauser_ata_gebruik
+-- REM    ===============================================================================
+-- -- Geef nu metauser_ata_gebruik de benodigde rechten
+-- --  hiermee kan metauser_ata_gebruik kan nu in ieder geval connecten 
+-- exec  urp_utils.link_user2role (p_username => 'metauser_ata_usage', p_rolename => 'connect');
+-- exec  urp_utils.link_user2role (p_username => 'metauser_ata_usage', p_rolename => 'rapporten_runnen');
+-- exec  urp_utils.link_user2role (p_username => 'metauser_ata_usage', p_rolename => 'documenten_raadplegen');
+-- --
+-- --
+-- REM    ===============================================================================
+-- PROMPT - Metauser_classified
+-- REM    ===============================================================================
+-- exec urp_utils.link_user2role ( p_username => 'metauser_classified', p_rolename => 'role_classified');
+--
+-- -------------------------------------------------------------------------------
+-- Koppel meta users aan rollen
+-- -------------------------------------------------------------------------------
+--  REM    ===============================================================================
+--  PROMPT - Metauser_stelselbeheerder_gbaprs
+--  REM    ===============================================================================
+--  exec urp_utils.link_user2role( p_username => 'metauser_stelselbeheerder_gbaprs', p_rolename => 'role_connect');
+--  exec urp_utils.link_user2role( p_username => 'metauser_stelselbeheerder_gbaprs', p_rolename => 'role_rapporten_runnen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_stelselbeheerder_gbaprs', p_rolename => 'role_documenten_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_stelselbeheerder_gbaprs', p_rolename => 'role_links_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_stelselbeheerder_gbaprs', p_rolename => 'role_stelselbeheerder');
+--  --
+--  REM    ===============================================================================
+--  PROMPT - Metauser_mijnloketbeheerder
+--  REM    ===============================================================================
+--  exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_connect');
+--  exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_rapporten_runnen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_documenten_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_links_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_mijnloketbeheerder');
+--  --
+--  REM    ===============================================================================
+--  PROMPT - Metauser_gbrbeheerder
+--  REM    ===============================================================================
+--  exec urp_utils.link_user2role( p_username => 'metauser_gbrbeheerder'     , p_rolename => 'role_connect');
+--  exec urp_utils.link_user2role( p_username => 'metauser_gbrbeheerder'     , p_rolename => 'role_rapporten_runnen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_gbrbeheerder'     , p_rolename => 'role_documenten_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_gbrbeheerder'     , p_rolename => 'role_links_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_gbrbeheerder'     , p_rolename => 'role_gbrbeheerder');
+--  --
+--  REM    ===============================================================================
+--  PROMPT - Metauser_classified
+--  REM    ===============================================================================
+--  exec urp_utils.link_user2role( p_username => 'metauser_classified'             , p_rolename => 'role_connect');
+--  exec urp_utils.link_user2role( p_username => 'metauser_classified'             , p_rolename => 'role_rapporten_runnen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_classified'             , p_rolename => 'role_documenten_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_classified'             , p_rolename => 'role_links_raadplegen');
+--  exec urp_utils.link_user2role( p_username => 'metauser_classified'             , p_rolename => 'role_mijnloketbeheerder');
+--  exec urp_utils.link_user2role( p_username => 'metauser_classified'             , p_rolename => 'role_mijnloket_classified');
+--  --
+--  REM    ===============================================================================
+--  PROMPT - Metauser_dailycheck_mail_subscribers
+--  REM    ===============================================================================
+--  exec urp_utils.link_user2role( p_username => 'metauser_dailycheck_mail_subscribers', p_rolename => 'role_dailyCheck_mail_subscribers');
+--  --
+--  REM    ===============================================================================
+--  PROMPT - Metauser_filter_admin
+--  REM    ===============================================================================
+--  exec urp_utils.link_user2role ( p_username => 'metauser_filter_admin'      , p_rolename => 'role_filter_admin');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,116 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. uitgaande antwoordberichten
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-11-18 09:17:54 +0100 (Thu, 18 Nov 2010) $
+|||  Revision : $Revision: 26380 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_la_uitgaand.dat $
+|||  ID       : $Id: rpt_la_uitgaand.dat 26380 2010-11-18 08:17:54Z nosinga $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Antwoord_Aantal_obvMaand)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Antwoord_Aantal_obvMaand','select   to_char(maand_dag,''YYYYMMDD'')  datum
+,        to_char(maand_dag,''DY'')        dag
+,        stelselcatalogus
+,        stuf300
+,        mijnloket
+,        stelselcatalogus + stuf300 + mijnloket    totaal
+from   ( select   trunc(entry_timestamp)    maand_dag
+         ,        sum(case when endpoint_name = ''guc_afnemers_oc4j.endpoint.inbound.tmf.Proxy''         then 1 else 0 end ) stelselcatalogus
+         ,        sum(case when endpoint_name = ''guc_afnemers_oc4j.endpoint.inbound.stuf300_out.Proxy'' then 1 else 0 end ) stuf300
+         ,        sum(case when endpoint_name = ''guc_afnemers_oc4j.endpoint.inbound.mlo.Proxy''         then 1 else 0 end ) mijnloket
+         from     entry
+         where    message_type  = ''RESPONSE''
+         and      to_char(entry_timestamp,''YYYYMM'') = nvl(:maand_yyyymm,to_char(entry_timestamp,''YYYYMM''))
+         group by trunc(entry_timestamp)
+       )
+order by datum'
+,'Aantallen antwoordberichten per soort bericht o.b.v. Maand'
+,'Toont de aantal antwoordberichten (La) die door het GM zijn verzonden naar afnemers
+Uitgesplitst naar maand en soort bericht
+- Attribuut Stelselcatalogus : Aantal antwoordberichten inzake de meta-data
+- Attribuut StUF300          : Aantal StUF Lv/La berichten
+- Attribuut MijnLoket        : Aantal vragen gesteld door MijnLoket'
+,null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (AantalGeraadpleegdeMLOServices)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION,DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('AantalGeraadpleegdeMLOServices', 'select   to_char(datum,''yyyymmdd'') datum
+,        webmethode
+,        count(1)                                            aantal
+,        ''#clob#payload#entry#id#''||min(request_id)||''#''     vraag_voorbeeld
+,        ''#clob#payload#entry#id#''||min(id)||''#''             antwoord_voorbeeld
+from     getburgersubservice_rpt
+where    to_char(datum,''yyyymmdd'') >= NVL(:datum_vanaf_yyyymmdd   ,to_char(datum,''yyyymmdd''))
+and      to_char(datum,''yyyymmdd'') <= NVL(:datum_totenmet_yyyymmdd,to_char(datum,''yyyymmdd''))
+and      ltrim(bsn,''0'')             = nvl(ltrim(:bsn,''0''),ltrim(bsn))
+group by to_char(datum,''yyyymmdd''), webmethode
+order by 3,2'
+,'Aantal geraadpleegde MLO Services o.b.v. datum en/of BSN'
+, 'Informatie inzake opvragingen van de afnemer MijnLoket (MLO) gedurende een op te geven periode en/of BSN', NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (AantalUniekeMLObezoekersopDag)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('AantalUniekeMLObezoekersopDag', 'select   count(1)                   aantal
+,        to_char(datum, ''yyyymmdd'') datum
+,        ''getBurgerResponse''        webmethode
+from   ( select * from getburger_rpt
+         union
+         select * from getburger_rpt_today
+       )
+where    to_char(datum,''yyyymmdd'') >= nvl(:datum_vanaf_yyyymmdd   ,to_char(sysdate,''yyyymmdd''))
+and      to_char(datum,''yyyymmdd'') <= nvl(:datum_totenmet_yyyymmdd,to_char(sysdate,''yyyymmdd''))
+group by datum
+order by datum'
+,'Aantal Unieke MLO berzoekers o.b.v. datum'
+, 'Aantal unieke (o.b.v. BSN) opvragingen van de afnemer MijnLoket (MLO) gedurende een op te geven periode', NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (MijnLoket_PL_met_issues)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('MijnLoket_PL_met_issues', 'select   mlo.*
+from   ( select   bsn
+         ,        min(laaddatum)                  laaddatum
+         from     stf300_stuurgegevens
+         where    substr(referentienummer,1,1) != ''i''
+         and      status                        = ''Error''
+         group by bsn
+       ) stf
+,      ( select   bsn
+         ,        datum                         inlog_datum
+         ,        to_char(datum,''yyyymmdd'')     datum
+         from     getburger_rpt
+       ) mlo
+where    mlo.bsn             = stf.bsn
+and      mlo.inlog_datum    >= stf.laaddatum
+and      ltrim(mlo.bsn,''0'')  = ltrim(nvl(:bsn,mlo.bsn),''0'')
+and      mlo.datum          >= nvl(:datum_vanaf_yyyymmdd    , mlo.datum)
+and      mlo.datum          <= nvl(:datum_totenmet_yyyymmdd , mlo.datum)
+order by mlo.bsn
+,        mlo.datum'
+, 'Persoonslijsten opgevraagd door MLO met minimaal 1 issue'
+, 'MijnLoket_PL_met_issues', NULL);
+--

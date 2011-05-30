@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure class="org.mortbay.jetty.webapp.WebAppContext">
+    <New id="ataUrpDataSource" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>java:jdbc/users</Arg>
+        <Arg>
+            <New class="oracle.jdbc.pool.OracleDataSource">
+                <Set name="URL">jdbc:oracle:thin:@localhost:1521:xe</Set>
+                <Set name="user">ata</Set>
+                <Set name="password">ata</Set>
+            </New>
+        </Arg>
+    </New>
+    <New id="ataBfkDataSource" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>java:jdbc/filters</Arg>
+        <Arg>
+            <New class="oracle.jdbc.pool.OracleDataSource">
+                <Set name="URL">jdbc:oracle:thin:@localhost:1521:xe</Set>
+                <Set name="user">guc_filters</Set>
+                <Set name="password">guc_filters</Set>
+            </New>
+        </Arg>
+    </New>
+    <Set name="extraClasspath">/projects/fqt-web/fqt-web/src/test/targets/who/</Set>
+</Configure>

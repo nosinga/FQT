@@ -1,0 +1,88 @@
+PROMPT file URP_MenuLeafs_Insert
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van MenuLeafs
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 07:49:56 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25507 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Permissions.dat $
+|||  ID       : $Id: URP_Permissions.dat 25507 2010-10-28 05:49:56Z nosinga $
+|||------------------------------------------------------------------------
+**/
+REM    ===============================================================================
+PROMPT - Create MENU LEAFS 
+REM    ===============================================================================
+-- submenu aan main menu en aan "echte" role hangen (zie REAME.txt)
+-- De volgende drie menu typen (rptmenu, urlmenu en docmenu)
+-- zijn op een dynamiche wijze gekoppeld aan de onderliggende shermen via de submenus
+-- eigenlijk wordt er voor rapporten urls en document directories steeds naar 1 type
+-- scherm gegaan met een parameter naanm (de naam van het submenu)
+-- er is 1 scherm voor rapporten een scherm voor urls en en een scherm voor document directories
+--
+REM    ===============================================================================
+PROMPT - RAPPORTEN ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Rapporten'    ,'STATIC','QUERIES'    ,urp_menu_utils.menuname2id('Rapporten Administratie'),'1');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('DB Connecties','STATIC','CONNECTIONS',urp_menu_utils.menuname2id('Rapporten Administratie'),'2');
+--
+REM    ===============================================================================
+PROMPT - URL MenuLeafs
+REM    ===============================================================================
+--
+--  In het geval van links moeten er twee stappen gedaan worden
+--  om een link permissie te inserten en aan een link menu en een rol te hangen
+--  1. insert url permissie en koppel deze url permissie aan een user role
+--  2. koppel deze url permissie aan een link menu
+--
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id) values ('Google','URL','http://www.google.com',urp_menu_utils.menuname2id('External Example'));
+--
+-- met bovennstaande call ga je naar google en moet je door de proxy
+-- kijk of de proxy staat ingesteld in de application properties
+-- Apache DocumentRoot/<env>/ata/appenv/<env>.environment.properties.php
+-- en kijk hier naar UTL_HTTP_SET_PROXY
+-- in Gemeente Rotterdam : define('UTL_HTTP_SET_PROXY','twdproxy.ir.rotterdam.nl:8080,localhost');
+-- zonder proxy : define('UTL_HTTP_SET_PROXY',',');
+--
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id) values ('ping'          ,'URL','GUC_CONFIG_BASE_URLping'          ,urp_menu_utils.menuname2id('GucPings'));
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id) values ('config'        ,'URL','GUC_CONFIG_BASE_URLconfig'        ,urp_menu_utils.menuname2id('GucPings'));
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id) values ('functionalPing','URL','GUC_CONFIG_BASE_URLfunctionalPing',urp_menu_utils.menuname2id('GucPings'));
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id) values ('statistics'    ,'URL','GUC_CONFIG_BASE_URLstatistics'    ,urp_menu_utils.menuname2id('GucPings'));
+--
+REM    ===============================================================================
+PROMPT - DOC MenuLeafs
+REM    ===============================================================================
+--
+--
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menu_id) values ('ArchitectuurDocumenten'    ,'DOC',urp_menu_utils.submenutype2mainmenuid('DOC'));
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menu_id) values ('StelselBeheerderDocumenten','DOC',urp_menu_utils.submenutype2mainmenuid('DOC'));
+--
+REM    ===============================================================================
+PROMPT - AGENT TOOL ABKR ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Gebruikers'      ,'STATIC','USERS'        ,urp_menu_utils.menuname2id('Agent Tool ABKR Administratie'),'1');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Rollen'          ,'STATIC','ROLES'        ,urp_menu_utils.menuname2id('Agent Tool ABKR Administratie'),'2');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Toestemmingen'   ,'STATIC','PERMISSIONS'  ,urp_menu_utils.menuname2id('Agent Tool ABKR Administratie'),'3');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('ATA Configuratie','STATIC','CONFIGURATION',urp_menu_utils.menuname2id('Agent Tool ABKR Administratie'),'4');
+
+REM    ===============================================================================
+PROMPT - FILTERS ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+-- main menu : 'mainmenu#61#Filters Administratie#Administratie Filters'
+--
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Keten'                     ,'STATIC','KETEN'               ,urp_menu_utils.menuname2id('Filters Administratie'),'0100');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Filter'                    ,'STATIC','FILTER'              ,urp_menu_utils.menuname2id('Filters Administratie'),'0200');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('FilterTest'                ,'STATIC','FILTERTEST'          ,urp_menu_utils.menuname2id('Filters Administratie'),'0250');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Organisatie'               ,'STATIC','ORGANISATIE'         ,urp_menu_utils.menuname2id('Filters Administratie'),'0300');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('Applicatie'                ,'STATIC','APPLICATIE'          ,urp_menu_utils.menuname2id('Filters Administratie'),'0400');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('StUF Bericht Identificatie','STATIC','BERICHTIDENTIFICATIE',urp_menu_utils.menuname2id('Filters Administratie'),'0500');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('StUF Versie'               ,'STATIC','STUFVERSIE'          ,urp_menu_utils.menuname2id('Filters Administratie'),'0600');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('StUF Entititeittype'       ,'STATIC','STUFENTITEITTYPE'    ,urp_menu_utils.menuname2id('Filters Administratie'),'0700');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('StUF Berichtsoort'         ,'STATIC','STUFBERICHTSOORT'    ,urp_menu_utils.menuname2id('Filters Administratie'),'0800');
+insert into urp_menuleaf_vw(menuleafname,menuleaftype,menuresourcelocation,menu_id,menuleaforder) values ('StUF Sectormodel'          ,'STATIC','STUFSECTORMODEL'     ,urp_menu_utils.menuname2id('Filters Administratie'),'0900');

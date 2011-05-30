@@ -1,0 +1,331 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. referentietabellen
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Rapport Beschrijvingen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Rapport Beschrijvingen','select queryname "Rapport naam"
+,      ''#ReportClob#queryname=report_queries_description&rapport_naam=''||qry.queryname||''# rapport beschrijving#'' "rapport beschrijving"
+,      ''#showreport#queryname=''||queryname||''#rapport uitvoeren#''||substr(pms.value,instr(pms.value,''#'',1,2) + 1)||''#'' "rapport uitvoeren"
+,      ''#ReportClob#queryname=report_queries_connection&connectionname=''||substr(pms.value,instr(pms.value,''#'',1,2) + 1)||''#''||substr(pms.value,instr(pms.value,''#'',1,2) + 1)||''#'' "db connection"
+from   sqm_queries      qry
+,      urp_permissions  pms
+where  lower(qry.queryname) like ''%''||lower(:rapport_naam)||''%''
+and    pms.value            like ''sqm#''||qry.queryname||''#''||''%''
+and    queryname in
+      (select substr(pms.value,instr(pms.value,''#'',1,1) + 1
+                          ,instr(pms.value,''#'',1,2) - (instr(pms.value,''#'',1,1) + 1)
+                    )
+       from     urp_permissions     pms
+       ,        urp_role_permission rpm
+       ,        urp_user_role       url
+       where    substr(pms.value,1,instr(pms.value,''#'',1,1)) = ''sqm#''
+       and      pms.id     = rpm.pms_id
+       and      rpm.rle_id = url.rle_id
+       and      url.usr_id = urp_utils.username2id(abkr_journaling.getuser)
+       )
+order by queryname'
+,'Overzicht van de ABKR rapporten','Overzicht van de diverse ABKR rapporten. Tevens is het mogelijk om deze uit te voeren.
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (report_queries_description)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('report_queries_description','select ''Rapport Naam ; ''||queryname||chr(10)||
+        chr(10)||
+       ''Rapport beschrijving ; ''||chr(10)||
+        nvl(description, ''geen beschrijving'')||chr(10)||
+        chr(10)||
+       ''SQL select statement ; ''||chr(10)||
+        sqlstatement  clobReport
+from   sqm_queries
+where  queryname = :rapport_naam
+order by queryname'
+,'Detail rapport beschrijvingen rapporten'
+,'Detail rapport van Rapport Beschrijvingen betreffende beschrijvingen en sql-statement','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (report_queries_connection)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('report_queries_connection', 'select ''Connectionname     ''||connectionname||chr(10)||
+       ''Username           ''||username||chr(10)||
+       ''Servicename        ''||servicename||chr(10)
+       as clobReport
+from   sqm_connections
+where  connectionname = :connectionname
+and    connectionname in
+      (select substr(pms.value,instr(pms.value,''#'',1,2) + 1)
+       from     urp_permissions     pms
+       ,        urp_role_permission rpm
+       ,        urp_user_role       url 
+       where    substr(pms.value,1,instr(pms.value,''#'',1,1)) = ''sqm#''
+       and      pms.id     = rpm.pms_id
+       and      rpm.rle_id = url.rle_id
+       and      url.usr_id = urp_utils.username2id(abkr_journaling.getuser)
+       )
+','Detail rapport connecties rapporten'
+, 'Detail rapport van Raport Beschrijvingen betreffende connecties', NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Functionele_Foutmeldingen_GM)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Functionele_Foutmeldingen_GM','select cde_error              error_code
+,      oms_error              error_omschrijving
+,      case when ind_error = ''E'' then ''Error''
+            when ind_error = ''W'' then ''Warning''
+            when ind_error = ''I'' then ''Informatief''
+            else ind_error
+       end                    soort_error
+from   ref_err_r'
+,'Functionele foutmeldingen GM'
+,'Geeft de diverse mogelijke functionele foutmeldingen weer die het GM kan loggen',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Database_Versies)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Database_Versies','select schema
+,      versienr
+,      dat_installatie    installatie_datum
+,      status
+from (       select ''ABKR_RPT''    schema, versienr, dat_installatie, status from abkr_rpt_db_versie                    where dat_installatie = ( select max(dat_installatie) from abkr_rpt_db_versie                   )
+       union select ''ATA''         schema, versienr, dat_installatie, status from ata_db_versie                         where dat_installatie = ( select max(dat_installatie) from ata_db_versie                        )
+       union select ''DVGM''        schema, versienr, dat_installatie, status from dvgm.db_versie@dvgm_ro                where dat_installatie = ( select max(dat_installatie) from dvgm.db_versie@dvgm_ro               )
+       union select ''STUF''        schema, versienr, dat_installatie, status from stuf.db_versie@stuf_ro                where dat_installatie = ( select max(dat_installatie) from stuf.db_versie@stuf_ro               )
+       union select ''STUF300_IN''  schema, versienr, dat_installatie, status from stuf300_in.db_versie@stuf300_in_ro    where dat_installatie = ( select max(dat_installatie) from stuf300_in.db_versie@stuf300_in_ro   )
+       union select ''STUF301_IN''  schema, versienr, dat_installatie, status from stuf301_in.db_versie@stuf301_in_ro    where dat_installatie = ( select max(dat_installatie) from stuf301_in.db_versie@stuf301_in_ro   )
+       union select ''STUF300_OUT'' schema, versienr, dat_installatie, status from stuf300_out.db_versie@stuf300_out_ro  where dat_installatie = ( select max(dat_installatie) from stuf300_out.db_versie@stuf300_out_ro )
+       union select ''STUF301_OUT'' schema, versienr, dat_installatie, status from stuf301_out.db_versie@stuf301_out_ro  where dat_installatie = ( select max(dat_installatie) from stuf301_out.db_versie@stuf301_out_ro )
+       union select ''GM_OUT''      schema, versienr, dat_installatie, status from gm_out.db_versie@gm_out_ro            where dat_installatie = ( select max(dat_installatie) from gm_out.db_versie@gm_out_ro           )
+       union select ''MLO_OUT''     schema, versienr, dat_installatie, status from mlo_out.db_versie@mlo_out_ro          where dat_installatie = ( select max(dat_installatie) from mlo_out.db_versie@mlo_out_ro         )
+       union select ''GUC_QUEUE''   schema, versienr, dat_installatie, status from guc_queue.db_versie@guc_queue_ro      where dat_installatie = ( select max(dat_installatie) from guc_queue.db_versie@guc_queue_ro     )
+       union select ''GUC_TRACE''   schema, versienr, dat_installatie, status from guc_trace.db_versie@guc_trace_ro      where dat_installatie = ( select max(dat_installatie) from guc_trace.db_versie@guc_trace_ro     )
+       union select ''GUC_FILTERS'' schema, versienr, dat_installatie, status from guc_filters.db_versie@guc_filters_ro  where dat_installatie = ( select max(dat_installatie) from guc_filters.db_versie@guc_filters_ro )
+       union select ''GUC_UNIQUE''  schema, versienr, dat_installatie, status from guc_unique.db_versie@guc_unique_ro    where dat_installatie = ( select max(dat_installatie) from guc_unique.db_versie@guc_unique_ro   )
+     )
+where  schema = nvl(upper(:schemanaam),schema)'
+,'Versiegegevens ABKR schema''s'
+,'Toont voor alle schema''s de versiegegevens',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Jira_Issues)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Jira_Issues','select   jra.issue
+,        count(1)                               aantal
+,        to_char(to_date(min(substr(stf.tijdstipbericht,1,8)),''YYYYMMDD''),''DD-MM-YYYY'')   min_datum
+,        to_char(to_date(max(substr(stf.tijdstipbericht,1,8)),''YYYYMMDD''),''DD-MM-YYYY'')   max_datum
+from     table(abkr_reports.abkr_issues)     jra
+,        stf300_stuurgegevens                stf
+where    jra.bericht_key                 = stf.bericht_key
+group by jra.issue
+order by jra.issue'
+,'Verschillende Jira-Issues die aan minimaal 1 bericht zijn gekoppeld'
+,'Verschillende Jira-Issues met het aantal berichten die eraan gekoppeld zijn','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (RMC-Regio)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('RMC-Regio','select   * 
+from     gm_rmc_regio_vw
+order by gemeentecode'
+,'De gemeenten die vallen in de RMC-Regio van Rotterdam'
+,'RMC staat voor Regionaal Meld- en Coördinatiepunt.'||chr(10)||chr(10)||
+'Nederland is opgedeeld in diverse RMC-regio''s.
+Leerlingen tot 23 jaar die verhuizen naar een gemeente in je eigen RMC-regio mogen door de leerlingenadministratie gevolgd worden, echter verhuist een leerling naar een gemeente buiten deze regio dan moet de volgindicatie afgesloten worden.
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Gebruikers)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION)
+ Values
+   ('Gebruikers', 'select username
+, id
+, ''#runreport#queryname=Gebruikers_menu&username_verplicht=''||username||''#User menus#'' usermenus
+, ''#runreport#queryname=Gebruikers_rapporten&username_verplicht=''||username||''#User reports#'' userreports
+, ''#runreport#queryname=Gebruikers_urls&username_verplicht=''||username||''#User urls#'' userurls
+, ''#tabledetails#URP_USERS#id#''||id||''#'' "rij details"
+, ''#tabledetails#URP_USERS#id||222||rv#''||id||''222''||rv||''#'' "samengestelde sleutel"
+, ''#tabledetails#URP_USERS_JN#id||222||rv#''||id||''2221#'' "first journal"
+, ''#tabledetails#URP_USERS_JN#id||222||rv#''||id||''222''||rv||''#'' "last journal"
+, ''#tabledetails#URP_USERS_JN#id#''||id||''#'' "all journals"
+, ''#tabledetails#URP_USERS#id#''||id||''#''||username||''#'' "link met content"
+FROM URP_USERS
+WHERE username LIKE ''%''||LOWER(:gebruikers_naam)||''%'' '
+,'Gebruikers'
+, 'Voorbeeld met DSL tbv Drill Down rapporten erin
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Gebruikers_menu)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION)
+ Values
+   ('Gebruikers_menu', '
+select * 
+from   urp_user_menu_vw
+where  username = :username_verplicht
+order by orderby1
+,        orderby2'
+, 'De menu''s waar een gebruiker toegang toe heeft'
+, 'De menu''s waar een gebruiker toegang toe heeft
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Gebruikers_rapporten)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION)
+ Values
+   ('Gebruikers_rapporten', '
+select * 
+from   urp_user_reports_vw
+where  username = :username_verplicht
+order by parentmenuname
+,        submenuname
+,        reportname_connectionname'
+, 'De rapporten waar een gebruiker toegang toe heeft'
+, 'De rapporten waar een gebruiker toegang toe heeft
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Gebruikers_urls)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION)
+ Values
+   ('Gebruikers_urls', '
+select * 
+from   urp_user_urls_vw
+where  username = :username_verplicht
+order by parentmenuname
+,        submenuname
+,        urlname'
+, 'De URL''s waar een gebruiker rechten toe heeft'
+, 'De URL''s waar een gebruiker rechten toe heeft
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Rol Beschrijvingen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Rol Beschrijvingen',
+'select rle.rolename rol_naam
+,      case rle.rolename
+        when ''role_connect''                         then ''met deze rol kan een user toegang ontzegd worden zonder al zijn rollen af te nemen, NIET IN HUIDIGE VERSIE''
+        when ''role_dailyCheck_GBA_mail_subscribers'' then ''deze rol bepaald aan welke ata gebruikers de dagelijkse GBA mail wordt gestuurd''
+        when ''role_dailyCheck_BAG_mail_subscribers'' then ''deze rol bepaald aan welke ata gebruikers de dagelijkse BAG mail wordt gestuurd''
+        when ''role_dbconnecties_admin''              then ''via deze rol kunnen database connecties aangemaakt worden''
+        when ''role_documenten_admin''                then ''via deze rol kunnen documenten worden toegevoegd of verwijderd tbv oa tool documentatie''
+        when ''role_filter_admin''                    then ''via deze rol kunnen de filters onderhouden worden, NIET IN HUIDIGE VERSIE''
+        when ''role_gebruikers_admin''                then ''via deze rol kunnen gebruikers worden onderhouden''
+        when ''role_grt_admin''                       then ''via deze rol kunnen gebruikers rollen en toestemmingen worden onderhouden''
+        when ''role_mijnloket_classified''            then ''via deze rol kan persoonsgebonden informatie opgevraagd worden''
+        when ''role_mijnloketbeheerder''              then ''via deze rol kan opgevraagd worden hoe vaak PLs aangeroepen worden van mijn loket''
+        when ''role_rapporten_admin''                 then ''via deze rol kunnen rapporten worden onderhouden''
+        when ''role_stelselbeheerder''                then ''onder deze rol hangen alle rapporten die nodig zijn voor stelselbeheer''
+       end         rol_omschrijving
+from   urp_roles           rle          
+where  lower(rle.rolename) like ''role%'' 
+order by rol_naam
+'
+,'Beschrijving van de verschillende rollen'
+,'Beschrijving van de verschillende rollen','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Rollen en gekoppelde toestemmingen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Rollen en gekoppelde toestemmingen',
+'select rle.rolename
+,      case
+        when substr(pms.value,1,3) = ''sqm''     then ''Rapport''
+        when substr(pms.value,1,3) = ''url''     then ''URL / Link''
+        when substr(pms.value,1,3) = ''doc''     then ''Directory raadplegen documenten''
+        when substr(pms.value,1,3) = ''dca''     then ''Directory toevoegen/verwijderen documenten''
+        when substr(pms.value,1,7) = ''submenu'' then ''Scherm''
+        else pms.value
+       end                 menu_item_type
+,      case
+        when substr(pms.value,1,3) = ''sqm''     then substr(pms.value,5)        
+        when substr(pms.value,1,3) = ''url''     then substr(pms.value,instr(pms.value,'';'')+1)
+        when substr(pms.value,1,3) = ''doc''     then substr(pms.value,13)
+        when substr(pms.value,1,3) = ''dca''     then substr(pms.value,13)
+        when substr(pms.value,1,7) = ''submenu'' then substr(substr(pms.value,instr(pms.value,''#'',1,2)+1),1,instr(substr(pms.value,instr(pms.value,''#'',1,2)+1),''#'')-1)
+        else pms.value 
+       end                 menu_item_naam 
+from   urp_roles           rle
+,      urp_permissions     pms
+,      urp_role_permission rpm
+where  lower(rle.rolename) like ''%''||lower(:rolnaam)||''%''        
+and    lower(rle.rolename) like ''role%''
+and    pms.value not like ''/%''
+and    rle.id = rpm.rle_id
+and    pms.id = rpm.pms_id
+order by 1, 2, 3
+'
+,'Rollen en gekoppelde toestemmingen'
+,'Rollen en gekoppelde toestemmingen','y',null);
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Gebruikers en gekoppelde toestemmingen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Gebruikers en gekoppelde toestemmingen',
+'select distinct usr.username
+,       usr.idm_id
+,      case
+        when substr(pms.value,1,3) = ''sqm''     then ''Rapport''
+        when substr(pms.value,1,3) = ''url''     then ''URL / Link''
+        when substr(pms.value,1,3) = ''doc''     then ''Directory raadplegen documenten''
+        when substr(pms.value,1,3) = ''dca''     then ''Directory toevoegen/verwijderen documenten''
+        when substr(pms.value,1,7) = ''submenu'' then ''Scherm''
+        else pms.value
+       end                 menu_item_type
+,      case
+        when substr(pms.value,1,3) = ''sqm''     then substr(pms.value,5)
+        when substr(pms.value,1,3) = ''url''     then substr(pms.value,instr(pms.value,'';'')+1)
+        when substr(pms.value,1,3) = ''doc''     then substr(pms.value,13)
+        when substr(pms.value,1,3) = ''dca''     then substr(pms.value,13)
+        when substr(pms.value,1,7) = ''submenu'' then substr(substr(pms.value,instr(pms.value,''#'',1,2)+1),1,instr(substr(pms.value,instr(pms.value,''#'',1,2)+1),''#'')-1)
+        else pms.value
+       end                 menu_item_naam
+from   urp_users           usr
+,      urp_user_role       url
+,      urp_roles           rle
+,      urp_role_permission rpm
+,      urp_permissions     pms
+where  lower(usr.username||usr.idm_id) like ''%''||lower(:gebruikers_naam_of_idm_id)||''%'' 
+and    lower(rle.rolename) like ''role%''
+and    pms.value not like ''/%''
+and    usr.id = url.usr_id
+and    rle.id = url.rle_id
+and    rle.id = rpm.rle_id
+and    pms.id = rpm.pms_id
+order by 1, 3, 4
+'
+,'Gebruikers en gekoppelde toestemmingen'
+,'Gebruikers en gekoppelde toestemmingen','y',null);

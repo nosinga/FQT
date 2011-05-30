@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CON">
+
+	<resultMap id="conMap" class="Connection">
+		<result property="id" 			column="ID"/>
+		<result property="name" 		column="CONNECTIONNAME"/>
+		<result property="username"	    column="USERNAME"/>
+		<result property="password" 	column="PASSWORD"/>
+		<result property="servicename" 	column="SERVICENAME"/>
+		<result property="tnsName"		column="TNSNAME"/>
+		<result property="description"	column="DESCRIPTION"/>
+	</resultMap>
+
+    <select id="findAllConnections" resultMap="conMap">
+        select id
+        ,      connectionname
+        ,      username
+        ,      urp_utils.password_decrypt(password) as password
+        ,      servicename
+        ,	   tnsName
+        ,      description
+        from SQM_CONNECTIONS order by CONNECTIONNAME
+    </select>
+
+    <select id="findAllConnectionsMySql" resultMap="conMap">
+        select id
+        ,      connectionname
+        ,      username
+        ,      password
+        ,      servicename
+        ,	   tnsName
+        ,      description
+        from SQM_CONNECTIONS order by CONNECTIONNAME
+    </select>
+
+    <select id="getConnectionByName" resultMap="conMap">
+		select id
+        ,      connectionname
+        ,      username
+        ,      urp_utils.password_decrypt(password) as password
+        ,      servicename
+        ,      tnsName
+        ,      description
+        from SQM_CONNECTIONS
+        where CONNECTIONNAME = #value#
+        order by 1
+    </select>
+
+    <select id="getConnectionByNameMySql" resultMap="conMap">
+		select id
+        ,      connectionname
+        ,      username
+        ,      password
+        ,      servicename
+        ,      tnsName
+        ,      description
+        from SQM_CONNECTIONS
+        where CONNECTIONNAME = #value#
+        order by 1
+    </select>
+
+    <select id="findConnectionsForQueryAndUser" parameterClass="java.util.Map" resultMap="conMap">
+        select distinct con.id
+        ,      con.connectionname
+        ,      con.username
+        ,      urp_utils.password_decrypt(con.password) as password
+        ,      con.servicename
+        ,	   con.tnsName	
+        ,      con.description
+        from   sqm_connections  con
+        ,      urp_permissions  pms
+        where  pms.con_id = con.id
+        and    pms.sql_id = #query_id#
+        and    pms.id in (select rpm.pms_id
+                          from   urp_role_permission rpm
+                          ,      urp_user_role       url                                                                                                      
+                          where  rpm.rle_id = url.rle_id
+                          and    url.usr_id = #user_id#)
+    </select>
+
+    <select id="findConnectionsForQueryAndUserMySql" parameterClass="java.util.Map" resultMap="conMap">
+        select distinct con.id
+        ,      con.connectionname
+        ,      con.username
+        ,      con.password
+        ,      con.servicename
+        ,	   con.tnsName
+        ,      con.description
+        from   sqm_connections  con
+        ,      urp_permissions  pms
+        where  pms.con_id = con.id
+        and    pms.sql_id = #query_id#
+        and    pms.id in (select rpm.pms_id
+                          from   urp_role_permission rpm
+                          ,      urp_user_role       url
+                          where  rpm.rle_id = url.rle_id
+                          and    url.usr_id = #user_id#)
+    </select>
+
+    <insert id="insertConnection" parameterClass="Connection">
+        insert into SQM_CONNECTIONS
+            (connectionname, username, password, servicename, tnsName, description) values
+            (#name#, #username#, #password#, #servicename#, #tnsName#, #description#)
+        <selectKey resultClass="long" >
+             SELECT SQM_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+    </insert>
+
+    <insert id="insertConnectionMySql" parameterClass="Connection">
+        insert into SQM_CONNECTIONS
+            (connectionname, username, password, servicename, tnsName, description) values
+            (#name#, #username#, #password#, #servicename#, #tnsName#, #description#)
+        <selectKey resultClass="long" >
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+	<update id="updateConnection" parameterClass="Connection">
+        update SQM_CONNECTIONS SET
+			CONNECTIONNAME = #name#,
+			USERNAME = #username#,
+			PASSWORD = #password#,
+			SERVICENAME = #servicename#,
+			TNSNAME = #tnsName#,
+			DESCRIPTION = #description#
+		where ID = #id#
+	</update>
+
+	<delete id="deleteConnection" parameterClass="Connection">
+		delete from SQM_CONNECTIONS where ID = #id#
+	</delete>
+
+</sqlMap>

@@ -1,0 +1,4 @@
+Insert into URP_USERS (USERNAME,PASSWORD) values ('kdw','kdw');
+
+Insert into URP_ROLES (ROLENAME) values ('all');
+

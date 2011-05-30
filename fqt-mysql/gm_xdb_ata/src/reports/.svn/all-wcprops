@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/!svn/ver/22366/projecten/abkr/trunk/gm_xdb_ata/src/reports
+END
+ETL_LOG.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/!svn/ver/17216/projecten/abkr/trunk/gm_xdb_ata/src/reports/ETL_LOG.pkb
+END
+ETL_LOG.pks
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/reports/ETL_LOG.pks
+END
+MLO_reports.sql
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/reports/MLO_reports.sql
+END
+GETBURGERSUBSERVICE_RPT.sql
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/reports/GETBURGERSUBSERVICE_RPT.sql
+END
+BuildAll.sql
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/!svn/ver/22365/projecten/abkr/trunk/gm_xdb_ata/src/reports/BuildAll.sql
+END
+GETBURGER_RPT.sql
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/reports/GETBURGER_RPT.sql
+END
+GETBURGER_RPT_TODAY.sql
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/reports/GETBURGER_RPT_TODAY.sql
+END
+ANTWOORD.sql
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/!svn/ver/17206/projecten/abkr/trunk/gm_xdb_ata/src/reports/ANTWOORD.sql
+END
+VRAAG.sql
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/!svn/ver/17210/projecten/abkr/trunk/gm_xdb_ata/src/reports/VRAAG.sql
+END

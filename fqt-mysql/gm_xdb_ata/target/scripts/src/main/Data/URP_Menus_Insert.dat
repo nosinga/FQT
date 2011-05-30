@@ -1,0 +1,72 @@
+PROMPT file URP_Menus.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het maken van menus
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 07:49:56 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25507 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Roles.dat $
+|||  ID       : $Id: URP_Roles.dat 25507 2010-10-28 05:49:56Z nosinga $
+|||------------------------------------------------------------------------
+**/
+--
+-- Menus worden in de tabel URP_ROLES opgeslagen , dit moet ooit veranderd worden TODO
+-- reden hiervoor was in php minder database schermen, in java zijn deze makkelijk te bouwen
+--REM    ===============================================================================
+PROMPT - Hoofdmenus
+REM    ===============================================================================
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'Rapporten'                     , 'MAIN'    , 'Rapporten (oa Berichten Auditen)'                       , '10', 'RPT'); 
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'Rapporten Administratie'       , 'MAIN'    , 'Administratie Audit Rapporten'                          , '11', 'STATIC');                                
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'GUC Configuratie'              , 'MAIN'    , 'GUC Configuratie & Systeem (Mule) Audit'                , '20', 'URL');                             
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'Documentatie'                  , 'MAIN'    , 'Documentatie Onderwerpen'                               , '30', 'DOC');                                                
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'Documentatie Administratie'    , 'MAIN'    , 'Documenten Uploaden en Verwijderen'                     , '31', 'DCA');                        
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'Agent Tool ABKR Administratie' , 'MAIN'    , 'Administratie van oa Gebruikers, Rollen & Toestemmingen', '51', 'STATIC');
+ insert into urp_menu_vw (menuname,menutype,menudescription,menuorder,submenutype) values ( 'Filters Administratie'         , 'MAIN'    , 'Administratie Filters'                                  , '61', 'STATIC'); 
+--
+REM    ===============================================================================
+PROMPT - Dynamische koppelingen voor RPT URL DOC en DCA                                               
+REM    ===============================================================================
+-- De volgende vier menu typen (rptmenu, urlmenu, docmenu en dcamenu)
+-- zijn op een dynamiche wijze gekoppeld aan de onderliggende shermen via de submenus
+-- eigenlijk wordt er voor rapporten urls en document directories steeds naar 1 type
+-- scherm gegaan met een parameter naanm (de naam van het submenu)
+-- er is 1 scherm voor rapporten een scherm voor urls en en een scherm voor document directories
+--
+REM    ===============================================================================  
+PROMPT - Rapport (rpt) menu
+REM    ===============================================================================
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'ATA Usage'                      , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));    
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'AfnemerGBR'                     , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'AfnemerMijnLoket'               , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'AfnemerMijnLoket_classified'    , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'BronKey2Burgerzaken_DDS'        , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+--insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'DailyCheck_ALL'                 , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT')); 
+--insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'DailyCheck_GBA'                 , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT')); 
+--insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'DailyCheck_BAG'                 , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT')); 
+--insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'DailyCheck Historie'            , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'DailyCheck'                     , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Examples'                       , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Bronhouder GBA'                 , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Bronhouder BAG'                 , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Kennisgevingen Inkomend'        , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Kennisgevingen Uitgaand'        , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Vraag/Antwoord Uitgaand'        , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'GUC'                            , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'StelselBeheerder_GBAPRS'        , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'StelselCatalogus'               , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Referentie'                     , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+insert into urp_menu_vw (menuname, menutype, parent_id) values ( 'Filters'                        , 'RPT', urp_menu_utils.submenutype2mainmenuid('RPT'));
+--
+REM    ===============================================================================
+PROMPT - Url (url) menu
+REM    ===============================================================================
+ insert into urp_menu_vw (menuname, menutype, parent_id) values  ( 'External Example' , 'URL' , urp_menu_utils.submenutype2mainmenuid('URL'));
+ insert into urp_menu_vw (menuname, menutype, parent_id) values  ( 'GucPings'         , 'URL' , urp_menu_utils.submenutype2mainmenuid('URL'));
+--

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="QRY">
+
+	<resultMap id="qryMap" class="Query">
+		<result property="id" 			    column="ID"/>
+		<result property="name" 		    column="QUERYNAME"/>
+		<result property="shortDescription"	column="SHORT_DESCRIPTION"/>
+		<result property="description"	    column="DESCRIPTION"/>
+		<result property="statement" 	    column="SQLSTATEMENT"/>
+		<result property="reportFormat" 	column="REPORT_FORMAT"/>
+	</resultMap>
+
+    <select id="findAllQueries" resultMap="qryMap">
+        select * from SQM_QUERIES order by QUERYNAME
+    </select>
+
+    <select id="findAllSearchQueries" parameterClass="java.lang.String" resultMap="qryMap">
+        select * from SQM_QUERIES
+        where  fqt_reports.search(#value#,'SQM_QUERIES') like '%'||chr(0)||id||chr(0)||'%'
+        order by QUERYNAME
+    </select>
+
+    <select id="findAllQueriesOrderByRecent" resultMap="qryMap">
+        select * from SQM_QUERIES order by ID desc
+    </select>
+
+    <select id="getQueryByName" resultMap="qryMap">
+        select *
+        from SQM_QUERIES
+        where QUERYNAME = #value#
+        order by 1
+    </select>
+
+	<insert id="insertQuery" parameterClass="Query">
+        insert into SQM_QUERIES
+            (QUERYNAME, SHORT_DESCRIPTION, DESCRIPTION, SQLSTATEMENT, REPORT_FORMAT) values
+            (#name#, #shortDescription#, #description#, #statement#, #reportFormat#)
+        <selectKey resultClass="long" >
+             SELECT SQM_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+	</insert>
+
+    <insert id="insertQueryMySql" parameterClass="Query">
+        insert into SQM_QUERIES
+            (QUERYNAME, SHORT_DESCRIPTION, DESCRIPTION, SQLSTATEMENT, REPORT_FORMAT) values
+            (#name#, #shortDescription#, #description#, #statement#, #reportFormat#)
+        <selectKey resultClass="long" >
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+	<update id="updateQuery" parameterClass="Query">
+        update SQM_QUERIES SET
+			QUERYNAME = #name#,
+			SHORT_DESCRIPTION = #shortDescription#,
+			DESCRIPTION = #description#,
+            SQLSTATEMENT = #statement#,
+            REPORT_FORMAT = #reportFormat#
+		where ID = #id#
+	</update>
+
+	<delete id="deleteQuery" parameterClass="Query">
+		delete from SQM_QUERIES where ID = #id#
+	</delete>
+
+	<select id="findReports" parameterClass="java.util.HashMap" resultMap="qryMap">
+     select *
+     from   sqm_queries
+     where  queryname in
+     (SELECT report.queryname 
+      from urp_user_menutreereport_vw report
+      ,    urp_menunodes              menunode
+      where report.parent_id = menunode.id
+      and   menunode.menuname   = #reportname#
+      and   report.username     = #username#
+      )
+      order by queryname
+	</select>
+
+</sqlMap>

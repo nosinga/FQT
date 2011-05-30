@@ -1,0 +1,18 @@
+-- $Date$
+-- $Revision$
+-- $Author$
+-- $URL$
+-- $ID: $
+
+
+@@ATA_Clean_All.sql
+@@ATA_Build_All.sql
+
+@@testmenu.sql
+
+--                                                                                           
+--Om ook met de ATA tool het resultaat te zien, draai dan onderstaande deze file niet        
+--
+                                                                                          
+@@testmenuundo.sql
+

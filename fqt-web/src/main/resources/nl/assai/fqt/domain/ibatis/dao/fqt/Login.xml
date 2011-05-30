@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="LOGIN">
+
+	<resultMap id="loginMap" class="Login">
+		<result property="username"     column="USERNAME"/>
+		<result property="password"     column="PASSWORD"/>
+		<result property="result"       column="RESULT"/>
+		<result property="timestamp"    column="TIMESTAMP"/>
+	</resultMap>
+
+    <insert id="insertLogin" parameterClass="Login">
+        insert into ATA_LOGINS_JNA
+            (USERNAME, PASSWORD, RESULT, TIMESTAMP) values
+            ( #username#
+            , urp_utils.user_password_encrypt(#password#)
+            , #result#
+            , SYSDATE)
+    </insert>
+
+    <insert id="insertLoginMySql" parameterClass="Login">
+        insert into ATA_LOGINS_JNA
+            (USERNAME, PASSWORD, RESULT, TIMESTAMP) values
+            ( #username#
+            , #password#
+            , #result#
+            , now())
+    </insert>
+
+</sqlMap>

@@ -1,0 +1,257 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries
+END
+AantalAfgetapteBerichtenCorrecteResponsePeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenCorrecteResponsePeriode.sql
+END
+AfgetapteBerichtenGeenResponseVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenGeenResponseVandaag.sql
+END
+TMF_verzoeken_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/TMF_verzoeken_periode.sql
+END
+aantal_MijnLoket_verzoeken_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_MijnLoket_verzoeken_vandaag.sql
+END
+AfgetapteBerichtenVerwerktPeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenVerwerktPeriode.sql
+END
+AfgetapteBerichtenNietGelogd.sql
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenNietGelogd.sql
+END
+AantalAfgetapteBerichtenVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenVandaag.sql
+END
+AfgetapteBerichtenFouteResponseVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenFouteResponseVandaag.sql
+END
+GelogdeBerichtenNietGeladen.sql
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/GelogdeBerichtenNietGeladen.sql
+END
+AantalAfgetapteBerichtenGeenResponsePeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenGeenResponsePeriode.sql
+END
+kennisgevingen_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/kennisgevingen_vandaag.sql
+END
+aantal_SoZaWe_verzoeken_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_SoZaWe_verzoeken_vandaag.sql
+END
+aantal_kennisgevingen_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_kennisgevingen_periode.sql
+END
+AfgetapteBerichtenCorrecteResponsePeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenCorrecteResponsePeriode.sql
+END
+AantalAfgetapteBerichtenFoutResponseVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenFoutResponseVandaag.sql
+END
+MijnLoket_verzoeken_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/MijnLoket_verzoeken_vandaag.sql
+END
+AfgetapteBerichtenVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenVandaag.sql
+END
+AfgetapteBerichtenGeenResponsePeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenGeenResponsePeriode.sql
+END
+aantal_MijnLoket_verzoeken_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_MijnLoket_verzoeken_periode.sql
+END
+AantalAfgetapteBerichtenPeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenPeriode.sql
+END
+Readme.txt
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/Readme.txt
+END
+AfgetapteBerichtenFouteResponsePeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenFouteResponsePeriode.sql
+END
+DVGM_AUDIT_counts.sql
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/DVGM_AUDIT_counts.sql
+END
+aantal_TMF_verzoeken_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_TMF_verzoeken_vandaag.sql
+END
+kennisgevingen_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/kennisgevingen_periode.sql
+END
+AantalAfgetapteBerichtenVerwerktVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenVerwerktVandaag.sql
+END
+SoZaWe_verzoeken_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/SoZaWe_verzoeken_vandaag.sql
+END
+aantal_SoZaWe_verzoeken_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_SoZaWe_verzoeken_periode.sql
+END
+MijnLoket_verzoeken_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/MijnLoket_verzoeken_periode.sql
+END
+AfgetapteBerichtenPeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenPeriode.sql
+END
+AantalAfgetapteBerichtenCorrecteResponseVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenCorrecteResponseVandaag.sql
+END
+TMF_verzoeken_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/TMF_verzoeken_vandaag.sql
+END
+AantalAfgetapteBerichtenFouteResponsePeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenFouteResponsePeriode.sql
+END
+AfgetapteBerichtenVerwerktVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenVerwerktVandaag.sql
+END
+AantalAfgetapteBerichtenGeenResponseVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenGeenResponseVandaag.sql
+END
+aantal_TMF_verzoeken_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_TMF_verzoeken_periode.sql
+END
+SoZaWe_verzoeken_periode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/SoZaWe_verzoeken_periode.sql
+END
+AantalAfgetapteBerichtenVerwerktPeriode.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AantalAfgetapteBerichtenVerwerktPeriode.sql
+END
+GelogdeBerichtedStatusDelivered.sql
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/GelogdeBerichtedStatusDelivered.sql
+END
+aantal_kennisgevingen_vandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/aantal_kennisgevingen_vandaag.sql
+END
+GelogdeBerichtenNietCorrectGeladen.sql
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/GelogdeBerichtenNietCorrectGeladen.sql
+END
+AfgetapteBerichtenCorrecteResponseVandaag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/!svn/ver/14098/projecten/abkr/trunk/gm_xdb_ata/src/main/Queries/AfgetapteBerichtenCorrecteResponseVandaag.sql
+END

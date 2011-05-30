@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="USR">
+
+    <resultMap id="usrMap" class="User">
+        <result property="id" column="ID"/>
+        <result property="rv" column="RV"/>
+        <result property="name" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="idmId" column="IDM_ID"/>
+        <result property="roles" column="ID" select="findRolesByUser"/>
+        <result property="menus" column="ID" select="findUserMenus"/>
+        <result property="permissions" column="ID" select="findPermissionsByUser"/>
+        <!-- result property="queries"		column="RV" 		select="QUERIES"/ -->
+    </resultMap>
+
+    <resultMap id="usermenu" class="UserMenu">
+        <result property="id" column="ID"/>
+        <result property="parentId" column="PARENT_ID"/>
+        <result property="menuLevel" column="MENULEVEL"/>
+        <result property="isCycle" column="ISCYCLE"/>
+        <result property="hasMenuLeafChild" column="HASMENULEAFCHILD"/>
+        <result property="userName" column="USERNAME"/>
+        <result property="itemName" column="ITEMNAME"/>
+        <result property="menuType" column="MENUTYPE"/>
+        <result property="menuSubtype" column="MENUSUBTYPE"/>
+        <result property="menuResourcelocation" column="MENURESOURCELOCATION"/>
+        <result property="queryName" column="QUERYNAME"/>
+        <result property="connectionName" column="CONNECTIONNAME"/>
+    </resultMap>
+
+    <resultMap id="urlMap" class="nl.assai.fqt.domain.model.fqt.Link">
+        <result property="id" column="ID"/>
+        <result property="rv" column="RV"/>
+        <result property="fromId" column="USR_ID"/>
+        <result property="toId" column="RLE_ID"/>
+    </resultMap>
+
+    <select id="findAllUsers" resultMap="usrMap">
+        select * from URP_USERS order by username
+    </select>
+
+    <select id="findAllSearchUsers" parameterClass="java.lang.String" resultMap="usrMap">
+        select * from URP_USERS
+        where lower(username) like concat(concat('%', lower(#value#)),'%')
+        order by username
+    </select>
+
+    <select id="getUserByName" parameterClass="java.lang.String" resultMap="usrMap">
+        select id
+        , username
+        , rv
+        , password
+        , idm_id
+        from URP_USERS where USERNAME = #value#
+    </select>
+
+    <select id="getUserByIdmId" parameterClass="java.lang.String" resultMap="usrMap">
+        select id
+        , username
+        , rv
+        , password
+        , idm_id
+        from URP_USERS where IDM_ID = #value#
+    </select>
+
+    <select id="getUserRoleLinks" resultMap="urlMap" parameterClass="User">
+        select * from URP_USER_ROLE where USR_ID = #id#
+    </select>
+
+    <insert id="insertUserRole" parameterClass="nl.assai.fqt.domain.model.fqt.Link">
+        insert into URP_USER_ROLE (
+        USR_ID
+        , RLE_ID
+        )values (
+        #fromId#
+        , #toId#
+        )
+        <selectKey resultClass="long">
+            SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+    </insert>
+
+    <insert id="insertUserRoleMySql" parameterClass="nl.assai.fqt.domain.model.fqt.Link">
+        insert into URP_USER_ROLE (
+        USR_ID
+        , RLE_ID
+        )values (
+        #fromId#
+        , #toId#
+        )
+        <selectKey resultClass="long">
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <delete id="deleteUserRoleLinks" parameterClass="User">
+        delete from URP_USER_ROLE where USR_ID = #id#
+    </delete>
+
+    <select id="findUsersByRole" parameterClass="Role" resultMap="usrMap">
+        select usr.id
+        , usr.username
+        , usr.rv
+        , usr.password
+        , usr.idmId
+        from urp_users usr
+        , urp_user_role url
+        where usr.id = url.usr_id
+        and url.rle_id = #id#
+    </select>
+
+    <select id="checkCurrentPassword" parameterClass="User" resultClass="java.lang.Integer">
+        select count(1) returnvalue
+        from urp_users
+        where username = #name#
+        and password = urp_utils.user_password_encrypt(#password#)
+    </select>
+
+    <select id="checkPasswordChanged" parameterClass="User" resultClass="java.lang.Integer">
+        select count(1) returnvalue
+        from urp_users
+        where username = #name#
+        and password != #password#
+    </select>
+
+    <select id="hashPassword" parameterClass="java.lang.String" resultClass="java.lang.String">
+        select urp_utils.user_password_encrypt(#value#) hash_password
+        from dual
+    </select>
+
+    <procedure id="changePassword" parameterClass="User">
+        call urp_utils.change_password(#name#,#password#)
+    </procedure>
+
+    <procedure id="changePasswordMySql" parameterClass="User">
+        update urp_users
+        set    password = #password#
+        where  username = #name#
+    </procedure>
+
+    <select id="getUserIdByUserNamePassword" parameterClass="User" resultClass="java.lang.Long">
+        select nvl(urp_utils.check_login(#name#,#password#),0) as returnvalue from dual
+    </select>
+
+    <select id="getUserIdByUserNamePasswordMySql" parameterClass="User" resultClass="java.lang.Long">
+        select ifnull(max(id),0) as returnvalue
+        from urp_users
+        where username = #name#
+        and password = #password#
+    </select>
+
+    <insert id="insertUser" parameterClass="User">
+        insert into URP_USERS_TAB (
+        USERNAME,
+        PASSWORD
+        ) values (
+        #name#,
+        urp_utils.user_password_encrypt('welkom123')
+        )
+        <selectKey resultClass="long">
+            SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+    </insert>
+
+    <insert id="insertUserMySql" parameterClass="User">
+
+        insert into URP_USERS (
+        USERNAME,
+        PASSWORD
+        ) values (
+        #name#,
+        'welkom123'
+        )
+        <selectKey resultClass="long">
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <update id="updateUser" parameterClass="User">
+        update URP_USERS_TAB
+        SET USERNAME = #name#
+        where ID = #id#
+    </update>
+
+    <update id="updateUserMySql" parameterClass="User">
+        update URP_USERS
+        SET USERNAME = #name#
+        where ID = #id#
+    </update>
+
+    <delete id="deleteUser" parameterClass="User">
+        delete URP_USERS_TAB where ID = #id#
+    </delete>
+
+    <delete id="deleteUserMySql" parameterClass="User">
+        delete from URP_USERS where ID = #id#
+    </delete>
+
+    <select id="findUserMenus" parameterClass="java.lang.Long" resultMap="usermenu">
+        select *
+        from URP_USER_MENUTREE_VW
+        where username = (select username from urp_users where id = #value#)
+    </select>
+
+    <select id="findUserMenusMySql" parameterClass="java.lang.Long" resultMap="usermenu">
+        select *
+        from URP_USER_MENUTREE_VW
+        where username = (select username from urp_users where id = #value#)
+    </select>
+</sqlMap>

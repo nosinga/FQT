@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="USR">
+
+    <resultMap id="menuMap" class="Menu">
+        <result property="id" 			column="ID"/>
+        <result property="name"         column="MENUNAME"/>
+        <result property="description"  column="MENUDESCRIPTION"/>
+        <result property="order"        column="MENUORDER"/>
+        <result property="type"         column="MENUTYPE"/>
+        <result property="subType"      column="SUBMENUTYPE"/>
+    </resultMap>
+
+    <resultMap id="menuNodeMap" class="MenuNode">
+        <result property="id" 			    column="ID"/>
+        <result property="rv" 			    column="RV"/>
+        <result property="parentId"         column="PARENT_ID"/>
+        <result property="parentMenuName"   column="PARENT_MENUNAME"/>
+        <result property="menuName"         column="MENUNAME"/>
+        <result property="menuDescription"  column="MENUDESCRIPTION"/>
+        <result property="orderBy"          column="ORDERBY"/>
+    </resultMap>
+
+    <procedure id="insertMenu" parameterClass="Menu">
+        { call URP_MENU_UTILS.ADDMENU(#name#, #type#, #description#, #order#, #subType#) }
+    </procedure>
+
+    <select id="findAllMenuNodes" resultMap="menuNodeMap">
+		select
+             node1.ID                    ID   
+        ,    node1.RV                    RV
+        ,    node1.PARENT_ID             PARENT_ID
+        ,    node1.MENUNAME              MENUNAME
+        ,    node1.MENUDESCRIPTION       MENUDESCRIPTION
+        ,    node1.ORDERBY               ORDERBY
+        ,    node2.MENUNAME              PARENT_MENUNAME
+        from URP_MENUNODES node1 
+             LEFT OUTER JOIN URP_MENUNODES node2 ON (node2.ID = node1.PARENT_ID)
+        order by node1.MENUNAME
+	</select>
+
+    <select id="findAllMenuNodesOrderByDisplay" resultMap="menuNodeMap">
+        select
+              node1.ID                                              ID
+         ,    node1.RV                                              RV
+         ,    node1.PARENT_ID                                       PARENT_ID
+         ,    LPAD('.', node1.menulevel*3,'.')||' '||node1.ITEMNAME MENUNAME
+         ,    null                                                  MENUDESCRIPTION
+         ,    null                                                  ORDERBY
+         ,    node2.MENUNAME                                        PARENT_MENUNAME
+         from URP_MENUtree_debug_vw node1
+              LEFT OUTER JOIN URP_MENUNODES node2 ON (node2.ID = node1.PARENT_ID)
+         where node1.menutype = 'node'
+    </select>
+
+    <insert id="insertMenuNode" parameterClass="MenuNode">
+        insert into URP_MENUNODES (
+             PARENT_ID
+        ,    MENUNAME
+        ,    MENUDESCRIPTION
+        ,    ORDERBY
+        ) values (
+             #parentId#
+        ,    #menuName#
+        ,    #menuDescription#
+        ,    #orderBy#
+        )
+        <selectKey resultClass="long" >
+             SELECT URP_SEQUENCE.currVal AS id FROM dual
+        </selectKey>
+    </insert>
+
+    <insert id="insertMenuNodeMySql" parameterClass="MenuNode">
+        insert into URP_MENUNODES (
+             PARENT_ID
+        ,    MENUNAME
+        ,    MENUDESCRIPTION
+        ,    ORDERBY
+        ) values (
+             #parentId#
+        ,    #menuName#
+        ,    #menuDescription#
+        ,    #orderBy#
+        )
+        <selectKey resultClass="long" >
+            select LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <update id="updateMenuNode" parameterClass="MenuNode">
+        update URP_MENUNODES
+        SET
+             PARENT_ID = #parentId#
+        ,    MENUNAME = #menuName#
+        ,    MENUDESCRIPTION = #menuDescription#
+        ,    ORDERBY = #orderBy#
+        where  ID = #id#
+    </update>
+
+    <delete id="deleteMenuNode" parameterClass="MenuNode">
+        delete URP_MENUNODES where ID = #id#
+    </delete>
+
+
+</sqlMap>

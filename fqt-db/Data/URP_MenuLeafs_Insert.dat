@@ -1,0 +1,82 @@
+PROMPT file URP_MenuLeafs_Insert
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van MenuLeafs
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 07:49:56 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25507 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Permissions.dat $
+|||  ID       : $Id: URP_Permissions.dat 25507 2010-10-28 05:49:56Z nosinga $
+|||------------------------------------------------------------------------
+**/
+REM    ===============================================================================
+PROMPT - Create MENU LEAFS 
+REM    ===============================================================================
+-- submenu aan main menu en aan "echte" role hangen (zie REAME.txt)
+-- De volgende drie menu typen (rptmenu, urlmenu en docmenu)
+-- zijn op een dynamiche wijze gekoppeld aan de onderliggende shermen via de submenus
+-- eigenlijk wordt er voor rapporten urls en document directories steeds naar 1 type
+-- scherm gegaan met een parameter naanm (de naam van het submenu)
+-- er is 1 scherm voor rapporten een scherm voor urls en en een scherm voor document directories
+--
+REM    ===============================================================================
+PROMPT - RAPPORTEN ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Menus'                 ,'MENUS'                ,'SCREEN',urp_utils.menuname2id('Report Administration'),'01');
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Report DB Connections' ,'CONNECTIONS'          ,'SCREEN',urp_utils.menuname2id('Report Administration'),'02');
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Reports'               ,'QUERIES'              ,'SCREEN',urp_utils.menuname2id('Report Administration'),'03');
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('ReportMenuConnectors'  ,'REPORTMENUCONNECTORS' ,'SCREEN',urp_utils.menuname2id('Report Administration'),'04');
+--
+--  --
+--  insert into urp_permissions(name,value,type,menu_id,orderby) values ('Queries Execute'       ,'QUERIES_EXECUTE'    ,'SCREEN',urp_utils.menuname2id('Rapporten Administratie'),5);
+REM    ===============================================================================
+PROMPT - URL MenuLeafs
+REM    ===============================================================================
+--
+--  In het geval van links moeten er twee stappen gedaan worden
+--  om een link permissie te inserten en aan een link menu en een rol te hangen
+--  1. insert url permissie en koppel deze url permissie aan een user role
+--  2. koppel deze url permissie aan een link menu
+--
+insert into urp_permissions(name,value,type,menu_id) values  ('Google','http://www.google.com','URL',urp_utils.menuname2id('External Example'));
+--
+-- met bovennstaande call ga je naar google en moet je door de proxy
+-- kijk of de proxy staat ingesteld in de application properties
+-- Apache DocumentRoot/<env>/ata/appenv/<env>.environment.properties.php
+-- en kijk hier naar UTL_HTTP_SET_PROXY
+-- in Gemeente Rotterdam : define('UTL_HTTP_SET_PROXY','twdproxy.ir.rotterdam.nl:8080,localhost');
+-- zonder proxy : define('UTL_HTTP_SET_PROXY',',');
+--
+--    insert into urp_permissions(name,value,type,menu_id) values ('ping'          ,'GUC_CONFIG_BASE_URLping'          ,'URL',urp_utils.menuname2id('GucPings'));
+--    insert into urp_permissions(name,value,type,menu_id) values ('config'        ,'GUC_CONFIG_BASE_URLconfig'        ,'URL',urp_utils.menuname2id('GucPings'));
+--    insert into urp_permissions(name,value,type,menu_id) values ('functionalPing','GUC_CONFIG_BASE_URLfunctionalPing','URL',urp_utils.menuname2id('GucPings'));
+--    insert into urp_permissions(name,value,type,menu_id) values ('statistics'    ,'GUC_CONFIG_BASE_URLstatistics'    ,'URL',urp_utils.menuname2id('GucPings'));
+--
+REM    ===============================================================================
+PROMPT - AGENT TOOL ABKR ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Users'            ,'USERS'            ,'SCREEN',urp_utils.menuname2id('User Management'),'01');
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Roles'            ,'ROLES'            ,'SCREEN',urp_utils.menuname2id('User Management'),'02');
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Permissions'      ,'PERMISSIONS'      ,'SCREEN',urp_utils.menuname2id('User Management'),'03');
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('ATA Configuratie' ,'CONFIGURATION'    ,'SCREEN',urp_utils.menuname2id('User Management'),'04');
+
+REM    ===============================================================================
+PROMPT - FILTERS ADMINISTRATIE (statisch menu)
+REM    ===============================================================================
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Keten'                     ,'KETEN'               , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),10);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Filter'                    ,'FILTER'              , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),20);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('FilterTest'                ,'FILTERTEST'          , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),25);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Organisatie'               ,'ORGANISATIE'         , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),30);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('Applicatie'                ,'APPLICATIE'          , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),40);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('StUF Bericht Identificatie','BERICHTIDENTIFICATIE', 'SCREEN',urp_utils.menuname2id('Filters Administratie'),50);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('StUF Versie'               ,'STUFVERSIE'          , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),60);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('StUF Entititeittype'       ,'STUFENTITEITTYPE'    , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),70);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('StUF Berichtsoort'         ,'STUFBERICHTSOORT'    , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),80);
+insert into urp_permissions(name,value,type,menu_id,orderby) values ('StUF Sectormodel'          ,'STUFSECTORMODEL'     , 'SCREEN',urp_utils.menuname2id('Filters Administratie'),90);

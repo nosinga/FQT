@@ -1,0 +1,104 @@
+PROMPT file URP_Roles2MetaUsers.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse roles
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+-- -------------------------------------------------------------------------------
+-- Koppel meta users aan rollen
+-- -------------------------------------------------------------------------------
+REM    ===============================================================================
+PROMPT - metauser_ata_admin
+REM    ===============================================================================
+exec urp_utils.link_user2role( p_username => 'metauser_ata_admin', p_rolename => 'role_connect');
+exec urp_utils.link_user2role( p_username => 'metauser_ata_admin', p_rolename => 'role_documenten_admin');
+exec urp_utils.link_user2role( p_username => 'metauser_ata_admin', p_rolename => 'role_gebruikers_admin');
+exec urp_utils.link_user2role( p_username => 'metauser_ata_admin', p_rolename => 'role_grt_admin');
+exec urp_utils.link_user2role( p_username => 'metauser_ata_admin', p_rolename => 'role_rapporten_admin');
+exec urp_utils.link_user2role( p_username => 'metauser_ata_admin', p_rolename => 'role_stelselbeheerder');
+
+REM    ===============================================================================
+PROMPT - metauser_sogict_admin
+REM    ===============================================================================
+exec urp_utils.link_user2role( p_username => 'metauser_sogict_admin', p_rolename => 'role_connect');
+exec urp_utils.link_user2role( p_username => 'metauser_sogict_admin', p_rolename => 'role_gebruikers_admin');
+exec urp_utils.link_user2role( p_username => 'metauser_sogict_admin', p_rolename => 'role_stelselbeheerder');
+--
+REM    ===============================================================================
+PROMPT - metauser_sogict_admin
+REM    ===============================================================================
+exec urp_utils.link_user2role( p_username => 'metauser_twd_admin', p_rolename => 'role_connect');
+exec urp_utils.link_user2role( p_username => 'metauser_twd_admin', p_rolename => 'role_dbconnecties_admin');
+--
+REM    ===============================================================================
+PROMPT - Metauser_mijnloketbeheerder
+REM    ===============================================================================
+exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_connect');
+exec urp_utils.link_user2role( p_username => 'metauser_mijnloketbeheerder'     , p_rolename => 'role_mijnloketbeheerder');
+--
+REM    ===============================================================================
+PROMPT - Metauser_dailycheck_mail_subscribers
+REM    ===============================================================================
+exec urp_utils.link_user2role( p_username => 'metauser_dailycheck_gba_mail_subscribers', p_rolename => 'role_dailyCheck_GBA_mail_subscribers');
+exec urp_utils.link_user2role( p_username => 'metauser_dailycheck_bag_mail_subscribers', p_rolename => 'role_dailyCheck_BAG_mail_subscribers');
+--
+REM    ===============================================================================
+PROMPT - Metauser_filter_admin
+REM    ===============================================================================
+exec urp_utils.link_user2role ( p_username => 'metauser_filter_admin'      , p_rolename => 'role_filter_admin');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

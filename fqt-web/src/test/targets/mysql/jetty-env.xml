@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure class="org.mortbay.jetty.webapp.WebAppContext">
+<!--
+    <New id="ataUrpDataSourceOracle" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>jdbc/ata_urp</Arg>
+        <Arg>
+            <New class="oracle.jdbc.pool.OracleDataSource">
+                <Set name="URL">jdbc:oracle:thin:@nosu:1521:xe</Set>
+                <Set name="user">fqt</Set>
+                <Set name="password">fqt</Set>
+            </New>
+        </Arg>
+    </New>
+-->    
+    <New id="ataUrpDataSourceMySql" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>jdbc/ata_urp</Arg>
+        <Arg>
+                <New class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+                <Set name="Url">jdbc:mysql://localhost:3306/fqt</Set>
+                <Set name="User">fqt</Set>
+                <Set name="Password">fqt</Set>
+            </New>
+        </Arg>
+    </New>
+    <New id="ataBfkDataSource" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>jdbc/ata_bfk</Arg>
+        <Arg>
+            <New class="oracle.jdbc.pool.OracleDataSource">
+                <Set name="URL">jdbc:oracle:thin:@localhost:1521:xe</Set>
+                <Set name="user">guc_filters_user</Set>
+                <Set name="password">guc_filters_user</Set>
+            </New>
+        </Arg>
+    </New>
+    <New id="ataBfkDataSource" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>jdbc/esb</Arg>
+        <Arg>
+            <New class="oracle.jdbc.pool.OracleDataSource">
+                <Set name="URL">jdbc:oracle:thin:@localhost:1521:xe</Set>
+                <Set name="user">guc_filters_user</Set>
+                <Set name="password">guc_filters_user</Set>
+            </New>
+        </Arg>
+    </New>
+    <New id="ataBfkDataSource" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>jdbc/esb-queue</Arg>
+        <Arg>
+            <New class="oracle.jdbc.pool.OracleDataSource">
+                <Set name="URL">jdbc:oracle:thin:@localhost:1521:xe</Set>
+                <Set name="user">guc_filters_user</Set>
+                <Set name="password">guc_filters_user</Set>
+            </New>
+        </Arg>
+    </New>
+</Configure>

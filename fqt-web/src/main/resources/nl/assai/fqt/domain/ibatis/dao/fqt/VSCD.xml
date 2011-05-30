@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VSCD">
+
+	<resultMap id="vscdMap" class="VSCD">
+                <result property="id"                        column="ID"                     />
+                <result property="csv_id"                    column="CSV_ID"                 />
+                <result property="online_cn"                 column="ONLINE_CN"              />
+                <result property="name"                      column="NAME"                   />
+                <result property="categorie"                 column="CATEGORIE"              />
+                <result property="postal_address"            column="POSTAL_ADDRESS"         />
+                <result property="postal_zipcode"            column="POSTAL_ZIPCODE"         />
+                <result property="postal_city"               column="POSTAL_CITY"            />
+                <result property="visit_address"             column="VISIT_ADDRESS"          />
+                <result property="visit_zipcode"             column="VISIT_ZIPCODE"          />
+                <result property="visit_city"                column="VISIT_CITY"             />
+                <result property="telephone_general"         column="TELEPHONE_GENERAL"      />
+                <result property="telephone_management"      column="TELEPHONE_MANAGEMENT"   />
+                <result property="telephone_sales"           column="TELEPHONE_SALES"        />
+                <result property="fax"                       column="FAX"                    />
+                <result property="email"                     column="EMAIL"                  />
+                <result property="url"                       column="URL"                    />
+                <result property="persoonsnummer"            column="PERSOONSNUMMER"         />
+                <result property="manager_prefix"            column="MANAGER_PREFIX"         />
+                <result property="manager_firstname"         column="MANAGER_FIRSTNAME"      />
+                <result property="manager_infix"             column="MANAGER_INFIX"          />
+                <result property="manager_lastname"          column="MANAGER_LASTNAME"       />
+                <result property="pr_manager_prefix"         column="PR_MANAGER_PREFIX"      />
+                <result property="pr_manager_firstname"      column="PR_MANAGER_FIRSTNAME"   />
+                <result property="pr_manager_infix"          column="PR_MANAGER_INFIX"       />
+                <result property="pr_manager_lastname"       column="PR_MANAGER_LASTNAME"    />
+                <result property="technician_prefix"         column="TECHNICIAN_PREFIX"      />
+                <result property="technician_firstname"      column="TECHNICIAN_FIRSTNAME"   />
+                <result property="technician_infix"          column="TECHNICIAN_INFIX"       />
+                <result property="technician_lastname"       column="TECHNICIAN_LASTNAME"    />
+                <result property="salesmanager_prefix"       column="SALESMANAGER_PREFIX"    />
+                <result property="salesmanager_firstname"    column="SALESMANAGER_FIRSTNAME" />
+                <result property="salesmanager_infix"        column="SALESMANAGER_INFIX"     />
+                <result property="salesmanager_lastname"     column="SALESMANAGER_LASTNAME"  />
+                <result property="number_rooms"              column="NUMBER_ROOMS"           />
+                <result property="chairs_room_1"             column="CHAIRS_ROOM_1"          />
+                <result property="chairs_room_2"             column="CHAIRS_ROOM_2"          />
+                <result property="chairs_room_3"             column="CHAIRS_ROOM_3"          />
+                <result property="chairs_total"              column="CHAIRS_TOTAL"           />
+                <result property="prod_house_company"        column="PROD_HOUSE_COMPANY"     />
+    </resultMap>
+
+
+    <select id="findAllVSCDs" resultMap="vscdMap">
+		select * from VSCD_TABLE order by name
+	</select>
+
+    <select id="findAllSearchVSCDs" parameterClass="String"  resultMap="vscdMap">
+		select * from VSCD_TABLE vscd
+        where  fqt_reports.search(#value#,'VSCD_TABLE') like '%'||chr(0)||vscd.id||chr(0)||'%'
+        order by  name
+	</select>
+
+</sqlMap>

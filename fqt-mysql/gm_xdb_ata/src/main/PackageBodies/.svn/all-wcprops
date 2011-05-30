@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/!svn/ver/30785/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies
+END
+ATA_HTTP.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/!svn/ver/20459/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/ATA_HTTP.pkb
+END
+ATA_UTILS.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/!svn/ver/20459/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/ATA_UTILS.pkb
+END
+URP_UTILS.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/!svn/ver/30785/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/URP_UTILS.pkb
+END
+URP_MENU_UTILS.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/!svn/ver/26484/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/URP_MENU_UTILS.pkb
+END
+ABKR_UTILS_GEN_DDL.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/!svn/ver/20459/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/ABKR_UTILS_GEN_DDL.pkb
+END
+ABKR_PLSQL_DOC.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/!svn/ver/20459/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/ABKR_PLSQL_DOC.pkb
+END
+SQM_UTILS.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/!svn/ver/30189/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/SQM_UTILS.pkb
+END
+ATA_REPORTS.pkb
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/!svn/ver/25877/projecten/abkr/trunk/gm_xdb_ata/src/main/PackageBodies/ATA_REPORTS.pkb
+END

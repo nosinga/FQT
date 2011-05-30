@@ -1,0 +1,376 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. Bronhouders
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Dubbele_BSN)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Dubbele_BSN','select   bsn
+,        count(1) aantal
+,        ''#runreport#queryname=Persoonsgegevens_GM_obvBSN&BSN_verplicht=''||bsn||''#Informatie#dvgm@gegmag#''      as Informatie
+from     psn_sjt_h_psn_s_rtmv
+group by bsn
+having   count(1) > 1'
+,'Dubbel voorkomende BSN''s in het GM'
+,'Retourneert de BSN''s die dubbel voorkomen in het Gegevensmagazijn.
+Hiervoor dient de bron aangepast te worden!'||chr(10)||chr(10)||
+'Attribuut Informatie
+Deze opent een nieuw rapport met de gegevens van de dubbele BSN''s
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Persoonsgegevens_GM_obvBSN)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Persoonsgegevens_GM_obvBSN','select gmn.ids_subject                                         persoon_GM
+,      gmn.dtt_laaddatum_ins                                   datum
+,      gmn.bsn
+,      gmn.a_num
+,      gmn.voorletters
+,      gmn.voornamen
+,      gmn.voorv_geslachtsnaam
+,      gmn.geslachtsnaam
+,      case when gmn.ind_delete = ''N'' then ''Nee'' else ''Ja'' end Verwijderd
+,      ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||lpad(gmn.bsn,9,''0'')||''#Persoonslijst#gm_out@gegmag#''      as Persoonslijst
+from   ( select idd_satelliet, ids_subject, ind_delete, bsn, a_num, dtt_laaddatum_ins, ird_transactie
+         ,      lead(idd_satelliet) over (partition by ids_subject order by dtt_laaddatum_ins, idd_satelliet) lead
+         ,      voorletters, voornamen, voorv_geslachtsnaam, geslachtsnaam, adellijke_titel, dat_geboorte, oms_geboorteplaats, lnd_geboorte, aand_geslacht, aand_naamgebruik
+         from   ( select * from psn_sjt_h_psn_s where bsn = ltrim(:BSN_verplicht,''0'') )
+       ) gmn
+where    gmn.lead is null'
+,'Persoonsgegevens in het GM o.b.v. BSN'
+,'Informatie of een persoon al dan niet in het Gegevensmagazijn voorkomt en of deze als verwijderd staat gemarkeerd. 
+Indien dit het geval is dan betekent dit dat afnemers deze persoon niet meer kunnen opvragen.'||chr(10)||chr(10)||
+'Parameter BSN_verplicht
+Deze parameter is verplicht en betreft het burgerservicenummer van een persoon weer.'||chr(10)||chr(10)||
+'Attribuut Persoon_GM
+Dit nummer geeft de unieke sleutel van de persoon weer binnen het Gegevensmagazijn'||chr(10)||chr(10)||
+'Attribuut Verwijderd
+Geeft weer of de persoon al dan niet als verwijderd staat gemarkeerd'||chr(10)||chr(10)||
+'Attribuut Persoonslijst
+Opent een nieuw rapport met daarin de gehele persoonslijst van de persoon
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Persoonslijst)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Persoonslijst','select psn.ids_subject                                Sleutel_GM
+,      ltrim(substr(psn.ids_subject,2),''0'')           Sleutel_BRON
+,      psn.bsn
+,      psn.a_num                  anummer
+,      psn.voornamen
+,      psn.voorletters
+,      psn.voorv_geslachtsnaam    voorvoegselgeslachtsnaam
+,      psn.geslachtsnaam
+,      ''#ReportClob#queryname=Persoonslijst_MLO&BSN_verplicht=''||psn.bsn||''#MLO_PL#abkr_rpt@ABKR#''            "MLO_PL"
+,      ''#ReportClob#queryname=Persoonslijst_StUF300&BSN_verplicht=''||psn.bsn||''#StUF300_PL#stuf300_out@gegmag#''    "StUF300_PL"
+,      ''#runreport#queryname=Gerelateerde_Personen&BSN_verplicht=''||psn.bsn||''#Gerelateerden#stuf300_out@gegmag#''   Gerelateerden
+from   psn_sjt_h_psn_s_rtmv     psn
+where  psn.bsn = lpad(:BSN_verplicht,9,''0'')'
+, 'Persoonslijsten GM o.b.v. BSN'
+,'Burgers die actueel in het Gegevensmagazijn staan.
+Parameter BSN_verplicht
+Deze parameter is verplicht en betreft het burgerservicenummer van een persoon.
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Persoonslijst_MLO)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) values ('Persoonslijst_MLO','select clobReport, orderby
+from   pl_getburgerbybsn_header
+union all
+select clobReport, orderby
+from   pl_mlo_getburgerbybsn_01
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_mlo_getburgerbybsn_02
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_getadresbybsn_header
+union all
+select clobReport, orderby
+from   pl_mlo_getadresbybsn
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_mlo_getemigratieadresbybsn
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_getoudersbybsn_header
+union all
+select clobReport, orderby
+from   pl_mlo_getoudersbybsn
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_getkinderenbybsn_header
+union all
+select clobReport, orderby
+from   pl_mlo_getkinderenbybsn
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_getreisdocumenten_header
+union all
+select clobReport, orderby
+from   pl_mlo_getreisdocumentenbybsn
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_getnationaliteiten_header
+union all
+select clobReport, orderby
+from   pl_mlo_getnationaliteitenbybsn
+where  PRS_BSN = :BSN_verplicht
+union all
+select clobReport, orderby
+from   pl_getpartnersbybsn_header
+union all
+select clobReport, orderby
+from   pl_mlo_getpartnersbybsn
+where  PRS_BSN = :BSN_verplicht
+order by orderby'
+, 'MLO Persoonslijst GM o.b.v. BSN'
+,'Persoonslijst van Burger die SOG-ICT kan raadplegen
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Persoonslijst_StUF300)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Persoonslijst_StUF300','select clobReport, orderby
+from   pl_stf300_persoonsgegeven_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_overlijden_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_gezagsverhouding_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_inschrijving_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_kiesrecht_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_kind_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_nationaliteitovg_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_nationaliteit_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_ouder_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_partner_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_reisdocumentovg_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_reisdocument_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_verblijfadrescor_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_verblijfadresins_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_verblijfadresvbl_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_verblijfplaats_vw
+where  prs_bsn = :BSN_verplicht
+union all
+select clobreport, orderby
+from   pl_stf300_verblijfstitel_vw
+where  prs_bsn = :BSN_verplicht
+order by orderby'
+,'STUF300 Persoonslijst GM o.b.v. BSN'
+,'Persoonslijst van Burger die SOG-ICT kan raadplegen
+','y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Personen_met_TeveelAdressen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Personen_met_TeveelAdressen','select ids_subject
+,      bsn
+,      prsadrvbl        verblijfsadres
+,      prsadrins        inschrijvingsadres
+,      prsadrcor        correspondentieadres
+,      totaal
+,      ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||lpad(bsn,9,''0'')||''#Persoonslijst#gm_out@gegmag#''                                                     as Persoonslijst
+,      ''#runreport#queryname=StUF300Berichten_obvSleutelwaarde&Entiteittype=PRS&SleutelWaarde_verplicht=''||ltrim(substr(ids_subject,2),''0'')||''#Berichten#stuf300_in@gegmag#''      as Berichten
+from ( select   psn.ids_subject
+       ,        psn.bsn
+       ,        sum(case when soort = ''PRSADRVBL'' then sub.aantal else 0 end) PRSADRVBL
+       ,        sum(case when soort = ''PRSADRINS'' then sub.aantal else 0 end) PRSADRINS
+       ,        sum(case when soort = ''PRSADRCOR'' then sub.aantal else 0 end) PRSADRCOR
+       ,        sum(sub.aantal)                                               totaal
+       from (   select   ids_subject, ''PRSADRVBL'' soort, count(1) aantal
+                from     psn_sjt_ads_l_vbl_s_rtmv
+                group by ids_subject
+                union
+                select   ids_subject, ''PRSADRINS'' soort, count(1) aantal
+                from     psn_sjt_ads_l_ins_s_rtmv
+                group by ids_subject
+                union
+                select   ids_subject, ''PRSADRCOR'' soort, count(1) aantal
+                from     psn_sjt_ads_l_cor_s_rtmv
+                group by ids_subject
+              ) sub 
+       ,        psn_sjt_h_psn_s_rtmv    psn
+       where    sub.ids_subject = psn.ids_subject
+       group by psn.ids_subject, psn.bsn
+     )
+where  prsadrvbl > 1 or prsadrins > 1 or prsadrcor > 1 or totaal > 2'
+,'Personen met teveel adressen in het GM'
+,'Rapport toont alle personen waarvoor geldt dat deze 
+   meer dan 1 verblijfsadres hebben
+of meer dan 1 inschrijvingsadres hebben
+of meer dan 1 correspondentieadres hebben
+of meer dan 2 adressen in totaal hebben'||chr(10)||chr(10)||
+'Attribuut Persoonslijst : Link naar de meest actuele persoonslijst van de persoon
+Attribuut Berichten     : Link naar alle berichten voor deze persoon
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Gerelateerde_Personen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Gerelateerde_Personen','select sub.bsn
+,      sub.soort
+,      sub.gerelateerde_bsn 
+,      case when rel.idd_satelliet is null then null 
+            else ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||lpad(sub.gerelateerde_bsn,9,''0'')||''#Persoonslijst#gm_out@gegmag#''
+           end                                           as Persoonslijst
+from ( select case when prs_bsn = gerelateerde_bsn then prs_bsn else null end bsn
+       ,      soort
+       ,      case when gerelateerde_bsn in (''geenWaarde'',''waardeOnbekend'',''nietGeautoriseerd'',''vastgesteldOnbekend'',''nietOndersteund'') then null 
+                   when gerelateerde_bsn = prs_bsn then null
+                   else gerelateerde_bsn end gerelateerde_bsn
+       ,      orderby
+       from (       select prs_bsn, soort, prs_bsn gerelateerde_bsn, clobreport, orderby from pl_stf300_persoonsgegeven_vw where prs_bsn = lpad(:BSN_verplicht,9,''0'')
+              union select prs_bsn, soort, bsn     gerelateerde_bsn, clobreport, orderby from pl_stf300_kind_vw            where prs_bsn = lpad(:BSN_verplicht,9,''0'')
+              union select prs_bsn, soort, bsn     gerelateerde_bsn, clobreport, orderby from pl_stf300_ouder_vw           where prs_bsn = lpad(:BSN_verplicht,9,''0'')
+              union select prs_bsn, soort, bsn     gerelateerde_bsn, clobreport, orderby from pl_stf300_partner_vw         where prs_bsn = lpad(:BSN_verplicht,9,''0'')
+            ) 
+       ) sub
+,        psn_sjt_h_psn_s_rtmv   rel
+where    sub.gerelateerde_bsn = rel.bsn (+)
+order by sub.orderby'
+,'Gerelateerde personen (ouders/partners en kinderen) o.b.v. BSN'
+,'Rapport toont voor een bepaalde opgegeven persoon de gegevens van gerelateerde personen.
+Hieronder vallen ouders/partners en kinderen.
+Indien een van deze personen ook actueel in het Gegevensmagazijn aanwezig is, 
+dan is het mogelijk om voor deze persoon de persoonslijst te bekijken
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Escalatie_Personen)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Escalatie_Personen','select gmn.ids_subject                                         persoon_GM
+,      gmn.dtt_laaddatum_ins                                   datum
+,      gmn.bsn
+,      gmn.a_num
+,      gmn.voorletters
+,      gmn.voornamen
+,      gmn.voorv_geslachtsnaam
+,      gmn.geslachtsnaam
+,      gmn.verwijderd
+,      case when gmn.verwijderd = ''Ja'' then null
+            else ''#runreport#queryname=Persoonslijst&BSN_verplicht=''||lpad(gmn.bsn,9,''0'')||''#Persoonslijst#gm_out@gegmag#''
+       end            as Persoonslijst
+,      ''#runreport#queryname=StUF300Berichten_obvSleutelwaarde&Entiteittype=PRS&SleutelWaarde_verplicht=''||ltrim(substr(ids_subject,2),''0'')||''#Berichten#stuf300_in@gegmag#''      as Berichten
+from ( select psn.ids_subject
+       ,      psn.dtt_laaddatum_ins
+       ,      psn.bsn
+       ,      psn.a_num
+       ,      psn.voorletters
+       ,      psn.voornamen
+       ,      psn.voorv_geslachtsnaam
+       ,      psn.geslachtsnaam
+       ,      psn.ind_delete
+       ,      case when nvl(:Incl_verwijderd_jn,''J'') = ''J'' then ''J''
+                   when psn.ind_delete = ''N'' then ''J''
+                   else ''N''
+              end  ind_tonen
+       ,      case when psn.ind_delete = ''N'' then ''Nee'' else ''Ja'' end Verwijderd
+       from   psn_sjt_h_psn_s psn
+       ,    ( select   psn.ids_subject
+              ,        max(psn.idd_satelliet) idd_satelliet
+              from     psn_sjt_h_psn_s psn
+              ,        dvgm_escalatie  esc
+              where    psn.ids_subject = esc.ids_attribuutwaarde
+              and      esc.entiteittype = ''PRS''
+              and      case when :BSN is null then psn.bsn else :BSN end = psn.bsn
+              group by psn.ids_subject
+            ) maxi
+       where psn.idd_satelliet = maxi.idd_satelliet
+     ) gmn
+where  gmn.ind_tonen = ''J'''
+,'Personen die minimaal 1 error bericht hebben'
+,'Personen die minimaal 1 error bericht hebben en die niet gecorrigeerd zijn door een toevoeging'||chr(10)||chr(10)||
+'Parameter Incl_verwijderd_jn : J geeft ook de verwijderde personen terug. N geeft alleen de actuele personen (default J)
+Parameter BSN : Eventueel alleen zoeken op 1 BSN'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Personen_zonder_Toevoeging)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Personen_zonder_Toevoeging','select stf.sleutel_waarde              persoon_gm
+,      stf.bsn                         bsn
+,      ''#runreport#queryname=StUF300Berichten_obvSleutelwaarde&Entiteittype=PRS&SleutelWaarde_verplicht=''||stf.sleutel_waarde||''#Berichten#stuf300_in@gegmag#''      as Berichten
+from   dvgm.dvgm_escalatie@dvgm_ro      esc
+,      stf300_stuurgegevens             stf
+where  esc.ird_transactie = stf.bericht_key
+and    esc.cde_escalatie  = ''003''
+and    stf.entiteittype   = ''PRS''
+and    stf.bsn            = nvl(:BSN , stf.bsn )'
+,'Alle personen zonder toevoegingsbericht'
+,'Alle personen waarvoor wel een wijzigingsbericht is aangeleverd maar geen toevoegingsbericht
+Deze personen zijn dus niet in het Gegevensmagazijn aanwezig.
+De bron dient eerst een toevoegingsbericht aan te bieden.'
+,'y',null);
+--

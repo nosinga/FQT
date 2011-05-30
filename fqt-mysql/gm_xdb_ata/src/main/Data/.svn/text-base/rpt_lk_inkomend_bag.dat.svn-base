@@ -1,0 +1,318 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. inkomende kennisgevingen BAG
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvCorrelationID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Bericht_Info_obvCorrelationID','select   bbq.sequence_id
+,        bbq.correlation_id
+,        bbq.enqueue_timestamp
+,        bbq.dequeue_timestamp
+,        bbq.status
+,        case when brq.sequence_id      is null    then ''Geen response''
+              when lower(brq.payload) like ''%bv0%'' then ''Bevestiging''
+              when lower(brq.payload) like ''%fo0%'' then ''Fout''
+              else ''Onbekend''
+         end                                                                                       soort_response
+,        ''#clob#payload#bag_bericht_queue#correlation_id#''||bbq.correlation_id||''#''                bericht
+,        case when brq.sequence_id is null
+         then
+            null
+         else
+           ''#clob#payload#bag_response_queue#correlation_id#''||bbq.correlation_id||''#''
+         end response
+,        case when upper(status) like ''%ERROR%''
+         then
+           ''#runreport#queryname=Foutmeldingen_Bericht_GUC&correlation_id_verplicht=''||bbq.correlation_id||''#Foutmeldingen#guc_trace@guc#''
+         else
+           null
+         end foutmeldingen_GUC
+,        ''#runreport#queryname=GUC_Trace_Endpoints&correlation_id_verplicht=''||bbq.correlation_id||''#Endpoints#guc_trace@guc#''      endpoints_GUC
+,        ''#runreport#queryname=StUF301Berichten_obvCorrelationID&correlation_id_verplicht=''||bbq.correlation_id||''#StUF301_GM#stuf301_in@gegmag#''      StUF301_GM
+,        ''#runreport#queryname=Relatie_Lk01IN_Lk01OUT&correlation_id_verplicht=''||bbq.correlation_id||''#Afnemers#guc_unique@guc#''    Afnemers
+,        case when info.entiteittype = ''AOA''
+              then ''#runreport#queryname=BAG_Nummeraanduiding_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Nummeraanduiding#stuf301_out@gegmag#''
+              when info.entiteittype = ''BRT''
+              then ''#runreport#queryname=BAG_Buurt_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Buurt#stuf301_out@gegmag#''
+              when info.entiteittype = ''OPR''
+              then ''#runreport#queryname=BAG_OpenbareRuimte_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#OpenbareRuimte#stuf301_out@gegmag#''
+              when info.entiteittype = ''PND''
+              then ''#runreport#queryname=BAG_Pand_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Pand#stuf301_out@gegmag#''
+              when info.entiteittype = ''TGO''
+              then ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Object#stuf301_out@gegmag#''
+              when info.entiteittype = ''WPL''
+              then ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Woonplaats#stuf301_out@gegmag#''
+              when info.entiteittype = ''WYK''
+              then ''#runreport#queryname=BAG_Wijk_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Wijk#stuf301_out@gegmag#''
+              else null
+         end                           Actuele_Stand_GM
+from     bag_bericht_queue     bbq
+,        bag_response_queue    brq
+,        bag_bericht_info      info
+where    bbq.correlation_id = brq.correlation_id (+)
+and      bbq.sequence_id    = info.sequence_id   (+)
+and      bbq.correlation_id = :correlation_id_verplicht'
+,'BAG berichten o.b.v. CorrelationID'
+,'Ophalen BAG berichtinformatie o.b.v. correlationID'||chr(10)||chr(10)||
+'Attribuut Bericht
+Deze link toont het XML bericht'||chr(10)||chr(10)||
+'Attribuut Response
+Indien het bericht een response bevat dan toont deze link het responsebericht'||chr(10)||chr(10)||
+'Attribuut Foutmeldingen_GUC
+Indien het bericht niet goed verwerkt is dan geeft deze link de foutmeldingen van de GUC'||chr(10)||chr(10)||
+'Attribuut Endpoints GUC
+Roept rapport aan met de informatie over de endpoints gedurende de verwerking van het bericht'||chr(10)||chr(10)||
+'Attribuut StUF301_GM
+Roept rapport aan met daarin de informatie over de verwerking van het bericht in het Gegevensmagazijn'||chr(10)||chr(10)||
+'Attribuut Afnemers
+Roept rapport aan met daarin de informatie over verspreiding van het bericht naar afnemers'||chr(10)||chr(10)||
+'Attribuut Actuele Stand GM
+Toont voor de desbetreffende business-sleutel en entiteittype de laatste en meest actuele stand in het Gegevensmagazijn'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvBusinessID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Bericht_Info_obvBusinessID','select *
+from ( select bbq.sequence_id              sequence_id
+       ,      bbq.correlation_id           correlation_id
+       ,      bbq.enqueue_timestamp        enqueue_timestamp
+       ,      bbq.status                   status
+       ,      info.entiteittype
+       ,      info.zenderapplicatie        zender_app
+       ,      info.referentienummer        referentienr
+       ,      info.k_mutatiesoort          mutatiesoort
+       ,      info.sleutelverzendend
+       ,      info.sleutelnaam_01          sleutelnaam
+       ,      info.sleutelwaarde_01        sleutelwaarde
+       ,      info.verwerkingsduur_ms
+       ,      ''#runreport#queryname=BAG_Bericht_Info_obvCorrelationID&correlation_id_verplicht=''||bbq.correlation_id||''#Bericht#''    info_bericht
+       ,      case when info.entiteittype = ''AOA''
+                   then ''#runreport#queryname=BAG_Nummeraanduiding_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Nummeraanduiding#stuf301_out@gegmag#''
+                   when info.entiteittype = ''BRT''
+                   then ''#runreport#queryname=BAG_Buurt_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Buurt#stuf301_out@gegmag#''
+                   when info.entiteittype = ''OPR''
+                   then ''#runreport#queryname=BAG_OpenbareRuimte_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#OpenbareRuimte#stuf301_out@gegmag#''
+                   when info.entiteittype = ''PND''
+                   then ''#runreport#queryname=BAG_Pand_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Pand#stuf301_out@gegmag#''
+                   when info.entiteittype = ''TGO''
+                   then ''#runreport#queryname=BAG_Object_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Object#stuf301_out@gegmag#''
+                   when info.entiteittype = ''WPL''
+                   then ''#runreport#queryname=BAG_Woonplaats_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Woonplaats#stuf301_out@gegmag#''
+                   when info.entiteittype = ''WYK''
+                   then ''#runreport#queryname=BAG_Wijk_obvBusinessID&Identificatie_verplicht=''||info.sleutelwaarde_01||''#Wijk#stuf301_out@gegmag#''
+                   else null
+              end                           Actuele_Stand_GM
+       from   bag_bericht_info              info
+       ,      bag_bericht_queue             bbq
+       where  info.sequence_id      = bbq.sequence_id (+)
+       and    info.sleutelwaarde_01 = :BusinessID_verplicht
+     )
+order by sequence_id'
+,'BAG berichten o.b.v. Business Sleutel'
+,'Ophalen BAG berichtinformatie o.b.v. Business Sleutel'||chr(10)||chr(10)||
+'Attribuut Info_Bericht
+Deze link geeft de nadere informatie voor het bericht'||chr(10)||chr(10)||
+'Attribuut Actuele Stand GM
+Toont voor de desbetreffende business-sleutel en entiteittype de laatste en meest actuele stand in het Gegevensmagazijn'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvReferentienummer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Bericht_Info_obvReferentienummer','select *
+from ( select bbq.sequence_id              sequence_id
+       ,      bbq.correlation_id           correlation_id
+       ,      bbq.enqueue_timestamp        enqueue_timestamp
+       ,      bbq.status                   status
+       ,      info.entiteittype
+       ,      info.zenderapplicatie        zender_app
+       ,      info.referentienummer        referentienr
+       ,      info.k_mutatiesoort          mutatiesoort
+       ,      info.sleutelverzendend
+       ,      info.sleutelnaam_01          sleutelnaam
+       ,      info.sleutelwaarde_01        sleutelwaarde
+       ,      info.verwerkingsduur_ms
+       ,      ''#runreport#queryname=BAG_Bericht_Info_obvCorrelationID&correlation_id_verplicht=''||bbq.correlation_id||''#Bericht#''    info_bericht
+       from   bag_bericht_info                 info
+       ,      bag_bericht_queue                bbq
+       where  info.sequence_id      = bbq.sequence_id (+)
+       and    info.referentienummer = :referentienummer_verplicht
+     )
+order by sequence_id'
+,'BAG berichten o.b.v. Referentienummer'
+,'Ophalen BAG berichtinformatie o.b.v. referentienummer'||chr(10)||chr(10)||
+'Attribuut Info_Bericht
+Deze link geeft de nadere informatie voor het bericht'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvStatus)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Bericht_Info_obvStatus','select bbq.sequence_id
+,      bbq.correlation_id
+,      bbq.enqueue_timestamp
+,      bbq.status
+,      info.entiteittype
+,      info.zenderapplicatie        zender_app
+,      info.referentienummer        referentienr
+,      info.k_mutatiesoort          mutatiesoort
+,      info.sleutelverzendend
+,      info.sleutelnaam_01          sleutelnaam
+,      info.sleutelwaarde_01        sleutelwaarde
+,      info.verwerkingsduur_ms
+,      ''#runreport#queryname=BAG_Bericht_Info_obvCorrelationID&correlation_id_verplicht=''||bbq.correlation_id||''#Bericht#''         info_bericht
+from   bag_bericht_info                 info
+,      bag_bericht_queue                bbq
+where  info.sequence_id                          = bbq.sequence_id
+and    bbq.status                                = :status_verplicht
+and    to_char(bbq.enqueue_timestamp,''YYYYMMDD'') = nvl(:datum_yyyymmdd,to_char(bbq.enqueue_timestamp,''YYYYMMDD''))'
+,'BAG Berichten o.b.v. Status'
+,'Ophalen BAG berichtinformatie o.b.v. status en periode'||chr(10)||chr(10)||
+'Mogelijke statussen:
+- NEW
+- ERROR-RESPONSE
+- ERROR-IGNORE
+- ERROR
+- PROCESSING
+- PROCESSED'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvDag)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('BAG_Bericht_Info_obvDag','select bbq.sequence_id
+,      bbq.correlation_id
+,      bbq.enqueue_timestamp
+,      bbq.status
+,      info.entiteittype
+,      info.zenderapplicatie        zender_app
+,      info.referentienummer        referentienr
+,      info.k_mutatiesoort          mutatiesoort
+,      info.sleutelverzendend
+,      info.sleutelnaam_01          sleutelnaam
+,      info.sleutelwaarde_01        sleutelwaarde
+,      info.verwerkingsduur_ms
+,      ''#runreport#queryname=BAG_Bericht_Info_obvCorrelationID&correlation_id_verplicht=''||bbq.correlation_id||''#Bericht#''         info_bericht
+from   bag_bericht_info                 info
+,      bag_bericht_queue                bbq
+where  info.sequence_id      = bbq.sequence_id
+and    to_char(bbq.enqueue_timestamp,''YYYYMMDD'') = :datum_yyyymmdd_verplicht
+and    to_char(bbq.enqueue_timestamp,''hh24miss'') >= nvl(:tijdstip_vanaf_hh24miss,to_char(bbq.enqueue_timestamp,''hh24miss''))
+and    to_char(bbq.enqueue_timestamp,''hh24miss'') <= nvl(:tijdstip_tot_hh24miss,to_char(bbq.enqueue_timestamp,''hh24miss''))'
+,'BAG berichten o.b.v. Datum en evt. Tijdstip'
+,'Ophalen BAG berichtinformatie o.b.v. een dag'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (StUF301Berichten_obvCorrelationID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('StUF301Berichten_obvCorrelationID','select   bericht_key
+,        tijdstipbericht
+,        laaddatum
+,        round(   extract (hour   from (verwerkttijd - laaddatum) ) * 3600000
+                + extract (minute from (verwerkttijd - laaddatum) ) * 60000
+                + extract (second from (verwerkttijd - laaddatum) ) * 1000
+              ) verwerkingssduur
+,        functie
+,        entiteittype
+,        referentienummer
+,        status
+,        sleutel_naam
+,        sleutel_waarde
+,        correlation_id
+,        ''#clob#xml_object#stuurgegevens#bericht_key#''||bericht_key||''#''                                                           bericht_0301
+,        ''#runreport#queryname=StUF301Berichten_obvSleutelwaarde&Entiteittype_verplicht=''||entiteittype||''&SleutelWaarde_verplicht=''||sleutel_waarde||''#Berichten_persoon#''  Berichten_persoon
+,        ''#runreport#queryname=Foutmeldingen_Bericht_GM&bericht_verplicht=''||bericht_key||''#Meldingen GM#dvgm@gegmag#''             Meldingen_GM
+,        ''#runreport#queryname=Audit_GM_Transacties&Bericht_verplicht=''||bericht_key||''#Audit GM#dvgm@gegmag#''                     Audit_GM
+--,        case when status != ''V''
+--              then''#runreport#queryname=Jira_Issues_obvBericht&Bericht_verplicht=''||bericht_key||''#Jira Issue#abkr_rpt@ABKR#''
+--              else null
+--         end                                                                                                                    Jira
+from     stuurgegevens
+where    correlation_id = :correlation_id_verplicht'
+,'StUF301 Berichten o.b.v. CorrelationID'
+,'Ophalen van de aangeleverde StUF berichten o.b.v. de correlation_id
+De berichten betreft de 03.01 versie uit STUF301_IN.'||chr(10)||chr(10)||
+'Parameter CorrelationID_verplicht
+Deze parameter is verplicht en betreft het unieke correlationID van een bericht'||chr(10)||chr(10)||
+'Attribuut Bericht_0301
+Dit attribuut toont het aangeleverde bericht in formaat 03.01'||chr(10)||chr(10)||
+'--Attribuut Berichten_Persoon
+--Door hierop te klikken verschijnt er een nieuw scherm met daarin alle berichten die voor deze persoon zijn aangeleverd.'||chr(10)||chr(10)||
+'Attribuut Meldingen_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin alle meldingen die bij het laden van het bericht door het Gegevensmagazijn zijn gelogged'||chr(10)||chr(10)||
+'Attribuut Audit_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin auditgegevens van het laden van het bericht in het Gegevensmagazijn'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (StUF301Berichten_obvSleutelwaarde)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('StUF301Berichten_obvSleutelwaarde','select   bericht_key
+,        tijdstipbericht
+,        laaddatum
+,        round(   extract (hour   from (verwerkttijd - laaddatum) ) * 3600000
+                + extract (minute from (verwerkttijd - laaddatum) ) * 60000
+                + extract (second from (verwerkttijd - laaddatum) ) * 1000
+              ) verwerkingssduur
+,        functie
+,        entiteittype
+,        referentienummer
+,        status
+,        sleutel_naam
+,        sleutel_waarde
+,        correlation_id
+,        ''#clob#xml_object#stuurgegevens#bericht_key#''||bericht_key||''#''                                             bericht_0301
+,        ''#runreport#queryname=Foutmeldingen_Bericht_GM&bericht_verplicht=''||bericht_key||''#Meldingen#dvgm@gegmag#''  Meldingen_GM
+,        ''#runreport#queryname=Audit_GM_Transacties&Bericht_verplicht=''||bericht_key||''#Audit GM#dvgm@gegmag#''       Audit_GM
+--,        case when status != ''V''
+--              then''#runreport#queryname=Jira_Issues_obvBericht&Bericht_verplicht=''||bericht_key||''#Jira Issue#abkr_rpt@ABKR#''
+--              else null
+--         end                                                                                                         Jira
+from     stuurgegevens
+where    entiteittype   = :Entiteittype_verplicht
+and      sleutel_waarde = :SleutelWaarde_verplicht
+order by laaddatum'
+,'StUF301 Berichten o.b.v. SleutelWaarde'
+,'Ophalen van de aangeleverde StUF berichten o.b.v. de business sleutel
+De berichten betreft de 03.01 versie uit STUF301_IN.'||chr(10)||chr(10)||
+'Parameter Entiteittype_verplicht
+Deze parameter is verplicht en betreft het entiteittype van een bericht weer.'||chr(10)||chr(10)||
+'Parameter Sleutelwaarde_verplicht
+Deze parameter is verplicht en betreft de unieke sleutel van een object weer.
+Ofwel de business-sleutel uit het bericht.'||chr(10)||chr(10)||
+'Attribuut Bericht_0301
+Dit attribuut toont het aangeleverde bericht in formaat 03.01'||chr(10)||chr(10)||
+'--Attribuut Berichten_Persoon
+--Door hierop te klikken verschijnt er een nieuw scherm met daarin alle berichten die voor deze persoon zijn aangeleverd.'||chr(10)||chr(10)||
+'Attribuut Meldingen_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin alle meldingen die bij het laden van het bericht door het Gegevensmagazijn zijn gelogged'||chr(10)||chr(10)||
+'Attribuut Audit_GM
+Door hierop te klikken verschijnt er een nieuw scherm met daarin auditgegevens van het laden van het bericht in het Gegevensmagazijn'
+,'y',null);
+--

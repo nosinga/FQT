@@ -1,0 +1,25 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Aanmaken versie tabel
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT CREATE TABLE DB_VERSIE
+CREATE TABLE DB_VERSIE
+  ( VERSIENR            VARCHAR2(100)
+  , DAT_INSTALLATIE     TIMESTAMP
+  , STATUS              VARCHAR2(100)
+  )
+/

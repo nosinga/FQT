@@ -1,0 +1,603 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. DailyCheck
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check001_JobControles_ALL)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check001_JobControles_ALL','select schema_user
+,      job
+,      what
+,      failures
+,      broken
+,      last_date
+,      next_date
+,      sysdate
+from   user_jobs
+where  broken = ''Y''
+union
+select schema_user
+,      job
+,      what
+,      failures
+,      broken
+,      last_date
+,      next_date
+,      sysdate
+from   user_jobs@stuf300_in_ro
+where  broken = ''Y''
+union
+select schema_user
+,      job
+,      what
+,      failures
+,      broken
+,      last_date
+,      next_date
+,      sysdate
+from   user_jobs@stuf301_in_ro
+where  broken = ''Y'''
+,'Informatie over niet draaiende geschedulde jobs'
+,'Query detecteert alle jobs die gescheduled zijn om op vaste tijden te draaien.
+De jobs draaien volgens DBMS_JOBS. 
+Indien de query een resultaat teruggeeft dan betekent dit dat de bewuste jobs niet draaien en dus alsnog aangezet dienen te worden.'||chr(10)||chr(10)||
+'Failures
+Indien er errors zijn opgetreden dan staat dat hier aangegeven'||chr(10)||chr(10)||
+'Broken
+Geeft aan of de job "gebroken" is, ofwel niet draait.'||chr(10)||chr(10)||
+'De jobs ETL_LOG en ETL_LOG_GEGMAG zijn specifieke ATA-jobs en horen dus bij de beheer van IOO
+',null,'column what format a20
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check002_Verdacht_Bericht_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check002_Verdacht_Bericht_GBA','select sequence_id
+,      enqueue_timestamp
+,      dequeue_timestamp
+,      status
+,      correlation_id
+from   guc_queue.gbaprs_aftap_bericht_queue
+where  status = ''PROCESSING''
+and    ( dequeue_timestamp + 4/24 ) <= systimestamp'
+,'Verdachte GBA aftapberichten'
+,'Query retourneert een mogelijk verdacht GBA bericht. Dit betreft een bericht die in de GUC_QUEUE.GBAPRS_AFTAP_BERICHT_QUEUE al meer dan 4 uur de status PROCESSING heeft. 
+Mogelijke oorzaak is dat de GUC stil staat. Onderzoek is vereist.
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check002_Verdacht_Bericht_BAG)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check002_Verdacht_Bericht_BAG','select sequence_id
+,      enqueue_timestamp
+,      dequeue_timestamp
+,      status
+,      correlation_id
+from   guc_queue.bag_bericht_queue
+where  status = ''PROCESSING''
+and    ( dequeue_timestamp + 4/24 ) <= systimestamp'
+,'Verdachte BAG aftapberichten'
+,'Query retourneert een mogelijk verdacht BAG bericht. Dit betreft een bericht die in de GUC_QUEUE.BAG_BERICHT_QUEUE al meer dan 4 uur de status PROCESSING heeft. 
+Mogelijke oorzaak is dat de GUC stil staat. Onderzoek is vereist.
+',null,null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check003_Aantal_Niet_Verwerkte_AftapBerichten_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check003_Aantal_Niet_Verwerkte_AftapBerichten_GBA','select  case when to_char(enqueue_timestamp,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then to_char(enqueue_timestamp,''YYYY-MM-DD'')
+             else to_char(enqueue_timestamp,''YYYY MONTH'')
+         end                                                                                    maand_dag
+,        count(1)                                                                               totaal
+,        sum(noresponseDDS)                                                                     GeenResponse_DDS
+,        sum(foutDDS)                                                                           Foutbericht_DDS
+,        sum(geenStuf)                                                                          GeenStUFBericht
+,        sum(BevestigingDDS)                                                                    Bevestiging_DDS
+,        count(1) - sum(noresponseDDS) - sum(foutDDS) - sum(geenStuf) - sum(BevestigingDDS)     Onbekend
+from   ( select case when to_char(abq.enqueue_timestamp,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then trunc(abq.enqueue_timestamp)
+                     else trunc(abq.enqueue_timestamp,''MM'')
+                end                                           enqueue_timestamp
+         ,      case when arq.sequence_id is null        then 1 else 0 end noresponseDDS
+         ,      case when arq.payload     like ''%Fault%'' then 1 else 0 end FOUTDDS
+         ,      case when arq.payload     like ''%The following operations are supported%'' then 1 else 0 end GeenStuf
+         ,      case when arq.payload     like ''%Bv01%''  then 1 else 0 end BevestigingDDS
+         from   guc_queue.gbaprs_aftap_bericht_queue  abq
+         ,      guc_queue.gbaprs_aftap_response_queue arq
+         where  abq.correlation_id = arq.correlation_id (+)
+         and    abq.status         = ''NEW''
+       )
+group by enqueue_timestamp
+order by enqueue_timestamp'
+,'Aantal (nog) niet verwerkte GBA aftapberichten'
+,'Aantal afgetapte GBA berichten die nog niet opgepakt zijn om te verwerken in het Gegevensmagazijn.
+Status van deze berichten is gelijk aan NEW.
+Het is niet fout indien berichten nog niet opgepakt zijn. De GUC zet berichten namelijk alleen door naar het Gegevensmagazijn indien DDS een bevestigingsresponse heeft verstuurd.'||chr(10)||chr(10)||
+'Attribuut Totaal'||chr(10)||
+'Totaal aantal berichten (nog) niet opgepakt door de GUC'||chr(10)||chr(10)||
+'Attribuut GeenResponse_DDS'||chr(10)||
+'Aantal berichten waarvoor DDS geen response heeft gestuurd : geen actie nodig'||chr(10)||chr(10)||
+'Attribuut FoutBericht_DDS'||chr(10)||
+'Aantal berichten waarvoor DDS een foutbericht als antwoord heeft gestuurd : geen actie nodig'||chr(10)||chr(10)||
+'Attribuut GeenStUFBericht'||chr(10)||
+'Aantal berichten die niet volgens StUF standaard formaat is : geen actie nodig'||chr(10)||chr(10)||
+'Attribuut Bevestiging_DDS'||chr(10)||
+'Aantal berichten waarvoor DDS een bevestiging heeft gestuurd, maar die nog niet door de GUC zijn verwerkt. Dit hoeft niet perse een foutieve situatie te zijn. De GUC pakt berichten sequentieel op. Het kan dus zijn dat deze berichten alsnog opgepakt worden. Indien de datum in het verleden ligt, dan moet hier onderzoek naar worden gepleegd. Wellicht staat de GUC stil.'||chr(10)||chr(10)||
+'Attribuut Onbekend'||chr(10)||
+'Deze berichten vallen buiten de andere oorzaken. Nader onderzoek is vereist
+',null,'column maand_dag         format a20
+column totaal            format 999999999
+column GeenResponse_DDS  format 999999999
+column FoutBericht_DDS   format 999999999
+column GeenStUFBericht   format 999999999
+column Bevestiging_DDS   format 999999999
+column Onbekend          format 999999999
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check004_Laatste_Bericht_StUF300_IN_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check004_Laatste_Bericht_StUF300_IN_GBA','select bericht_key
+,      correlation_id
+,      to_char(laaddatum,''DD-MM-YYYY HH24:MI:SS'') laaddatum
+,      entiteittype
+,      status
+from   stuf300_in.stf300_stuurgegevens
+where  bericht_key in ( select max(bericht_key)
+                        from   stuf300_in.stf300_stuurgegevens
+                      )'
+,'Informatie over het laatst aangeboden bericht aan het GM'
+,'Laatste berichtgegevens dat door de GUC aan het Gegevensmagazijn is aangeboden om te verwerken. Betreft hier het STUF300_IN schema.
+',null,'column correlation_id format a50
+column laaddatum      format a20
+column status         format a10
+column entiteittype   format a15
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check004_Laatste_Bericht_StUF301_IN_BAG)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check004_Laatste_Bericht_StUF301_IN_BAG','select bericht_key
+,      correlation_id
+,      to_char(laaddatum,''DD-MM-YYYY HH24:MI:SS'') laaddatum
+,      entiteittype
+,      status
+from   stuf301_in.stuurgegevens
+where  bericht_key in ( select max(bericht_key)
+                        from   stuf301_in.stuurgegevens
+                      )'
+,'Informatie over het laatst aangeboden bericht aan het GM'
+,'Laatste berichtgegevens dat door de GUC aan het Gegevensmagazijn is aangeboden om te verwerken. Betreft hier het STUF301_IN schema.
+',null,'column correlation_id format a50
+column laaddatum      format a20
+column status         format a10
+column entiteittype   format a15
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check005_Statistieken_Totaal_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check005_Statistieken_Totaal_GBA'
+,'select entiteittype                            as entiteittype
+,      totaal                                  as totaal
+,      aant_err                                as aant_error
+,      nvl(round((aant_err/totaal)*100,2),0)   as perc_error
+,      aant_err_obj                            as aant_uniek_obj_error
+,      aant_tot_obj                            as aant_uniek_obj_totaal
+from ( select   stf.entiteittype
+       ,        count(1)         totaal
+       ,        err.aant_err
+       ,        err_obj.aant_err_obj
+       ,        tot_obj.aant_tot_obj
+       from     stf300_stuurgegevens    stf
+       ,      ( select entiteittype, count(1) aant_err from   stf300_stuurgegevens where  status = ''Error'' group by entiteittype ) err
+       ,      ( select entiteittype, count(distinct sleutel_naam||sleutel_waarde) aant_err_obj from   stf300_stuurgegevens where  status = ''Error'' group by entiteittype ) err_obj
+       ,      ( select entiteittype, count(distinct sleutel_naam||sleutel_waarde) aant_tot_obj from   stf300_stuurgegevens where substr(referentienummer,1,1) != ''i'' group by entiteittype ) tot_obj
+       where    substr(stf.referentienummer,1,1) != ''i''   /* initiele load uitsluiten */
+       and      stf.entiteittype = err.entiteittype (+)
+       and      stf.entiteittype = err_obj.entiteittype (+)
+       and      stf.entiteittype = tot_obj.entiteittype (+)
+       group by stf.entiteittype
+       ,        err.aant_err
+       ,        err_obj.aant_err_obj
+       ,        tot_obj.aant_tot_obj
+     )'
+,'Statistieken (totaal) GBA aftapberichten aangeleverd aan het GM'
+,'Totaal aantallen en statistieken van GBA berichten die door de GUC aangeleverd zijn aan het Gegevensmagazijn.'||chr(10)||chr(10)||
+'Attribuut Entiteittype : De entiteit van het aangeleverde bericht
+Attribuut Totaal : Totaal aantal aangeleverde berichten
+Attribuut Aant_Error : Aantal berichten met status Error
+Attribuut Perc_Error : Het percentage berichten met status Error
+Attribuut Aant_Uniek_Obj_Error : Uniek aantal objecten met minimaal 1 Error bericht
+Attribuut Aant_Uniek_Obj_Totaal : Uniek aantal objecten'||chr(10)||chr(10)||
+'De initiele load (december 2009) is niet meegenomen in de query'
+,null
+,'column status format a10
+column perc_error format 990D99
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check005_Statistieken_Totaal_BAG)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check005_Statistieken_Totaal_BAG','select entiteittype                            as entiteittype
+,      totaal                                  as totaal
+,      aant_err                                as aant_error
+,      nvl(round((aant_err/totaal)*100,2),0)   as perc_error
+,      aant_err_obj                            as aant_uniek_obj_error
+,      aant_tot_obj                            as aant_uniek_obj_totaal
+from ( select   stf.entiteittype
+       ,        count(1)         totaal
+       ,        err.aant_err
+       ,        err_obj.aant_err_obj
+       ,        tot_obj.aant_tot_obj
+       from     stuurgegevens    stf
+       ,      ( select entiteittype, count(1) aant_err from   stuurgegevens where  status = ''Error'' group by entiteittype ) err
+       ,      ( select entiteittype, count(distinct sleutel_naam||sleutel_waarde) aant_err_obj from   stuurgegevens where  status = ''Error'' group by entiteittype ) err_obj
+       ,      ( select entiteittype, count(distinct sleutel_naam||sleutel_waarde) aant_tot_obj from   stuurgegevens group by entiteittype ) tot_obj
+       where    stf.bericht_key != -1
+       and      stf.entiteittype = err.entiteittype (+)
+       and      stf.entiteittype = err_obj.entiteittype (+)
+       and      stf.entiteittype = tot_obj.entiteittype (+)
+       group by stf.entiteittype
+       ,        err.aant_err
+       ,        err_obj.aant_err_obj
+       ,        tot_obj.aant_tot_obj
+     )'
+,'Statistieken (totaal) BAG aftapberichten aangeleverd aan het GM'
+,'Totaal aantallen en statistieken van BAG berichten die door de GUC aangeleverd zijn aan het Gegevensmagazijn.'||chr(10)||chr(10)||
+'Attribuut Entiteittype          : De entiteit van het aangeleverde bericht
+Attribuut Totaal                : Totaal aantal aangeleverde berichten
+Attribuut Aant_Error            : Aantal berichten met status Error
+Attribuut Perc_Error            : Het percentage berichten met status Error
+Attribuut Aant_Uniek_Obj_Error  : Uniek aantal objecten met minimaal 1 Error bericht
+Attribuut Aant_Uniek_Obj_Totaal : Uniek aantal objecten'
+,null,'column entiteittype format a15
+column status       format a10
+column perc_error   format 990D99
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check006_Statistieken_Totaal_perDatum_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check006_Statistieken_Totaal_perDatum_GBA'
+,'select case when datum = to_date(''01-01-1900'',''DD-MM-YYYY'') then ''** INITIEEL **''
+            when to_char(datum,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then to_char(datum,''YYYY-MM-DD'')
+            else to_char(datum,''YYYY MONTH'')
+       end maand_dag
+,      entiteittype   type    
+,      count(datum)                                                                 aant_dagen
+,      sum(aant_verwerkt) + sum(aant_error)                                         aant_berichten
+,      sum(aant_verwerkt)                                                           aant_verwerkt
+,      sum(aant_error)                                                              aant_error
+,      round(( sum(aant_error)/( sum(aant_verwerkt)+sum(aant_error) ) ) * 100,2)    perc_error
+,      sum(aant_overig)                                                             aant_overig
+,      sum(aant_subject)                                                            aant_subject
+from ( select tijdstipbericht
+       ,      entiteittype
+       ,      case when soort = ''I'' then to_date(''01-01-1900'',''DD-MM-YYYY'')
+                   when to_char(tijdstipbericht,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then trunc(tijdstipbericht)
+                   else trunc(tijdstipbericht,''MM'')  end datum
+       ,      case when soort = ''I'' then ''** INITIEEL **''
+                   when to_char(tijdstipbericht,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then to_char(tijdstipbericht,''YYYY-MM-DD'')
+                   else to_char(tijdstipbericht,''YYYY MONTH'')  end maand_dag
+       ,      sum(aant_error)                                aant_error
+       ,      sum(aant_verwerkt)                             aant_verwerkt
+       ,      sum(aant_overig)                               aant_overig
+       ,      count(distinct entiteittype||sleutel_waarde)   aant_subject
+       from  ( select case when substr(referentienummer,1,1) = ''i'' then add_months(trunc(sysdate,''YYYY''),-1) else to_date(substr(tijdstipbericht,1,8),''YYYYMMDD'') end tijdstipbericht
+               ,      case when substr(referentienummer,1,1) = ''i'' then ''I'' else ''W'' end soort
+               ,      status
+               ,      entiteittype
+               ,      sleutel_waarde
+               ,      case when status = ''Error''            then 1 else 0 end aant_error
+               ,      case when status = ''V''                then 1 else 0 end aant_verwerkt
+               ,      case when status not in (''Error'',''V'') then 1 else 0 end aant_overig
+               from   stf300_stuurgegevens
+             )
+       group by tijdstipbericht, entiteittype, soort
+     )
+group by datum, entiteittype
+order by datum, entiteittype'
+,'Statistieken (totaal per datum) aftapberichten aangeleverd aan het GM'
+,'Maandtotaal aantallen en statistieken van berichten die door de GUC aangeleverd zijn aan het Gegevensmagazijn'||chr(10)||chr(10)||
+'Attribuut Maand_Dag
+Indien de verwerkdatum ligt in de huidige maand dan toont deze query de gegevens voor die bewuste dag. Ligt de verwerkdatum niet in de huidige maand dan worden de gegevens per jaar/maand getoond.
+De waarde "** INITIEEL **" geeft de initiele toevoegingsberichten uit december 2009 weer.'||chr(10)||chr(10)||
+'Attribuut Aant_Dagen
+Geeft het aantal dagen weer waarop berichten in de bewuste jaar/maand aan het GM zijn aangeboden.'||chr(10)||chr(10)||
+'Aantal Subject
+Betreft het unieke aantal personen waarvoor berichten zijn aangeleverd aan het GM'
+,null
+,'column maand_dag       format a20
+column type            format a8
+column aant_dagen      format 999999
+column aant_berichten  format 999999
+column aant_verwerkt   format 999999
+column aant_error      format 999999
+column perc_error      format 990D99
+column aant_overig     format 999999
+column aant_subject    format 999999
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check007_Gedetecteerde_Issues_perIssue_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check007_Gedetecteerde_Issues_perIssue_GBA','select jra.issue
+,      count(stf.entiteittype||stf.sleutel_waarde)       error_berichten
+,      count(distinct stf.entiteittype||stf.sleutel_waarde)    unieke_objecten
+,      to_char(to_date(substr(min(stf.tijdstipbericht),1,8),''YYYYMMDD''),''DD-MM-YYYY'')   eerste_datum
+,      to_char(to_date(substr(max(stf.tijdstipbericht),1,8),''YYYYMMDD''),''DD-MM-YYYY'')   laatste_datum
+from   table(abkr_reports.abkr_issues)   jra
+,      stf300_stuurgegevens              stf
+where  jra.bericht_key = stf.bericht_key
+group by jra.issue
+order by to_number(substr(jra.issue,6))'
+,'Aantallen gedetecteerde issues per Jira-Issue'
+,'Opsplitsing errorberichten naar gedetecteerde issues'||chr(10)||chr(10)||
+'Attribuut ISSUE
+Verwijzing naar een issuenummer in Jira. Zie voor de issuebeschrijving dan ook Jira.'||chr(10)||chr(10)||
+'Attribuut Error Berichten
+Totaal error-berichten die aan dit issue gerelateerd kunnen worden'||chr(10)||chr(10)||
+'Attribuut Unieke Objecten
+Totaal aantal unieke objecten waarvoor geldt dat er minimaal 1 error bericht is betreffende dit issue'||chr(10)||chr(10)||
+'Attribuut Eerste datum
+De eerste datum waarop het issue is opgetreden'||chr(10)||chr(10)||
+'Attribuut Laatste datum
+De laatste datum waarop het issue is opgetreden'
+,null
+,'column issue             format a15
+column error_berichten   format 999999
+column unieke_objecten   format 999999
+column abkr52            format 99999B
+column abkr53            format 99999B
+column abkr54            format 99999B
+column eerste_datum      format a20
+column laatste_datum     format a20
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check008_Gedetecteerde_Issues_perDatum_GBA)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check008_Gedetecteerde_Issues_perDatum_GBA'
+,'select case when to_char(datum,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then to_char(datum,''YYYY-MM-DD'')
+            else to_char(datum,''YYYY MONTH'')
+       end maand_dag
+,      count(datum)  dagen
+,      sum(aant_err) aant_err
+,      sum(a17)  abkr17
+,      sum(a34)  abkr34   , sum(a51)  abkr51
+,      sum(a52)  abkr52   , sum(a53)  abkr53
+,      sum(a54)  abkr54   , sum(a57)  abkr57
+,      sum(a58)  abkr58   , sum(a60)  abkr60
+,      sum(a73)  abkr73   , sum(a79)  abkr79
+,      sum(a101) abkr101  , sum(a113) abkr113
+,      sum(a114) abkr114  , sum(a115) abkr115
+,      sum(a116) abkr116  , sum(a118) abkr118
+,      sum(a120) abkr120  , sum(a125) abkr125
+,      sum(a126) abkr126  , sum(a250) abkr250 , sum(a255) abkr255
+,      sum(oraerr)    oraerr   , sum(noissue)   noissue
+from ( select tijdstip
+       ,      case when to_char(tijdstip,''YYYYMM'') = to_char(sysdate,''YYYYMM'') then trunc(tijdstip)
+                   else trunc(tijdstip,''MM'')  end datum
+       ,      count(bericht_key) aant_err
+       ,      sum(a01)   a01   ,  sum(a17)   a17
+       ,      sum(a34)   a34   ,  sum(a51)   a51
+       ,      sum(a52)   a52   ,  sum(a53)   a53
+       ,      sum(a54)   a54   ,  sum(a57)   a57
+       ,      sum(a58)   a58   ,  sum(a60)   a60
+       ,      sum(a73)   a73   ,  sum(a79)   a79
+       ,      sum(a101)  a101  ,  sum(a113)  a113
+       ,      sum(a114)  a114  ,  sum(a115)  a115
+       ,      sum(a116)  a116  ,  sum(a118)  a118
+       ,      sum(a120)  a120  ,  sum(a125)  a125
+       ,      sum(a126)  a126  ,  sum(a250)  a250
+       ,      sum(a255)  a255
+       ,      sum(ORAERR)      oraerr
+       ,      sum(noissue)     noissue
+       from ( select jra.bericht_key
+              ,      jra.issue
+              ,      to_date(substr(stf.tijdstipbericht,1,8),''YYYYMMDD'') tijdstip
+              ,      case when jra.issue = ''ABKR-01''  then 1 else 0 end A01
+              ,      case when jra.issue = ''ABKR-17''  then 1 else 0 end A17
+              ,      case when jra.issue = ''ABKR-34''  then 1 else 0 end A34
+              ,      case when jra.issue = ''ABKR-51''  then 1 else 0 end A51
+              ,      case when jra.issue = ''ABKR-52''  then 1 else 0 end A52
+              ,      case when jra.issue = ''ABKR-53''  then 1 else 0 end A53
+              ,      case when jra.issue = ''ABKR-54''  then 1 else 0 end A54
+              ,      case when jra.issue = ''ABKR-57''  then 1 else 0 end A57
+              ,      case when jra.issue = ''ABKR-58''  then 1 else 0 end A58
+              ,      case when jra.issue = ''ABKR-60''  then 1 else 0 end A60
+              ,      case when jra.issue = ''ABKR-73''  then 1 else 0 end A73
+              ,      case when jra.issue = ''ABKR-79''  then 1 else 0 end A79
+              ,      case when jra.issue = ''ABKR-101'' then 1 else 0 end A101
+              ,      case when jra.issue = ''ABKR-113'' then 1 else 0 end A113
+              ,      case when jra.issue = ''ABKR-114'' then 1 else 0 end A114
+              ,      case when jra.issue = ''ABKR-115'' then 1 else 0 end A115
+              ,      case when jra.issue = ''ABKR-116'' then 1 else 0 end A116
+              ,      case when jra.issue = ''ABKR-118'' then 1 else 0 end A118
+              ,      case when jra.issue = ''ABKR-120'' then 1 else 0 end A120
+              ,      case when jra.issue = ''ABKR-125'' then 1 else 0 end A125
+              ,      case when jra.issue = ''ABKR-126'' then 1 else 0 end A126
+              ,      case when jra.issue = ''ABKR-250'' then 1 else 0 end A250
+              ,      case when jra.issue = ''ABKR-255'' then 1 else 0 end A255
+              ,      case when jra.issue = ''ORA-ERROR'' then 1 else 0 end ORAERR
+              ,      case when jra.issue is null           then 1 else 0 end NOISSUE
+              from   table(abkr_reports.abkr_issues)    jra
+              ,      stf300_stuurgegevens               stf
+              where  jra.bericht_key = stf.bericht_key
+           ) group by tijdstip
+    ) group by datum order by datum'
+    ,'Aantallen gedetecteerde issues per Jira-Issue en datum'
+    ,'Opsplitsing errorberichten naar gedetecteerde issues volgens nummering in Jira.'||chr(10)||chr(10)||
+'Attribuut Maand_Dag
+Indien de verwerkdatum ligt in de huidige maand dan toont deze query de gegevens voor die bewuste dag. Ligt de verwerkdatum niet in de huidige maand dan worden de gegevens per jaar/maand getoond.
+De waarde "** INITIEEL **" geeft de initiele toevoegingsberichten uit december 2009 weer.
+',null,'column maand_dag format a16
+column dagen  format 999999
+column abkr01 format 99999B
+column abkr17 format 99999B
+column abkr34 format 99999B
+column abkr51 format 99999B
+column abkr52 format 99999B
+column abkr53 format 99999B
+column abkr54 format 99999B
+column abkr57 format 99999B
+column abkr58 format 99999B
+column abkr60 format 99999B
+column abkr73 format 99999B
+column abkr79 format 99999B
+column abkr101 format 99999B
+column abkr113 format 99999B
+column abkr114 format 99999B
+column abkr115 format 99999B
+column abkr116 format 99999B
+column abkr118 format 99999B
+column abkr120 format 99999B
+column abkr125 format 99999B
+column abkr126 format 99999B
+column abkr250 format 99999B
+column abkr255 format 99999B
+column oraerr format 99999B
+column noissue format 99999B');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check009_Aantal_Kennisgeving_Afnemer_Error_ALL)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check009_Aantal_Kennisgeving_Afnemer_Error_ALL'
+,'select   abq.afnemer
+,        abq.status
+,        count(1)                                              aantal
+,        to_char(min(abq.enqueue_timestamp), ''YYYYMMDD'' )    begindatum
+,        to_char(max(abq.enqueue_timestamp), ''YYYYMMDD'' )    einddatum
+from     afnemers_bericht_queue    abq
+where    abq.status = ''ERROR''
+group by abq.afnemer
+,        abq.status'
+,'Aantal door te zetten kennisgevingen naar afnemers met status ERROR'
+,'Het aantal kennisgevingsberichten die in de afnemers queue staan met status ERROR
+Dit houdt een blokkade in voor het doorzetten van verdere kennisgevingsberichten naar de desbetreffende afnemer. Andere afnemers krijgen hun berichten wel.'
+,null,'col afnemer    format a20
+col status     format a20
+col begindatum format a15
+col einddatum  format a15');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check010_Volgindicaties_DDS_Error_ALL)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check010_Volgindicaties_DDS_Error_ALL','select   vip.status
+,        count(1)                                          aantal
+,        to_char(min(creatie_timestamp),''YYYYMMDD'')        begindatum
+,        to_char(max(creatie_timestamp),''YYYYMMDD'')        einddatum
+from     volgindicatiepersonen   vip
+where    vip.status = ''ERROR''
+group by vip.status'
+,'Aantal volgindicaties naar DDS met status ERROR'
+,'Geeft weer of er te zetten volgindicaties Buitengemeentelijk naar DDS de status ERROR hebben.
+Een record met status ERROR heeft een blokkade tot gevolg van al het verkeer naar DDS inzake volgindicaties Buitengemeentelijk.'||chr(10)||chr(10)||
+'Mogelijke oorzaak : het niet bereikbaar zijn van DDS.
+Oplossing : zet de status handmatig naar NEW'
+,null,'col status     format a20
+col begindatum format a15
+col einddatum  format a15');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check011_Volgindicaties_Afnemer_Error_ALL)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check011_Volgindicaties_Afnemer_Error_ALL','select   via.applicatie_afnemer
+,        via.status
+,        count(1)                                          aantal
+,        to_char(min(creatie_timestamp),''YYYYMMDD'')        begindatum
+,        to_char(max(creatie_timestamp),''YYYYMMDD'')        einddatum
+from     volgindicatiesafnemers   via
+where    via.status = ''ERROR''
+group by via.applicatie_afnemer
+,        via.status'
+,'Aantal volgindicaties naar afnemers met status ERROR'
+,'Geeft weer of er te zetten volgindicaties Binnen- en Buitengemeentelijk naar een afnemer de status ERROR hebben.
+Een record met status ERROR heeft een blokkade tot gevolg van al het verkeer naar de desbetreffende afnemer inzake volgindicaties.'||chr(10)||chr(10)||
+'Mogelijke oorzaak : het niet bereikbaar zijn van de afnemer
+Oplossing : zet de status handmatig naar NEW'
+,null,'col status     format a20
+col begindatum format a15
+col einddatum  format a15');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check012_ORA_Meldingen_GUC_ALL)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check012_ORA_Meldingen_GUC_ALL','select   to_char(max(entry_timestamp),''YYYYMMDD'')   datum
+,        value1                                     melding
+,        count(1)                                   aantal
+from     entry
+where    is_error_message        = 1                           /* Error berichten */
+and      nvl(value1,''X'')        like ''%ORA%''                   /* ORA-meldingen */
+and      substr(value1,1,20)    != ''Loading DVGM failure''      /* Met uitzondering van de fouten gelogd in DVGM */
+group by value1'
+,'Gelogde ORA-meldingen door GUC'
+,'Geeft weer of er ORA-meldingen in de GUC zijn opgetreden.
+',null,'column datum   format a10
+column melding format a60
+');
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (daily_check013_ORA_Meldingen_GM_ALL)
+REM ===============================================================================
+REM INSERTING into SQM_QUERIES
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('daily_check013_ORA_Meldingen_GM_ALL','select   to_char(max(dtd_timestamp),''YYYYMMDD'')     datum
+,        err_melding                                melding
+,        count(1)                                   aantal
+from     dvgm_err
+where    substr(err_code ,1,4 ) not in (''DVGM'')                /* Exclusief user-defined */
+and      err_code               not in (''-1008'')               /* Deze melding ontstaat a.g.v. ABKR-34 */
+and      err_code               not between -20999 and -20000  /* Exclusief user-defined */
+group by err_melding'
+,'Gelogde ORA-meldingen door GM'
+,'Geeft weer of er ORA-meldingen in het Gegevensmagazijn zijn opgetreden.
+',null,'column datum   format a10
+column melding format a60
+');
+
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (DailyCheck_Totaal_Rapport_perDatum)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION,DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('DailyCheck_Totaal_Rapport_perDatum', 'SELECT to_char(created,''yyyymmdd'') datum
+,      ''#clob#report#rpt_reports#id#''||max(id)||''#'' report_details
+from   rpt_reports
+where    to_char(created,''yyyymmdd'') between nvl(:datum_vanaf_yyyymmdd ,to_char(created,''yyyymmdd'') )
+                                         and nvl(:datum_totenmet_yyyymmdd ,to_char(created,''yyyymmdd'') )
+group by to_char(created,''yyyymmdd'')
+ORDER BY 1 desc'
+,'Alle verzonden DailyCheck rapportages'
+, 'Alle DailyCheck totaalrapportages die in het verleden zijn aangemaakt en verstuurd (eventueel voor een opgegeven periode)', NULL);
+--

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+                         "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+<!--
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Jetty</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+		    <role-name>ata_gebruiker</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+-->
+        <!--  realm-name duplicated to pom.xml, change on both places -->
+<!--
+        <realm-name>See file fqt-web/src/test/resources/authentication.properties for usernames and passwords</realm-name>
+	</login-config>
+-->
+</web-app>
+	

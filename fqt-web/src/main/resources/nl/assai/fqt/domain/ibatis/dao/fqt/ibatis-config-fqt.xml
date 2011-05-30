@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC
+        "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<settings lazyLoadingEnabled="true"/>
+
+    <typeAlias
+            alias="UrlLink"
+            type="nl.assai.fqt.domain.model.fqt.UrlLink"/>
+
+    <typeAlias
+            alias="VSCD"
+            type="nl.assai.fqt.domain.model.fqt.VSCD"/>
+
+    <typeAlias
+            alias="Contact"
+            type="nl.assai.fqt.domain.model.fqt.Contact"/>
+
+    <typeAlias
+            alias="ReportConnection"
+            type="nl.assai.fqt.domain.model.fqt.ReportConnection"/>
+
+    <typeAlias
+            alias="Permission"
+            type="nl.assai.fqt.domain.model.fqt.Permission"/>
+
+    <typeAlias
+            alias="Role"
+            type="nl.assai.fqt.domain.model.fqt.Role"/>
+
+    <typeAlias
+            alias="User"
+            type="nl.assai.fqt.domain.model.fqt.User"/>
+
+    <typeAlias
+            alias="UserMenu"
+            type="nl.assai.fqt.domain.model.fqt.UserMenu"/>
+
+    <typeAlias
+            alias="Login"
+            type="nl.assai.fqt.domain.model.fqt.Login"/>
+
+    <typeAlias
+            alias="Action"
+            type="nl.assai.fqt.domain.model.fqt.Action"/>
+
+    <typeAlias
+            alias="Menu"
+            type="nl.assai.fqt.domain.model.fqt.Menu"/>
+
+    <typeAlias
+            alias="MenuNode"
+            type="nl.assai.fqt.domain.model.fqt.MenuNode"/>
+
+    <typeAlias
+            alias="Connection"
+            type="nl.assai.fqt.domain.model.fqt.Connection"/>
+
+    <typeAlias
+            alias="Query"
+            type="nl.assai.fqt.domain.model.fqt.Query"/>
+
+    <typeHandler
+            javaType="boolean"
+            callback="nl.assai.fqt.domain.ibatis.dao.BooleanTypeHandler"/>
+
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/VSCD.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Contact.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Journaling.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Permission.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/ReportConnection.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Role.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/User.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Login.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Action.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Menu.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Connection.xml"/>
+    <sqlMap resource="nl/assai/fqt/domain/ibatis/dao/fqt/Query.xml"/>
+
+</sqlMapConfig>

@@ -1,0 +1,52 @@
+PROMPT file URP_Permissions
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van permissions
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-10-28 10:47:19 +0200 (Thu, 28 Oct 2010) $
+|||  Revision : $Revision: 25533 $
+|||  Author   : $Author: nosinga $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Permissions.dat $
+|||  ID       : $Id: URP_Permissions.dat 25533 2010-10-28 08:47:19Z nosinga $
+|||------------------------------------------------------------------------
+**/
+--
+--- ***
+--- Toevoegen PERMISSIONS
+--- en meteen verbinden aan ROLES
+--- ***
+--
+REM    ===============================================================================
+PROMPT - Create PHP PERMISSIONS
+REM    ===============================================================================
+-- alle php file permissions
+-- toestemming tot aanroepen alle php files (vanaf root)
+--
+exec urp_utils.insert_pms_and_link2role ( p_name => 'all_php'      , p_type => 'PHP'  , p_permissionvalue => '/'          , p_rolename => 'super_admin');
+--   toestemming voor de root files (menu login etc)
+--
+exec urp_utils.insert_pms_and_link2role ( p_name => 'rootandmenu'  , p_type => 'PHP'  , p_permissionvalue => '/approot/'  , p_rolename => 'connect');
+--   toestemmingen voor runnen de audit rapporten te runnen in php
+exec urp_utils.insert_pms_and_link2role ( p_name => 'sqlrun'       , p_type => 'PHP'  , p_permissionvalue => '/sqm/run'   , p_rolename => 'reports_run' );
+exec urp_utils.insert_pms_and_link2role ( p_name => 'sqlshow'      , p_type => 'PHP'  , p_permissionvalue => '/sqm/show'  , p_rolename => 'reports_run' );
+--  onderhouden van user roles en permissions                                         
+--  toestemming op onderhoudschermen gebruiker (user) rol en toestemming (permission) 
+--  nederlands: grt, engels : urp                                                     
+--                                                                                   
+exec urp_utils.insert_pms_and_link2role ( p_name => 'urp'          , p_type => 'PHP'  , p_permissionvalue => '/urp/'      , p_rolename => 'user_management');
+--  toestemming voor alle files subdirectory sqm                                       
+--  dit is voor onderhoud rapporten en connecties                                      
+--                                                                                     
+exec urp_utils.insert_pms_and_link2role ( p_name => 'sql'          , p_type => 'PHP'  , p_permissionvalue => '/sqm/'      , p_rolename => 'reports_admin');
+-- onderstaande toestemming is nodig om de documenten te bekijken in php               
+exec urp_utils.insert_pms_and_link2role ( p_name => 'apputils'     , p_type => 'PHP'  , p_permissionvalue => '/apputils/' , p_rolename => 'reports_admin');
+--
+-- Persoonslijst gebonden permissions
+-- Filters gebonden permissions
+-- Nooit geimplementeerd in php

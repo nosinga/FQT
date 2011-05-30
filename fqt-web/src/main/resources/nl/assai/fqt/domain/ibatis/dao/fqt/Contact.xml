@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CONT">
+
+	<resultMap id="contMap" class="Contact">
+        <result property="id" 			column="ID"/>
+        <result property="vscdId" 	    column="VSCD_TABLE_ID"/>
+		<result property="description"  column="DESCRIPTION"/>
+		<result property="contactDate"	column="CONTACTDATE"/>
+	</resultMap>
+
+    <select id="findAllContacts" resultMap="contMap">
+        select id
+        ,      vscd_table_id
+        ,      description
+        ,      to_char(contactdate,'YYYY-MM-DD hh24:mi') contactdate
+        from   VSCD_CONTACTS order by id desc
+    </select>
+
+    <select id="findAllVSCDContacts" parameterClass="java.lang.Long" resultMap="contMap">
+        select id
+        ,      vscd_table_id
+        ,      description
+        ,      to_char(contactdate,'YYYY-MM-DD hh24:mi') contactdate
+        from   VSCD_CONTACTS
+        where  VSCD_TABLE_ID = #value#
+        order  by id desc
+    </select>
+
+	<insert id="insertContact" parameterClass="Contact">
+        insert into VSCD_CONTACTS
+            (vscd_table_id,description) values
+            (#vscdId#,#description#)
+        <selectKey resultClass="long" >
+             SELECT VSCD_SEQ.currVal AS id FROM dual
+        </selectKey>
+	</insert>
+
+	<update id="updateContact" parameterClass="Contact">
+        update VSCD_CONTACTS SET
+			DESCRIPTION = #description#
+		where ID = #id#
+	</update>
+
+	<delete id="deleteContact" parameterClass="Contact">
+		delete from VSCD_CONTACTS where ID = #id#
+	</delete>
+
+</sqlMap>

@@ -1,0 +1,67 @@
+PROMPT file URP_MenuLeafs4Reports.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het updaten van <sqm#>permissions
+|||  (deze <sqm#> permissie wordt op zijn beurt aangemaakt door een
+|||   trigger op de SQM_QUERIES tabel)
+|||  waarmee een query aan een connectie wordt verbonden 
+|||  en vervolgens wordt
+|||  deze "query connectie permissie" verbonden aan 
+|||  een rapport menu en aan een rol
+|||
+||| Bovenstaande beschriiving wordt uitgevoerd door een procedure
+||| die urp_utils.lq2c2m2r heet (link query to connecation to menu to role)
+||| de documentatie van deze functie is leidend
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-02-17 10:05:08 +0100 (Thu, 17 Feb 2011) $
+|||  Revision : $Revision: 30033 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_MenuLeafs4Reports.dat $
+|||  ID       : $Id: URP_MenuLeafs4Reports.dat 30033 2011-02-17 09:05:08Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+--  In het geval van rappporten moeten er vier stappen gedaan worden
+--  om een rapport aan een connectie, een rapport menu en een rol te hangen
+--  1. insert sqm permissie
+--  2. koppel hierbij een connectie aan het rapport
+--  3. koppel deze sqm permissie aan een rapport menu
+--     Als je voor <p_rptmenu> null invult wordt het rappport niet aan een menu gehangen
+--     dit is voornamelijk handig voor doorlink rapporten die je niet rechtstreeks in een menu wilt hangen
+--  4. koppel deze url permissie aan een user role
+--  deze 4 stappen worden dmv 1 procedure call uitgevoerd : ata_install_dml.lq2c2m2r
+
+REM    ===============================================================================
+PROMPT - ATA_GM
+REM    ===============================================================================
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('ATA_ACTIONS'               ,'ATA Usage'     ,'audit_ata_usage' ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('ATA_LOGINS'                ,'ATA Usage'     ,'audit_ata_usage' ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('urp_users_example'         ,'Examples'      ,'reports_admin' ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('Query_Afhankelijkheid'     ,'ATA Usage'     ,'reports_admin' ,'ata@ABKR'  );
+/*
+|| Onderstaande rapporten staan niet in een menu, maar zijn drill-down rapporten
+*/
+exec urp_menu_utils.addMenuLeafReport('urp_users_menu'          , null           ,'reports_admin'  ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('urp_users_reports'       , null           ,'reports_admin'  ,'ata@ABKR'  );
+exec urp_menu_utils.addMenuLeafReport('urp_users_urls'          , null           ,'reports_admin'  ,'ata@ABKR'  );
+--
+-- -- ----------------------------------------------------------------------------------------------------------------------------------------
+-- -- overzichtsrapport
+-- -- link query-connection to menu & role (parameters : reportname , rptmenuname , rolename , connectionname )
+-- -- ----------------------------------------------------------------------------------------------------------------------------------------
+-- exec urp_menu_utils.addMenuLeafReport('DailyCheck_Totaal_Rapport_perDatum' ,  'DailyCheck Historie' , 'stelselbeheerder' , 'abkr_rpt@ABKR');
+-- --
+-- ------------------------------------------------------------------------------------------------------------
+-- link query-connection to menu & role (parameters : reportname , connectionname , parentmenuname , rolename)
+-- ------------------------------------------------------------------------------------------------------------
+exec urp_menu_utils.addMenuLeafReport('Rapport Beschrijvingen'                   , 'Referentie'                     , 'reports_run'   , 'ata@ABKR'        );
+--

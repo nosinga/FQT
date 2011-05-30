@@ -1,0 +1,24 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse connecties
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-02-01 11:31:25 +0100 (Tue, 01 Feb 2011) $
+|||  Revision : $Revision: 29174 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/SQM_Connections.dat $
+|||  ID       : $Id: SQM_Connections.dat 29174 2011-02-01 10:31:25Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT Toevoegen CONNECTIONS
+--
+REM ===============================================================================
+REM Create SQM_CONNECTIONS
+REM =============================================================================== 
+exec  urp_utils.insert_connection ( p_connectionname => 'ata@ABKR'           , p_username       => 'fqt' );

@@ -1,0 +1,27 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van database versie
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-06-17 14:01:36 +0200 (Thu, 17 Jun 2010) $
+|||  Revision : $Revision: 19935 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: svn://andromeda.ioo.local/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/DB_VERSIE.ins $
+|||  ID       : $Id: DB_VERSIE.ins 19935 2010-06-17 12:01:36Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+REM ===============================================================================
+REM Vullen DB_VERSIE
+REM ===============================================================================
+--
+insert into db_versie ( versienr , dat_installatie , status ) 
+               values ( '1.29.1' , systimestamp    , 'INSTALLATIE BEZIG');
+--
+PROMPT -> DB Versie (installatie) toegevoegd
+PROMPT

@@ -1,0 +1,153 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. landelijke tabellen GBA
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-03-23 10:40:23 +0100 (Wed, 23 Mar 2011) $
+|||  Revision : $Revision: 31507 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_GBALandelijketabel.dat $
+|||  ID       : $Id: rpt_GBALandelijketabel.dat 31507 2011-03-23 09:40:23Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_AdellijkeTitelsPerdikaatTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_AdellijkeTitelsPerdikaatTabel','select   adl.ids_adellijke_titel   as adellijke_titel_predikaat 
+,        adl.oms_adellijke_titel   as omschrijving
+,        adl.srt_adellijke_titel   as soort
+from     llt_adl_h_adl_s_rtmv      adl
+where    lower(adl.ids_adellijke_titel) = lower(nvl(:Code,adl.ids_adellijke_titel))
+order by adl.ids_adellijke_titel'
+,'Landelijke tabel 38 - Adellijke titels/predikaten'
+,'De landelijke GBA tabel voor Adellijke titels en predikaten.
+Een opsomming van de adellijke titels en/of predikaten die een persoon kan bezitten of die aan een persoon kunnen worden toegekend met hun codes, omschrijvingen en soorten.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_GemeentenTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_GemeentenTabel','select   gem.ids_gemeente          as gemeentecode
+,        gem.nam_gemeente          as gemeentenaam
+,        case when gem.cde_gemeente_nieuw is null then null
+              else ''#runreport#queryname=GBA_GemeentenTabel&Gemeentecode=''||gem.cde_gemeente_nieuw||''#''||gem.cde_gemeente_nieuw||'' - ''|| gnw.nam_gemeente
+         end                       as overgegaan_in_gemeente
+,        gem.dat_begin_object      as datum_ingang
+,        gem.dat_einde_object      as datum_einde
+from     llt_gem_h_gem_s_rtmv      gem
+,        llt_gem_h_gem_s_rtmv      gnw
+where    gem.cde_gemeente_nieuw               = gnw.ids_gemeente (+)
+and      nvl(ltrim(gem.ids_gemeente,''0''),''0'') = nvl(ltrim(nvl(:Gemeentecode,gem.ids_gemeente),''0''),''0'')
+order by gem.ids_gemeente'
+,'Landelijke tabel 33 - Gemeenten'
+,'De landelijke GBA tabel voor Gemeenten.
+Een opsomming van alle huidige en voormalige Nederlandse gemeenten met hun codes, namen en geldigheidstermijnen.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_LandenTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_LandenTabel','select   lnd.ids_land              as landcode
+,        lnd.nam_land              as landnaam
+,        lnd.dat_begin_object      as datum_ingang
+,        lnd.dat_einde_object      as datum_einde
+from     llt_lnd_h_lnd_s_rtmv      lnd
+where    nvl(ltrim(lnd.ids_land,''0''),''0'') = nvl(ltrim(nvl(:Landcode,lnd.ids_land),''0''),''0'')
+order by lnd.ids_land'
+,'Landelijke tabel 34 - Landen'
+,'De landelijke GBA tabel voor Landen.
+Een opsomming van alle huidige en voormalige landen met hun codes, namen en geldigheidstermijnen.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_NationaliteitenTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_NationaliteitenTabel','select   nat.ids_nationaliteit     as nationaliteitscode
+,        nat.oms_nationaliteit     as omschrijving
+,        nat.dat_begin_object      as datum_ingang
+,        nat.dat_einde_object      as datum_einde
+from     llt_nat_h_nat_s_rtmv      nat
+where    nvl(ltrim(nat.ids_nationaliteit,''0''),''0'') = nvl(ltrim(nvl(:Nationaliteitscode,nat.ids_nationaliteit),''0''),''0'')
+order by nat.ids_nationaliteit'
+,'Landelijke tabel 32 - Nationaliteiten'
+,'De landelijke GBA tabel voor Nationaliteiten.
+Een opsomming van alle door Nederland erkende nationaliteiten met hun codes, omschrijvingen en geldigheidstermijnen.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_RedenOntbindingTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_RedenOntbindingTabel','select   ohp.ids_rdn_ontbinding_hgp as code
+,        ohp.oms_rdn_ontbinding     as omschrijving
+,        ohp.dat_begin_object       as datum_ingang
+,        ohp.dat_einde_object       as datum_einde
+from     llt_ohp_h_ohp_s_rtmv       ohp
+where    lower(ohp.ids_rdn_ontbinding_hgp) = lower(nvl(:Code,ohp.ids_rdn_ontbinding_hgp))
+order by ohp.ids_rdn_ontbinding_hgp'
+,'Landelijke tabel 41 - Reden ontbinding/nietigverklaring'
+,'De landelijke GBA tabel voor Reden ontbinding/nietigverklaring huwelijk/geregistreerd partnerschap
+Een opsomming van de wettelijke gronden van ontbinding/nietigverklaring van een huwelijk/geregistreerd partnerschap met hun codes, omschrijvingen en geldigheidstermijnen.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_NederlandsReisdocumentTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_NederlandsReisdocumentTabel','select   rdt.ids_nl_reisdocument    as code
+,        rdt.oms_nl_reisdocument    as omschrijving
+,        rdt.dat_begin_object       as datum_ingang
+,        rdt.dat_einde_object       as datum_einde
+from     llt_rdt_h_rdt_s_rtmv       rdt
+where    lower(rdt.ids_nl_reisdocument) = lower(nvl(:Code,rdt.ids_nl_reisdocument))
+order by rdt.ids_nl_reisdocument'
+,'Landelijke tabel 48 - Nederlands reisdocumenten'
+,'De landelijke GBA tabel voor Soorten Nederlandse Reisdocumenten
+Een opsomming van de modellen van de Nederlandse reisdocumenten met hun codes, omschrijvingen en geldigheidstermijnen.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_VerblijfstitelTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_VerblijfstitelTabel','select   vbt.ids_verblijfstitel     as verblijfstitel
+,        vbt.oms_verblijfstitel     as omschrijving
+,        vbt.dat_begin_object       as datum_ingang
+,        vbt.dat_einde_object       as datum_einde
+from     llt_vbt_h_vbt_s_rtmv       vbt
+where    nvl(ltrim(vbt.ids_verblijfstitel,''0''),''0'') = nvl(ltrim(nvl(:Verblijfstitel,vbt.ids_verblijfstitel),''0''),''0'')
+order by vbt.ids_verblijfstitel'
+,'Landelijke tabel 56 - Verblijfstitels'
+,'De landelijke GBA tabel voor soorten Verblijfstitels
+Een opsomming van de verblijfsrechtelijke statussen met hun codes, omschrijvingen en geldigheidstermijnen.'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (GBA_VerkrijgingVerlies_NLschapTabel)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('GBA_VerkrijgingVerlies_NLschapTabel','select   vvn.ids_rdn_nlschap       as reden
+,        vvn.oms_rdn_nlschap       as omschrijving
+,        vvn.cde_srt_vvn           as soort
+,        vvn.dat_begin_object      as datum_ingang
+,        vvn.dat_einde_object      as datum_einde
+from     llt_vvn_h_vvn_s_rtmv      vvn
+where    nvl(ltrim(vvn.ids_rdn_nlschap,''0''),''0'') = nvl(ltrim(nvl(:Reden,vvn.ids_rdn_nlschap),''0''),''0'')
+order by vvn.ids_rdn_nlschap'
+,'Landelijke tabel 37 - Reden verkrijging/verlies Nederlanderschap'
+,'De landelijke GBA tabel voor Reden verkrijging/verlies Nederlanderschap.
+Een opsomming van de wettelijke gronden ter verkrijging/verlies van het Nederlanderschap met hun codes, omschrijvingen, soorten en geldigheidstermijnen.'
+,'y',null);
+--

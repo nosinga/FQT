@@ -1,0 +1,29 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het updaten van database versie STATUS
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+REM ===============================================================================
+REM Update DB_VERSIE Status
+REM ===============================================================================
+--
+update db_versie 
+set    status   = 'INSTALLATIE GEREED'
+where  versienr = '1.29.1'
+;
+--
+PROMPT -> DB Versie (status) aangepast
+PROMPT

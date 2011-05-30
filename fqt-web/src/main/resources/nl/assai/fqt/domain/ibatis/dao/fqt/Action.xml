@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+  PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+  "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ACTION">
+
+	<resultMap id="actionMap" class="Action">
+		<result property="username"     column="USERNAME"/>
+		<result property="action"       column="ACTION"/>
+		<result property="timestamp"    column="TIMESTAMP"/>
+	</resultMap>
+
+    <insert id="insertAction" parameterClass="Action">
+        insert into ATA_ACTIONS_JNA
+            (USERNAME, ACTION, TIMESTAMP) values
+            ( #username#
+            , #action#
+            , SYSDATE)
+    </insert>
+
+    <insert id="insertActionMySql" parameterClass="Action">
+        insert into ATA_ACTIONS_JNA
+            (USERNAME, ACTION, TIMESTAMP) values
+            ( #username#
+            , #action#
+            , now())
+    </insert>
+
+</sqlMap>

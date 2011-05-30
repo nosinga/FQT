@@ -1,0 +1,90 @@
+PROMPT - file README.txt - BEGIN
+--- ***
+--- #############################
+--- ####
+--- # START TOELICHTING OP MENU'S
+--- ####
+--- #  Een toelichting op hoofdmenu's en submenu's, hoofdmenu's worden ook wel parentmenu's
+--- #  genoemd in relatie tot submenu's die dan gewoon menu heten.
+--- #  Een hoofdmenu hangt nooit direct aan een user, als een user recht heeft op 
+--- #  een submenu onder het hoofdmenu dan wordt het hoofdmenu automatisch zichtbaar voor de user
+--- #  een user is hetzelfde als een gebruiker
+--- ####
+--- #  Hoofdmenu's zijn opgeslagen in de table roles (ze hebben daar de prefix mainmenu)
+--- #  een hoofdmenu is als het ware een bijzondere rol (ooit komen ze in een eigen tabel)
+--- ####
+--- #  Submenus statisch en dynamisch
+--- #  Statische Submenu links zijn opgeslagen in permissions (ze hebben daar de prefix submenu)
+--- #  een submenu link is als het ware een bijzondere permissie
+--- #  statische submenu links hebben altijd minimaal 2 parents
+--- #  - 1 de userrole waar ze aan hangen (link wordt gemaakt mbv insert_pms_and_link2role)
+--- #  - 2 het mainmenu waar ze aan hangen (link wordt gemaakt mbv link_mainmenu2submenu)
+--- ####
+--- #  Dynamische Submenu's zijn opgeslagen in de tabel ... roles ... dit is gedaan omdat
+--- #  onder deze dynamische submenu weer childs bevatten, deze childs zitten gewoon
+--- #  weer in de tabel permissies in het geval van rapporten en url's
+--- #  de childs onder de dynamische doc menus zijn gewoon documenten in een directory en
+--- #  per document is geen permissie entry aangemaakt, maw als je recht hebt op een directory
+--- #  heb je automatisch leesrecht op alle hierinstaande documenten !
+--- #  er zijn drie typen dynamische menu's  
+--- #  - 1. Rapporten (veruit de belangrijkste, vgl toad of cognos)
+--- #  - 2. Links (vgl wiki)
+--- #  - 3. Documenten (vgl wiki)
+--- ####
+--- #  -- de menu's kun je herkennen in de rollen tabel aan hun prefix
+--- #  - 1. Rapporten  = rptmenu
+--- #  - 2. Links      = urlmenu
+--- #  - 3. Documenten = docmenu
+--- #  Omdat je in het geval van dynamische menus roles aan roles moet koppelen
+--- #  ie je koppelt een mainnemu role aan een rptmenu role of een urlmenu role of een docmenu role
+--- #  is hier een speciale techniek toegepast.
+--- #  Eerst is de mainmenu regulier gekoppeld aan een permissie. Dit is echter een speciale koppel 
+--- #  permissie met het volgende uiterlijk 
+--- #     voor rpt "submenu#permission2role#rptmenu#...."
+--- #  en voor url "submenu#permission2role#urlmenu#...."
+--- #  en voor doc "submenu#permission2role#docmenu#...."
+--- #  Alle dynamische submenu's van het type rpt, url en doc die opgeslagen zijn in de tabel roles
+--- #  hangen via deze prefix constructie onder de permissie (de relatie loopt ahw terug)
+--- ####
+--- #  Gelukkig hangen de rapport verwijzingen en de links weer gewoon onder de dynamische submenu's
+--- #  als permissies. In het geval van rapport verwijzingen en links heeft een gebruiker via een
+--- #  rol recht op executie van het rapport of recht op raadpleging van de link.
+--- ####
+--- #  In principe zijn de dynamische submenus nooit rechtsreeks gekoppeld aan een user
+--- #  maar kan een user gebruik maken van een dynamisch submenu op het moment dat zij 
+--- #  een permissie heeft op een van de onderliggende rapport verwijzingen of
+--- #  een aanklik permissie heeft op een link.
+--- ####
+--- #  De rapport link, dit is tevens de permissie, heeft de volgende vorm 
+--- #  sqm#<sqm_queries.queryname>#<sqm_connections.connectionname>
+--- #  maw de gebruiker heeft het recht om een query op een database uit te voeren 
+--- #  --
+--- #  Als je een rapport aan maakt (ie een entry toevoegd in de tabel sqm_queries)
+--- #  dan wordt er automatisch een permissie voor je aangemaakt
+--- #  de gedacht hierachter is dat als je een rapport aanmaakt het de bedoeling
+--- #  is dat ie op een gegeven moemnt uitgevoerd wordt door een gebruiker
+--- ####
+--- #  De url link, dit is tevens de permissie, heeft de volgende vorm
+--- #  url#<href name>#prompt#
+--- #  omdat verschillende url's alleen vanaf de applicatieserver bereikbaar zullen
+--- #  zijn is er een redirect pagina gebouwd (een proxy op de applicatie server)
+--- #  deze redirectpagina zie je terug in de permissietabel als de waarde
+--- #  URLREDIRECT, daarnaast zie je GUC_CONFIG_BASE_URL in de permissie tabel staan
+--- #  de GUC_CONFIG_BASE_URL is een environment variabele die voor bijvoorbeeld GUC productie
+--- #  de volgende waarde heeft "http://twd145.resource.twd.rotterdam.nl:3200/prod/beheer/" 
+--- #  in Apache php kun je de environment waarden terugvinden in de
+--- #  Apache DocumentRoot/<env>/ata/appenv/<env>.environment.properties.php
+--- #  #
+--- #  # DocumentRoot: The directory out of which you will serve your
+--- #  # documents. By default, all requests are taken from this directory, but
+--- #  # symbolic links and aliases may be used to point to other locations.
+--- #  #
+--- ####
+--- #  Natuurlijk er is een uitzondering ! Het docmenu. Omdat het te ver voert om voor elk
+--- #  document rechten in te stellen is hier gekozen om rechtstreeks permissie te geven
+--- #  op de directory. 
+--- ####
+--- # EINDE TOELICHTING OP MENU'S
+--- ####
+--- #############################
+PROMPT - file README.txt - EINDE

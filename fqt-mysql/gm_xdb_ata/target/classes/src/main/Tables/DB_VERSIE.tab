@@ -1,0 +1,25 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Aanmaken versie tabel
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2010-04-29 07:08:45 +0200 (Thu, 29 Apr 2010) $
+|||  Revision : $Revision: 18146 $
+|||  Author   : $Author: mcopier $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Tables/DB_VERSIE.tab $
+|||  ID       : $Id: DB_VERSIE.tab 18146 2010-04-29 05:08:45Z mcopier $
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT CREATE TABLE DB_VERSIE
+CREATE TABLE DB_VERSIE
+  ( VERSIENR            VARCHAR2(100)
+  , DAT_INSTALLATIE     TIMESTAMP
+  , STATUS              VARCHAR2(100)
+  )
+/

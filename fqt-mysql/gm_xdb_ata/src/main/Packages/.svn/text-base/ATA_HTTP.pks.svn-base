@@ -1,0 +1,28 @@
+PROMPT CREATE OR REPLACE PACKAGE ATA_HTTP
+CREATE OR REPLACE package ata_http
+is
+  -----------------------------------------------------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------------------------------------
+  --SUBVERSION INFO : DO NOT CHANGE!!!!
+  s_spec_date         constant     varchar(4000) := '$Date$';
+  s_spec_revision     constant     varchar(4000) := '$Revision$';
+  s_spec_author       constant     varchar(4000) := '$Author$';
+  s_spec_url          constant     varchar(4000) := '$URL$';
+  s_spec_id           constant     varchar(4000) := '$Id$';
+  -----------------------------------------------------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------------------------------------
+--
+  -- ------------------------------------------------------------------------------- --
+  -- Functies/Procedures                                                             --
+  -- ------------------------------------------------------------------------------- --
+ function  ora_info                     return varchar2;
+    function response (
+     p_url                in   varchar2 default 'http://www.google.com'
+,    p_redirect_href_http in   varchar2 default null
+,    p_proxy              in   varchar2 default null
+,    p_no_proxy_domains   in   varchar2 default null
+  )
+    return clob;
+end ata_http; 
+/
+

@@ -1,0 +1,32 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Aanmaken van de objecttypes t.b.v. pipelined functies
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT OBJECT TYPE QUERY_DEPENDENCIES_OBJ
+create or replace type query_dependencies_obj as object 
+  ( queryname          varchar2(100)
+  , called_by          clob
+  , calling            clob
+  , calling_missing    clob
+  )
+/
+--
+PROMPT TABLE TYPE QUERY_DEPENDENCIES_TAB
+create or replace
+type query_dependencies_tab as table of query_dependencies_obj
+/
+--

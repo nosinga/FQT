@@ -1,0 +1,370 @@
+===============================================================================
+Schoonmaken zonder alle data te verwijderen
+===============================================================================
+===============================================================================
+Partially Cleaning schema ATA
+===============================================================================
+===============================================================================
+Aanmaken van de DB-VERSIE tabel
+===============================================================================
+CREATE TABLE DB_VERSIE
+
+===============================================================================
+Vullen DB-versie tabel
+===============================================================================
+-> DB Versie (installatie) toegevoegd
+
+
+===============================================================================
+Aanmaken Tabellen
+===============================================================================
+CREATE TABLE URP_USERS
+CREATE TABLE URP_ROLES
+CREATE TABLE URP_PERMISSIONS
+CREATE TABLE URP_USER_ROLE
+CREATE TABLE URP_ROLE_PERMISSION
+CREATE TABLE SQM_CONNECTIONS
+CREATE TABLE SQM_QUERIES
+
+===============================================================================
+Migreren Tabel Data
+===============================================================================
+
+===============================================================================
+Aanmaken Sequences
+===============================================================================
+CREATE SEQUENCE URP_SEQUENCE
+CREATE SEQUENCE SQM_SEQUENCE
+
+===============================================================================
+Ophogen Sequence
+===============================================================================
+
+===============================================================================
+Aanmaken Constraints
+===============================================================================
+===============================================================================
+Aanmaken types
+===============================================================================
+OBJECT TYPE QUERY_DEPENDENCIES_OBJ
+TABLE TYPE QUERY_DEPENDENCIES_TAB
+
+===============================================================================
+Aanmaken package specificaties
+===============================================================================
+CREATE OR REPLACE PACKAGE ATA_UTILS
+CREATE OR REPLACE PACKAGE ATA_HTTP
+CREATE OR REPLACE PACKAGE ABKR_UTILS_GEN_DDL
+CREATE OR REPLACE PACKAGE ABKR_JOURNALING
+CREATE OR REPLACE PACKAGE ABKR_JOURNALING_MAINTENANCE
+CREATE OR REPLACE PACKAGE ATA_REPORTS
+
+===============================================================================
+Aanmaken Table Triggers
+===============================================================================
+CREATE OR REPLACE TRIGGER URP_USR_TRG_BRIU
+CREATE OR REPLACE TRIGGER URP_RLE_TRG_BRIU
+CREATE OR REPLACE TRIGGER URP_PMS_TRG_BRIU
+CREATE OR REPLACE TRIGGER URP_URL_TRG_BRIU
+CREATE OR REPLACE TRIGGER URP_RPM_TRG_BRIUD
+CREATE OR REPLACE TRIGGER SQM_CON_TRG_BRIU
+CREATE OR REPLACE TRIGGER SQM_SQL_TRG_BRIU
+
+===============================================================================
+Aanmaken Views
+===============================================================================
+VIEW URP_ROLE_VW
+VIEW URP_USER_ROLE_VW
+VIEW URP_PERMISSIONS_VW
+VIEW URP_ROLE_PERMISSION_VW
+VIEW URP_USER_PERMISSION_VW
+VIEW URP_USER_MENU_VW
+VIEW URP_USER_REPORTS_VW
+VIEW URP_USER_URLS_VW
+
+===============================================================================
+Aanmaken View Triggers
+===============================================================================
+
+===============================================================================
+Aanmaken package bodies
+===============================================================================
+CREATE OR REPLACE PACKAGE BODY ATA_UTILS
+CREATE OR REPLACE PACKAGE BODY ATA_HTTP
+CREATE OR REPLACE PACKAGE BODY ABKR_UTILS_GEN_DDL
+CREATE OR REPLACE PACKAGE BODY ABKR_JOURNALING
+CREATE OR REPLACE PACKAGE BODY ATA_REPORTS
+
+===============================================================================
+Aanmaken package specificaties
+===============================================================================
+package ABKR_PLSQL_DOC
+
+===============================================================================
+Aanmaken package bodies
+===============================================================================
+package body ABKR_PLSQL_DOC
+
+===============================================================================
+Aanmaken tijdelijke Data packages
+===============================================================================
+===============================================================================
+Toevoegen ATA Users
+===============================================================================
+file URP_Users.dat
+Toevoegen USERS
+- Users IOO ATA
+- Users IOO ABKR
+- Users IOO other
+- Users PZR
+- Users GBR
+- Users SoZaWe
+- Users SO-GICT
+- Users TWD
+- Meta Users
+
+===============================================================================
+Toevoegen ATA Roles
+===============================================================================
+file URP_Roles.dat
+Toevoegen ROLES
+
+===============================================================================
+Koppelen ATA Roles aan ATA Meta Users
+===============================================================================
+file URP_Roles2MetaUsers.dat
+- metauser_ata_admin
+- metauser_sogict_admin
+- metauser_sogict_admin
+- Metauser_mijnloketbeheerder
+- Metauser_dailycheck_mail_subscribers
+- Metauser_filter_admin
+
+===============================================================================
+Kopieeren ATA User profielen naar ATA Users
+===============================================================================
+file URP_Users2MetaUsers.dat
+- Metauser_super_admin
+- Metauser_stelselbeheerder_gbaprs
+- Metauser_classified
+- Metauser_mijnloketbeheerder
+- Metauser_gbrbeheerder
+- Metauser_atatest
+- Metauser_dailycheck_mail_subscribers
+- Role_Super_Admin
+
+===============================================================================
+Toevoegen ATA Permissions
+===============================================================================
+file URP_Permissions
+- Create PHP PERMISSIONS
+
+===============================================================================
+Toevoegen database connecties tbv functionele Queries
+===============================================================================
+Toevoegen CONNECTIONS
+
+===============================================================================
+Toevoegen functionele Queries
+===============================================================================
+INSERTING into SQM_QUERIES (ATA_LOGINS)
+INSERTING into SQM_QUERIES (ATA_ACTIONS)
+INSERTING into SQM_QUERIES (Query_Afhankelijkheid)
+INSERTING into SQM_QUERIES (Key2B_berichtPayload)
+INSERTING into SQM_QUERIES (Key2B_berichten)
+INSERTING into SQM_QUERIES (UniekeMLObezoekersopDag)
+INSERTING into SQM_QUERIES (UniekeMLObezoekersopDag_classified)
+INSERTING into SQM_QUERIES (daily_check001_JobControles_ALL)
+INSERTING into SQM_QUERIES (daily_check002_Verdacht_Bericht_GBA)
+INSERTING into SQM_QUERIES (daily_check002_Verdacht_Bericht_BAG)
+INSERTING into SQM_QUERIES (daily_check003_Aantal_Niet_Verwerkte_AftapBerichten_GBA)
+INSERTING into SQM_QUERIES (daily_check004_Laatste_Bericht_StUF300_IN_GBA)
+INSERTING into SQM_QUERIES (daily_check004_Laatste_Bericht_StUF301_IN_BAG)
+INSERTING into SQM_QUERIES (daily_check005_Statistieken_Totaal_GBA)
+INSERTING into SQM_QUERIES (daily_check005_Statistieken_Totaal_BAG)
+INSERTING into SQM_QUERIES (daily_check006_Statistieken_Totaal_perDatum_GBA)
+INSERTING into SQM_QUERIES (daily_check007_Gedetecteerde_Issues_perIssue_GBA)
+INSERTING into SQM_QUERIES (daily_check008_Gedetecteerde_Issues_perDatum_GBA)
+INSERTING into SQM_QUERIES (daily_check009_Aantal_Kennisgeving_Afnemer_Error_ALL)
+INSERTING into SQM_QUERIES (daily_check010_Volgindicaties_DDS_Error_ALL)
+INSERTING into SQM_QUERIES (daily_check011_Volgindicaties_Afnemer_Error_ALL)
+INSERTING into SQM_QUERIES (daily_check012_ORA_Meldingen_GUC_ALL)
+INSERTING into SQM_QUERIES (daily_check013_ORA_Meldingen_GM_ALL)
+INSERTING into SQM_QUERIES (DailyCheck_Totaal_Rapport_perDatum)
+INSERTING into SQM_QUERIES (Dubbele_BSN)
+INSERTING into SQM_QUERIES (Persoonsgegevens_GM_obvBSN)
+INSERTING into SQM_QUERIES (Persoonslijst)
+INSERTING into SQM_QUERIES (Persoonslijst_MLO)
+INSERTING into SQM_QUERIES (Persoonslijst_StUF300)
+INSERTING into SQM_QUERIES (Personen_met_TeveelAdressen)
+INSERTING into SQM_QUERIES (Gerelateerde_Personen)
+INSERTING into SQM_QUERIES (Escalatie_Personen)
+INSERTING into SQM_QUERIES (Personen_zonder_Toevoeging)
+INSERTING into SQM_QUERIES (SC_Administratie)
+INSERTING into SQM_QUERIES (SC_Categorie)
+INSERTING into SQM_QUERIES (SC_Element)
+INSERTING into SQM_QUERIES (SC_Stufpaden)
+INSERTING into SQM_QUERIES (SC_GM_Verwijzing)
+INSERTING into SQM_QUERIES (Domeinwaarden)
+INSERTING into SQM_QUERIES (Rapport Beschrijvingen)
+INSERTING into SQM_QUERIES (report_queries_description)
+INSERTING into SQM_QUERIES (report_queries_connection)
+INSERTING into SQM_QUERIES (Functionele_Foutmeldingen_GM)
+INSERTING into SQM_QUERIES (Database_Versies)
+INSERTING into SQM_QUERIES (Jira_Issues)
+INSERTING into SQM_QUERIES (RMC-Regio)
+INSERTING into SQM_QUERIES (Gebruikers)
+INSERTING into SQM_QUERIES (Gebruikers_menu)
+INSERTING into SQM_QUERIES (Gebruikers_rapporten)
+INSERTING into SQM_QUERIES (Gebruikers_urls)
+INSERTING into SQM_QUERIES (Rol Beschrijvingen)
+INSERTING into SQM_QUERIES (Rollen en gekoppelde toestemmingen)
+INSERTING into SQM_QUERIES (Gebruikers en gekoppelde toestemmingen)
+INSERTING into SQM_QUERIES (GBA_Aftap_Aantal_perStatus)
+INSERTING into SQM_QUERIES (GUC_Trace_Endpoints)
+INSERTING into SQM_QUERIES (Foutmeldingen_Bericht_GM)
+INSERTING into SQM_QUERIES (Foutmeldingen_Bericht_GUC)
+INSERTING into SQM_QUERIES (StUF300Berichten_obvCorrelationID)
+INSERTING into SQM_QUERIES (StUF300Berichten_obvSleutelwaarde)
+INSERTING into SQM_QUERIES (Audit_GM_Transacties)
+INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvReferentienummer)
+INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvBSN)
+INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvDag)
+INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvStatus)
+INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvCorrelationID_Aftap)
+INSERTING into SQM_QUERIES (GBA_Bericht_Info_obvCorrelationID_Initieel)
+INSERTING into SQM_QUERIES (GBA_Bericht_Status_obvMaand)
+INSERTING into SQM_QUERIES (GBA_Jira_Issues_obvDagIssue)
+INSERTING into SQM_QUERIES (GBA_Jira_Issues_obvMaand)
+INSERTING into SQM_QUERIES (Jira_Issues_obvBericht)
+INSERTING into SQM_QUERIES (GBA_Statistieken_QUEUE)
+INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvCorrelationID)
+INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvReferentienummer)
+INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvStatus)
+INSERTING into SQM_QUERIES (BAG_Bericht_Info_obvDag)
+INSERTING into SQM_QUERIES (StUF301Berichten_obvCorrelationID)
+INSERTING into SQM_QUERIES (StUF301Berichten_obvSleutelwaarde)
+INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvCorrelationID)
+INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvAfnemer)
+INSERTING into SQM_QUERIES (AfnemersBericht_Info_obvStatus)
+INSERTING into SQM_QUERIES (Afnemer_Applicaties)
+INSERTING into SQM_QUERIES (Afnemer_Volgindicaties_obvAfnemer)
+INSERTING into SQM_QUERIES (Afnemer_Volgindicaties_TotaalperAfnemer)
+INSERTING into SQM_QUERIES (Antwoord_Aantal_obvMaand)
+INSERTING into SQM_QUERIES (AantalGeraadpleegdeMLOServices)
+INSERTING into SQM_QUERIES (AantalUniekeMLObezoekersopDag)
+INSERTING into SQM_QUERIES (MijnLoket_PL_met_issues)
+INSERTING into SQM_QUERIES (GUC_Recovery_Status)
+INSERTING into SQM_QUERIES (Filter_Organisaties_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Applicaties_obvID)
+INSERTING into SQM_QUERIES (Filter_Applicaties_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Entiteittype_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Berichtsoort_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Sectormodel_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Berichtidentificatie_obvID)
+INSERTING into SQM_QUERIES (Filter_Berichtidentificatie_obvNaam)
+INSERTING into SQM_QUERIES (Filters_obvID)
+INSERTING into SQM_QUERIES (Filters_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Keten_obvNaam)
+INSERTING into SQM_QUERIES (Filter_Keten_obvBronAfnemer)
+INSERTING into SQM_QUERIES (Filter_KetenItems_obvKetenID)
+INSERTING into SQM_QUERIES (Filter_KetenItems_obvFilterID)
+INSERTING into SQM_QUERIES (Filter_Volgindicaties_obvKetenNaam)
+INSERTING into SQM_QUERIES (BAG_Nummeraanduiding_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Nummeraanduiding_obvPostcode)
+INSERTING into SQM_QUERIES (BAG_OpenbareRuimte_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Woonplaats_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Wijk_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Buurt_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Pand_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_Object_obvBusinessID)
+INSERTING into SQM_QUERIES (BAG_ObjectGebruiksdoel_obvObjectIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectToegankelijk_obvObjectIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectAdres_obvObjectIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectAdres_obvAdresIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectPand_obvObjectIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectPand_obvPandIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectOntstaanUit_obvObjectIDD)
+INSERTING into SQM_QUERIES (BAG_ObjectOvergegaanIn_obvObjectIDD)
+INSERTING into SQM_QUERIES (Verschillen_GBA_BAG_Adres)
+INSERTING into SQM_QUERIES (GBA_AdellijkeTitelsPerdikaatTabel)
+INSERTING into SQM_QUERIES (GBA_GemeentenTabel)
+INSERTING into SQM_QUERIES (GBA_LandenTabel)
+INSERTING into SQM_QUERIES (GBA_NationaliteitenTabel)
+INSERTING into SQM_QUERIES (GBA_RedenOntbindingTabel)
+INSERTING into SQM_QUERIES (GBA_NederlandsReisdocumentTabel)
+INSERTING into SQM_QUERIES (GBA_VerblijfstitelTabel)
+INSERTING into SQM_QUERIES (GBA_VerkrijgingVerlies_NLschapTabel)
+===============================================================================
+Toevoegen ATA Menus
+===============================================================================
+file URP_Menus.dat
+- Hoofdmenus
+- Dynamische koppelingen voor RPT URL DOC en DCA
+- Rapport (rpt) menu
+- Url (url) menu
+
+===============================================================================
+Toevoegen ATA Menus Leafs
+===============================================================================
+file URP_MenuLeafs_Insert
+- Create MENU LEAFS
+- RAPPORTEN ADMINISTRATIE (statisch menu)
+- URL MenuLeafs
+- DOC MenuLeafs
+- AGENT TOOL ABKR ADMINISTRATIE (statisch menu)
+- FILTERS ADMINISTRATIE (statisch menu)
+
+===============================================================================
+Linken ATA Menus Leafs aan rollen
+===============================================================================
+file URP_MenuLeafs_Link2Role
+- RAPPORTEN ADMINISTRATIE (statisch menu)
+- URL MenuLeafs
+- DOC MenuLeafs
+- DCA MenuLeafs
+- AGENT TOOL ABKR ADMINISTRATIE (statisch menu)
+- FILTERS (statisch menu)
+- FILTERS ADMINISTRATIE (statisch menu)
+
+===============================================================================
+Toevoegen ATA Menus Leafs voor Rapporten
+===============================================================================
+file URP_MenuLeafs4Reports.dat
+- ATA_GM
+- GBAPRSBASIS
+- DAILYCHECK
+- DAILYCHECK GBA mail rol
+- DAILYCHECK BAG mail rol
+- Bronhouder GBA
+- Kennisgevingen Inkomend
+- Kennisgevingen Uitgaand
+- Vraag/Antwoord Uitgaand
+- GUC
+- Referentie
+- StelselCatalogus
+- Filters
+- Bronhouder BAG
+
+===============================================================================
+Draaien journaling
+===============================================================================
+begin abkr_journaling_maintenance.create_objects('URP%',true); end
+begin abkr_journaling_maintenance.create_objects('SQM%',true); end
+
+===============================================================================
+ATA tabellen granten
+===============================================================================
+ATA.DB_VERSIE granten aan ABKR_RPT                                              
+
+===============================================================================
+Drop tijdelijke packages
+===============================================================================
+drop package abkr_journaling_maintenance
+
+===============================================================================
+Update DB-versie tabel (status)
+===============================================================================
+-> DB Versie (status) aangepast
+

@@ -1,0 +1,48 @@
+PROMPT file URP_Roles.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse roles
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT Toevoegen ROLES
+--
+REM ===============================================================================
+REM Create URP_ROLES
+REM =============================================================================== 
+--- Echte Roles
+--- role_connect
+--- door een user connect af te nemen kan hij ook niet meer aanloggen
+--- dit is handig om een user tijdelijk de toegang te ontzeggen zonder 
+--- zijn hele profiel te moeten verwijderen
+insert into urp_roles (rolename) values ('role_connect');     
+--- - role_grt_admin
+--- - grt staat voor gebruikers rollen toestemmingen
+insert into urp_roles (rolename) values ('role_grt_admin');        
+--
+insert into urp_roles (rolename) values ('role_gebruikers_admin');           
+insert into urp_roles (rolename) values ('role_dailyCheck_GBA_mail_subscribers');
+insert into urp_roles (rolename) values ('role_dailyCheck_BAG_mail_subscribers');
+insert into urp_roles (rolename) values ('role_documenten_admin');           
+insert into urp_roles (rolename) values ('role_filter_admin');               
+--
+insert into urp_roles (rolename) values ('role_rapporten_admin');            
+insert into urp_roles (rolename) values ('role_dbconnecties_admin');
+--
+insert into urp_roles (rolename) values ('role_stelselbeheerder');           
+--
+insert into urp_roles (rolename) values ('role_mijnloket_classified');       
+insert into urp_roles (rolename) values ('role_mijnloketbeheerder');         
+--

@@ -1,0 +1,387 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. filters
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-03-10 09:56:26 +0100 (Thu, 10 Mar 2011) $
+|||  Revision : $Revision: 31012 $
+|||  Author   : $Author: whoogendam $
+|||  URL      : $URL: http://nosinga@svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/rpt_filters.dat $
+|||  ID       : $Id: rpt_filters.dat 31012 2011-03-10 08:56:26Z whoogendam $
+|||------------------------------------------------------------------------
+**/
+--
+set define off;
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Organisaties_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Organisaties_obvNaam','select org.naam
+,      org.omschrijving
+from   bfk_organisatie  org
+where  org.naam = nvl(:Organisatie_naam,org.naam)'
+,'Soorten organisaties o.b.v. Naam'
+,'De verschillende organisaties die de gebruikt worden bij het versturen van StUF-berichten'||chr(10)||chr(10)||
+'In de StUF berichten is dit attribuut terug te vinden onder onder "stuurgegevens" met tag "zender.organisatie" en "ontvanger.organisatie"'
+,'y',null);
+
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Applicaties_obvID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Applicaties_obvID','select app.naam
+,      app.omschrijving
+,      ''#runreport#queryname=Filter_Organisaties_obvNaam&Organisatie_naam=''||app.organisatie||''#''||app.organisatie||''#''  as organisatie
+,      app.email_adres
+from   bfk_applicatie   app
+where  app.id = nvl(:Applicatie_id,app.id)'
+,'Soorten applicaties o.b.v. ID'
+,'De verschillende applicaties die de gebruikt worden bij het versturen van StUF-berichten'||chr(10)||chr(10)||
+'In de StUF berichten is dit attribuut terug te vinden onder onder "stuurgegevens" met tag "zender.applicatie" en "ontvanger.applicatie"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Applicaties_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Applicaties_obvNaam','select sub.id, sub.naam
+,      sub.omschrijving
+,      ''#runreport#queryname=Filter_Organisaties_obvNaam&Organisatie_naam=''||sub.organisatie||''#''||sub.organisatie||''#''  as organisatie
+,      sub.email_adres
+,      case when sub.aantal_bronhouder > 0 
+            then ''#runreport#queryname=Filter_Keten_obvBronAfnemer&Bronhouder_Naam=''||sub.naam||''#''||sub.aantal_bronhouder||'' keten(s)#''
+            else null 
+       end       as bronhouder_keten
+,      case when sub.aantal_afnemers > 0 
+            then ''#runreport#queryname=Filter_Keten_obvBronAfnemer&Afnemer_Naam=''||sub.naam||''#''||sub.aantal_afnemers||'' keten(s)#''
+            else null 
+       end       as afnemer_keten
+from ( select app.*
+       ,    ( select count(1)  aantal_bronhouder_ketens from bfk_keten where bronhouder_id = app.id )  aantal_bronhouder
+       ,    ( select count(1)  aantal_bronhouder_ketens from bfk_keten where afnemer_id = app.id )     aantal_afnemers
+       from   bfk_applicatie   app
+       where  app.naam = nvl(:Applicatie_naam,app.naam)
+     ) sub'
+,'Soorten applicaties o.b.v. Naam'
+,'De verschillende applicaties die de gebruikt worden bij het versturen van StUF-berichten'||chr(10)||chr(10)||
+'In de StUF berichten is dit attribuut terug te vinden onder onder "stuurgegevens" met tag "zender.applicatie" en "ontvanger.applicatie"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Entiteittype_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Entiteittype_obvNaam','select   ete.naam
+,        ete.omschrijving
+from     bfk_entiteittype    ete
+where    ete.naam = nvl(:Entiteittype,ete.naam)
+order by ete.naam'
+,'Soorten entiteittypes o.b.v. Naam'
+,'De verschillende entiteittypes die de StUF-standaard ondersteunt'||chr(10)||chr(10)||
+'In de StUF berichten is dit attribuut terug te vinden onder onder "stuurgegevens" met tag "entiteittype"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Berichtsoort_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Berichtsoort_obvNaam','select   bst.naam
+,        bst.omschrijving
+from     bfk_berichtsoort    bst
+where    bst.naam = nvl(:Berichtsoort,bst.naam)'
+,'Soorten berichtsoorten o.b.v. Naam'
+,'De verschillende berichtsoorten die de StUF-standaard ondersteunt'||chr(10)||chr(10)||
+'In de StUF berichten is dit attribuut terug te vinden onder onder "stuurgegevens" met tag "berichtcode"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Sectormodel_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Sectormodel_obvNaam','select   sml.naam
+,        sml.omschrijving
+from     bfk_sectormodel     sml
+where    sml.naam = nvl(:Sectormodel,sml.naam)'
+,'Soorten sectormodellen o.b.v. Naam'
+,'De verschillende sectormodellen die de StUF-standaard ondersteunt'||chr(10)||chr(10)||
+'In de StUF berichten is dit attribuut terug te vinden onder onder "stuurgegevens" met tag "sectormodel"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Berichtidentificatie_obvID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Berichtidentificatie_obvID','select   bid.naam
+,        bid.omschrijving
+,        ''#runreport#queryname=Filter_Entiteittype_obvNaam&Entiteittype=''||bid.entiteittype||''#''||bid.entiteittype||''#''    as entiteittype
+,        ''#runreport#queryname=Filter_Berichtsoort_obvNaam&Berichtsoort=''||bid.berichtsoort||''#''||bid.berichtsoort||''#''    as berichtsoort
+,        bid.versie
+,        ''#runreport#queryname=Filter_Sectormodel_obvNaam&Sectormodel=''||bid.sectormodel||''#''||bid.sectormodel||''#''        as sectormodel
+,        bid.versiesectormodel
+,        bid.xpath_sleutel_waarde
+from     bfk_bericht_identificatie  bid
+where    bid.id = nvl(:Berichtidentificatie_id,bid.id)
+order by bid.entiteittype, bid.naam'
+,'Combinaties berichtidentificaties o.b.v. ID'
+,'De verschillende combinaties die een StUF-bericht identificeert (via de stuurgegevens van een bericht)'||chr(10)||chr(10)||
+'Het betreft hier de stuurgegevens tags "entiteittype" , "berichtcode" , "sectormodel" , "versieStUF" , "versieSectormodel"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Berichtidentificatie_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Berichtidentificatie_obvNaam','select   bid.naam
+,        bid.omschrijving
+,        ''#runreport#queryname=Filter_Entiteittype_obvNaam&Entiteittype=''||bid.entiteittype||''#''||bid.entiteittype||''#''    as entiteittype
+,        ''#runreport#queryname=Filter_Berichtsoort_obvNaam&Berichtsoort=''||bid.berichtsoort||''#''||bid.berichtsoort||''#''    as berichtsoort
+,        bid.versie
+,        ''#runreport#queryname=Filter_Sectormodel_obvNaam&Sectormodel=''||bid.sectormodel||''#''||bid.sectormodel||''#''        as sectormodel
+,        bid.versiesectormodel
+,        bid.xpath_sleutel_waarde
+from     bfk_bericht_identificatie  bid
+where    bid.naam = nvl(:Berichtidentificatie_naam,bid.naam)
+order by bid.entiteittype, bid.naam'
+,'Combinaties berichtidentificaties o.b.v. Naam'
+,'De verschillende combinaties die een StUF-bericht identificeert (via de stuurgegevens van een bericht)'||chr(10)||chr(10)||
+'Het betreft hier de stuurgegevens tags "entiteittype" , "berichtcode" , "sectormodel" , "versieStUF" , "versieSectormodel"'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filters_obvID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filters_obvID','select ftr.naam
+,      ftr.versie
+,      ftr.rij_kolom_type         as type
+,      ftr.ind_actief
+,      ftr.omschrijving
+,      ftr.dat_begin              as begindatum
+,      ftr.dat_einde              as einddatum
+,      ftr.result                 as resultaat
+,      ftr.xpath
+,      case when ftr.sql_statement is null
+            then null
+            else ''#clob#sql_statement#bfk_filter#id#''||ftr.id||''#''
+       end                        as sql_statement
+,      case when ftr.xslt is null
+            then null
+            else ''#clob#xslt#bfk_filter#id#''||ftr.id||''#''     
+       end                        as xslt
+from   bfk_filter  ftr
+where  ftr.id = nvl(:Filter_id,ftr.id)'
+,'Filters o.b.v. ID'
+,'De verschillende filters t.b.v. het verarmen, verrijken en al dan niet doorzetten van berichten'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filters_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filters_obvNaam','select ftr.naam
+,      ftr.versie
+,      ftr.rij_kolom_type         as type
+,      ftr.ind_actief
+,      ftr.omschrijving
+,      ftr.dat_begin              as begindatum
+,      ftr.dat_einde              as einddatum
+,      ftr.result                 as resultaat
+,      ftr.xpath
+,      case when ftr.sql_statement is null
+            then null
+            else ''#clob#sql_statement#bfk_filter#id#''||ftr.id||''#''
+       end                        as sql_statement
+,      case when ftr.xslt is null
+            then null
+            else ''#clob#xslt#bfk_filter#id#''||ftr.id||''#''     
+       end                        as xslt
+,      ''#runreport#queryname=Filter_KetenItems_obvFilterID&FilterID=''||ftr.id||''#KetenItems#''    as KetenItems
+from   bfk_filter  ftr
+where  lower(ftr.naam) like lower(''%''||nvl(:Naam_like,ftr.naam)||''%'')'
+,'Filters o.b.v. Naam'
+,'De verschillende filters t.b.v. het verarmen, verrijken en al dan niet doorzetten van berichten'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Keten_obvNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Keten_obvNaam','select ktn.naam
+,      ''#runreport#queryname=Filter_Applicaties_obvID&Applicatie_id=''||brn.id||''#''||brn.naam||''#''    as bronhouder
+,      ktn.ind_bronhouder_akkoord                                                                    as bronhouder_akkoord
+,      ''#runreport#queryname=Filter_Applicaties_obvID&Applicatie_id=''||afn.id||''#''||afn.naam||''#''    as afnemer
+,      ''#runreport#queryname=Filter_Berichtidentificatie_obvID&Berichtidentificatie_id=''||ktn.bid_id||''#''||bid.naam||''#''    as bericht_identificatie
+,      ktn.ind_actief
+,      ktn.dat_begin                   as begindatum
+,      ktn.dat_einde                   as einddatum
+,      ktn.omschrijving
+,      ''#runreport#queryname=Filter_KetenItems_obvKetenID&Keten_id=''||ktn.id||''#KetenItems#''         as ketenitems
+,      case when aantal_volgindicaties > 0
+            then ''#runreport#queryname=Filter_Volgindicaties_obvKetenNaam&Keten_naam=''||ktn.naam||''#''||ktn.aantal_volgindicaties||''#''
+            else null
+       end                                                                                           as volgindicaties
+from ( select ktn.*
+       ,    ( select count(1)
+              from   volgindicatiesafnemers via, bfk_applicatie app
+              where app.id = ktn.afnemer_id
+              and   via.applicatie_afnemer = app.naam) aantal_volgindicaties
+       from   bfk_keten   ktn
+       where  ktn.naam = nvl(:Keten_naam,ktn.naam)
+     ) ktn
+,      bfk_applicatie               brn
+,      bfk_applicatie               afn
+,      bfk_bericht_identificatie    bid
+where  ktn.bronhouder_id = brn.id
+and    ktn.afnemer_id    = afn.id
+and    ktn.bid_id        = bid.id
+order by ktn.naam'
+,'Ketencombinaties o.b.v. Naam'
+,'De verschillende ketencombinaties t.b.v. het verarmen, verrijken en al dan niet doorzetten van berichten'||chr(10)||chr(10)||
+'Attribuut bronhouder_akkoord : geeft aan of de bronhouder de keten akkoord heeft bevonden
+Attribuut bericht_identificatie : de identificatie van het bericht waarvoor de keten bedoeld is
+Attribuut ketenitems : toont de onderliggende filters die voor de keten uitgevoerd moeten worden
+Attribuut volgindicaties : toont eventuele specifieke sleutels (van personen) die de afnemer wil volgen'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Keten_obvBronAfnemer)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Keten_obvBronAfnemer','select ktn.naam
+,      ''#runreport#queryname=Filter_Applicaties_obvID&Applicatie_id=''||brn.id||''#''||brn.naam||''#''    as bronhouder
+,      ktn.ind_bronhouder_akkoord                                                                    as bronhouder_akkoord
+,      ''#runreport#queryname=Filter_Applicaties_obvID&Applicatie_id=''||afn.id||''#''||afn.naam||''#''    as afnemer
+,      ''#runreport#queryname=Filter_Berichtidentificatie_obvID&Berichtidentificatie_id=''||ktn.bid_id||''#''||bid.naam||''#''    as bericht_identificatie
+,      ktn.ind_actief
+,      ktn.dat_begin                   as begindatum
+,      ktn.dat_einde                   as einddatum
+,      ktn.omschrijving
+,      ''#runreport#queryname=Filter_KetenItems_obvKetenID&Keten_id=''||ktn.id||''#KetenItems#''         as ketenitems
+,      case when aantal_volgindicaties > 0
+            then ''#runreport#queryname=Filter_Volgindicaties_obvKetenNaam&Keten_naam=''||ktn.naam||''#''||ktn.aantal_volgindicaties||''#''
+            else null
+       end                                                                                           as volgindicaties
+from ( select ktn.*
+       ,    ( select count(1)
+              from   volgindicatiesafnemers via, bfk_applicatie app
+              where app.id = ktn.afnemer_id
+              and   via.applicatie_afnemer = app.naam) aantal_volgindicaties
+       from   bfk_keten   ktn
+     ) ktn
+,      bfk_applicatie               brn
+,      bfk_applicatie               afn
+,      bfk_bericht_identificatie    bid
+where  ktn.bronhouder_id = brn.id
+and    ktn.afnemer_id    = afn.id
+and    ktn.bid_id        = bid.id
+and    brn.naam          = nvl(:Bronhouder_Naam,brn.naam)
+and    afn.naam          = nvl(:Afnemer_Naam   ,afn.naam)'
+,'Ketencombinaties o.b.v. Bronhouder en/of Afnemer'
+,'De verschillende ketencombinaties t.b.v. het verarmen, verrijken en al dan niet doorzetten van berichten'||chr(10)||chr(10)||
+'Attribuut bronhouder_akkoord : geeft aan of de bronhouder de keten akkoord heeft bevonden
+Attribuut bericht_identificatie : de identificatie van het bericht waarvoor de keten bedoeld is
+Attribuut ketenitems : toont de onderliggende filters die voor de keten uitgevoerd moeten worden
+Attribuut volgindicaties : toont eventuele specifieke sleutels (van personen) die de afnemer wil volgen'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_KetenItems_obvKetenID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_KetenItems_obvKetenID','select   ''#runreport#queryname=Filter_Keten_obvNaam&Keten_naam=''||ktn.naam||''#''||ktn.naam||''#'' as ketennaam
+,        kti.ktn_id
+,        kti.volgorde_nr
+,        case when kti.rij_flt_id is null
+              then null
+              else ''#runreport#queryname=Filters_obvID&Filter_id=''||kti.rij_flt_id||''#''||rij.naam||''#''    
+         end                             as rij_filter
+,        kti.ind_rij_negatief
+,        case when kti.kolom_flt_id is null
+              then null
+              else ''#runreport#queryname=Filters_obvID&Filter_id=''||kti.kolom_flt_id||''#''||klm.naam||''#''
+         end                             as kolom_filter
+,        kti.ind_kolom_negatief
+,        kti.ind_actief
+,        kti.dat_begin                   as begindatum
+,        kti.dat_einde                   as einddatum   
+from     bfk_keten_item    kti
+,        bfk_keten         ktn
+,        bfk_filter        rij
+,        bfk_filter        klm
+where    kti.ktn_id       = ktn.id (+)
+and      kti.rij_flt_id   = rij.id (+)
+and      kti.kolom_flt_id = klm.id (+)
+and      kti.ktn_id       = nvl(:Keten_id,kti.ktn_id)
+order by kti.ktn_id
+,        kti.volgorde_nr'
+,'Keten Item combinaties o.b.v. KetenID'
+,'De verschillende filters in een keten t.b.v. het verarmen, verrijken en al dan niet doorzetten van berichten'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_KetenItems_obvFilterID)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_KetenItems_obvFilterID','select   ''#runreport#queryname=Filter_Keten_obvNaam&Keten_naam=''||ktn.naam||''#''||ktn.naam||''#'' as ketennaam
+,        kti.ktn_id
+,        kti.volgorde_nr
+,        case when kti.rij_flt_id is null
+              then null
+              else ''#runreport#queryname=Filters_obvID&Filter_id=''||kti.rij_flt_id||''#''||rij.naam||''#''
+         end                             as rij_filter
+,        kti.ind_rij_negatief
+,        case when kti.kolom_flt_id is null
+              then null
+              else ''#runreport#queryname=Filters_obvID&Filter_id=''||kti.kolom_flt_id||''#''||klm.naam||''#''
+         end                             as kolom_filter
+,        kti.ind_kolom_negatief
+,        kti.ind_actief
+,        kti.dat_begin                   as begindatum
+,        kti.dat_einde                   as einddatum
+from     bfk_keten_item    kti
+,        bfk_keten         ktn
+,        bfk_filter        rij
+,        bfk_filter        klm
+where    kti.ktn_id          = ktn.id (+)
+and      kti.rij_flt_id      = rij.id (+)
+and      kti.kolom_flt_id    = klm.id (+)
+and    (    kti.rij_flt_id   = nvl(:FilterID , kti.rij_flt_id   )
+         or kti.kolom_flt_id = nvl(:FilterID , kti.kolom_flt_id )
+       )
+order by kti.ktn_id
+,        kti.volgorde_nr'
+,'Keten Item combinaties o.b.v. FilterID'
+,'De verschillende filters in een keten t.b.v. het verarmen, verrijken en al dan niet doorzetten van berichten'||chr(10)||chr(10)||
+'Retourneert Keten Items waarbij de rij-filter overeenkomt met de gevraagde filter alsmede waarbij de kolom-filter overeenkomt'
+,'y',null);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (Filter_Volgindicaties_obvKetenNaam)
+REM ===============================================================================
+Insert into SQM_QUERIES (QUERYNAME,SQLSTATEMENT,SHORT_DESCRIPTION,DESCRIPTION,LOGUSAGE,REPORT_FORMAT) 
+values ('Filter_Volgindicaties_obvKetenNaam','select   ktn.naam
+,        vip.bsn
+,        vip.anummer
+,        vip.gemeentecode
+,        vip.abkr_sleutel
+,        vip.k2b_sleutel
+,        vip.dds_sleutel
+from     volgindicatiesafnemers via
+,        volgindicatiepersonen  vip
+,        bfk_applicatie         app
+,        bfk_keten              ktn
+where    ktn.naam = nvl(:Keten_naam,ktn.naam)
+and      app.id = ktn.afnemer_id
+and      via.applicatie_afnemer = app.naam
+and      vip.id = via.vip_id
+order by ktn.naam, vip.gemeentecode, vip.bsn'
+,'Volgindicaties behorende bij een filterketen'
+,'Alle volgindicaties die bij een filterketen zijn vastgelegd','y',null);
+--

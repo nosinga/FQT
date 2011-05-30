@@ -1,0 +1,112 @@
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het aanmaken van de queries m.b.t. PL/Sql Documentatie
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date$
+|||  Revision : $Revision$
+|||  Author   : $Author$
+|||  URL      : $URL$
+|||  ID       : $Id$
+|||------------------------------------------------------------------------
+**/
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_PLSQL_DOC)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('ATA_PLSQL_DOC', 'SELECT   object_name package_table_name
+,        object_type package_or_table
+,    CASE
+        WHEN object_type = ''PACKAGE''
+        THEN ''#runreport#queryname=ATA_PLSQL_DOC_documentation&packagename=''||object_name
+        WHEN object_type = ''TABLE''
+        THEN ''#runreport#queryname=ATA_PLSQL_DOC_tabledetails&table_name=''||object_name
+         END documentation
+,       ''#runreport#queryname=ATA_PLSQL_DOC_dependencies&objectname=''||object_name dependencies
+,    CASE
+        WHEN object_type = ''PACKAGE''
+        THEN ''#runreport#queryname=ATA_PLSQL_DOC_source&objectname=''||object_name
+         END source
+from     user_objects
+where    object_type in (''TABLE'',''PACKAGE'')
+and      lower(object_name) like lower(''%''||nvl(:package_or_table_name,object_name)||''%'')
+order    by 2, 1'
+,'ATA_PLSQL_DOC'
+, NULL, NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_PLSQL_DOC_dependencies)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('ATA_PLSQL_DOC_dependencies', 'select ABKR_PLSQL_DOC.plsql_tab_attribute(1,rownum) packagename
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(2,rownum) references
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(3,rownum) referencedby
+from   all_users, all_users, all_users, all_users
+where  rownum <= ABKR_PLSQL_DOC.plsql_tab_rowcount(''getdependencies''
+,''objectname'',:objectname
+)'
+,'ATA_PLSQL_DOC_dependencies'
+, NULL, NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_PLSQL_DOC_documentation)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('ATA_PLSQL_DOC_documentation', 'select ABKR_PLSQL_DOC.plsql_tab_attribute(1,rownum) package_name
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(2,rownum) procedure_name
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(3,rownum) textline
+from   all_users, all_users, all_users, all_users
+where  rownum <= ABKR_PLSQL_DOC.plsql_tab_rowcount(''getdocumentation''
+,''packagename'',:packagename
+,''procedurename'',:procedurename
+)'
+,'ATA_PLSQL_DOC_documentation'
+, NULL, NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_PLSQL_DOC_source)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION,DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('ATA_PLSQL_DOC_source', 'select ABKR_PLSQL_DOC.plsql_tab_attribute(1,rownum) object_name
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(2,rownum) object_type
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(3,rownum) text
+from   all_users, all_users, all_users, all_users
+where  rownum <= ABKR_PLSQL_DOC.plsql_tab_rowcount(''getsource''
+,''objectname'',:objectname
+,''objecttype'',:objecttype
+)'
+,'ATA_PLSQL_DOC_source'
+, NULL, NULL);
+--
+REM ===============================================================================
+PROMPT INSERTING into SQM_QUERIES (ATA_PLSQL_DOC_tabledetails)
+REM ===============================================================================
+Insert into SQM_QUERIES
+   (QUERYNAME, SQLSTATEMENT, SHORT_DESCRIPTION, DESCRIPTION, REPORT_FORMAT)
+ Values
+   ('ATA_PLSQL_DOC_tabledetails', 'select ABKR_PLSQL_DOC.plsql_tab_attribute(1,rownum) column_name
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(2,rownum) data_type
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(3,rownum) not_null
+,      ABKR_PLSQL_DOC.plsql_tab_attribute(4,rownum) comments
+from   all_users, all_users, all_users, all_users
+where  rownum <= ABKR_PLSQL_DOC.plsql_tab_rowcount(''gettabledetails''
+,''owner'',:owner
+,''table_name'',:table_name
+)'
+,'ATA_PLSQL_DOC_tabledetails'
+, NULL, NULL);
+

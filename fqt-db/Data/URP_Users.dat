@@ -1,0 +1,45 @@
+PROMPT file URP_Users.dat
+/**
+|||------------------------------------------------------------------------
+|||OMSCHRIJVING:
+|||  Script voor het toevoegen van diverse users
+|||
+|||PARAMETERS:
+|||
+|||OPMERKINGEN:
+|||  De idm_ids (user names) e103** zijn beschikbaar in IDM in de TAP straat.
+||| 
+|||SUBVERSION INFO : DO NOT CHANGE!!!!
+|||  Date     : $Date: 2011-01-26 08:30:33 +0100 (Wed, 26 Jan 2011) $
+|||  Revision : $Revision: 28895 $
+|||  Author   : $Author: ghelmers $
+|||  URL      : $URL: http://svn.ioo.rotterdam.nl/projecten/abkr/trunk/gm_xdb_ata/src/main/Data/URP_Users.dat $
+|||  ID       : $Id: URP_Users.dat 28895 2011-01-26 07:30:33Z ghelmers $
+|||------------------------------------------------------------------------
+**/
+--
+PROMPT Toevoegen USERS
+--
+REM    ===============================================================================
+PROMPT - Users IOO ATA
+REM    ===============================================================================
+exec urp_utils.addUser ( p_username => 'nanne.osinga@epsvenue.com');
+exec urp_utils.addUser ( p_username => 'wim@assai.nl');
+-- 
+REM    ===============================================================================
+PROMPT - Meta Users
+REM    ===============================================================================
+--- - Users META USERS
+--- ***
+--- -  meta users zijn een soort profiel users, hiermee hoor je niet aan te loggen
+--- -  deze users kunnen gebruikt worden om nieuwe users aan te maken
+--- -  alle rollen die een bepaald type user nodig heeft zit aan zo'n user toegevoegd 
+--- ***
+--- -  TODO alleen users met het juiste userdomain mogen aanloggen
+--- -       metausers hebben geen userdomain en kunnen dus ook niet aanloggen
+--
+exec urp_utils.addUser ( p_username => 'metauser_super_admin');
+exec urp_utils.addUser ( p_username => 'metauser_ata_usage');
+exec urp_utils.addUser ( p_username => 'metauser_classified');
+exec urp_utils.addUser ( p_username => 'metauser_projectdocumentcontrol_usage');
+exec urp_utils.addUser ( p_username => 'metauser_kkp_usage');
